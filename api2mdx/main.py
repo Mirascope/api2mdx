@@ -1,61 +1,35 @@
 #!/usr/bin/env python3
-"""Regenerate API documentation for Mirascope.
+"""Generate MDX API documentation from Python source code.
 
-This script:
-1. Clones/updates the Mirascope repository at the version specified in pyproject.toml
-2. Extracts the API documentation structure
-3. Generates MDX files with API documentation based on autodoc directives using Griffe
+This tool extracts API documentation from Python source code and generates
+MDX files for use with React-based documentation sites.
 
 Usage:
-  - `bun run apigen`: Regenerate all API documentation
-  - `bun run apigen pattern`: Regenerate only files matching the pattern
+  api2mdx --source-path ./src --package mypackage --output ./docs/api
 """
 
 import argparse
-import os
 import sys
 from pathlib import Path
 
-from scripts.apigen.config import ApiSourceConfig, ApiSourcesDict
-from scripts.apigen.doclinks_postprocessor import process_doc_links
-from scripts.apigen.documentation_generator import DocumentationGenerator
-
-# Configuration for API documentation sources
-# Maps repository/package to documentation target directory
-API_SOURCES: ApiSourcesDict = {
-    "mirascope": ApiSourceConfig(
-        repo="https://github.com/Mirascope/mirascope.git",
-        package="mirascope",
-        docs_path="api_ref",
-        content_subpath="docs/mirascope",
-        target_path="content/docs/mirascope/api",
-    ),
-    # Future configuration for lilypad-sdk would be added here
-    # "lilypad-sdk": ApiSourceConfig(
-    #     repo="https://github.com/Mirascope/lilypad-sdk.git",
-    #     package="lilypad_sdk",
-    #     docs_path="docs/api",
-    #     content_subpath="docs/lilypad",
-    #     target_path="content/docs/lilypad/api",
-    # ),
-}
-
-# Default source when only one is currently in use
-DEFAULT_SOURCE = "mirascope"
+from api2mdx.doclinks_postprocessor import process_doc_links
+from api2mdx.documentation_generator import DocumentationGenerator
 
 
-def process_source(
-    source_name: str,
-    source_config: ApiSourceConfig,
-    project_root: Path,
+def generate_documentation(
+    source_path: Path,
+    package: str,
+    docs_path: str,
+    output_path: Path,
     pattern: str | None = None,
 ) -> bool:
-    """Process a single API documentation source.
+    """Generate API documentation from source code.
 
     Args:
-        source_name: Name of the source
-        source_config: Configuration for the source
-        project_root: Root directory of the project
+        source_path: Path to the source code directory
+        package: Python package name to document
+        docs_path: Path within the package where docs are located
+        output_path: Path where generated documentation should be written
         pattern: Optional file pattern to regenerate only specific files
 
     Returns:
@@ -64,7 +38,7 @@ def process_source(
     """
     try:
         # Initialize the documentation generator
-        generator = DocumentationGenerator(source_config, project_root)
+        generator = DocumentationGenerator(source_path, package, docs_path, output_path)
         generator.setup()
 
         # Generate documentation
@@ -75,68 +49,18 @@ def process_source(
             generator.generate_all()
 
         # Process documentation links
-        target_dir = project_root / source_config.target_path
-        modified_count = process_doc_links(str(target_dir))
+        modified_count = process_doc_links(str(output_path))
         print(f"Processed documentation links, modified {modified_count} files")
 
-        print(f"Successfully processed {source_name}")
+        print(f"Successfully generated documentation for {package}")
         return True
     except Exception as e:
-        print(f"Error processing {source_name}: {e}", file=sys.stderr)
+        print(f"Error generating documentation: {e}", file=sys.stderr)
         return False
 
 
-def normalize_pattern(pattern: str | None) -> str | None:
-    """Normalize a file pattern to handle extension issues.
-
-    Strips the extension from the pattern to match files regardless of whether
-    they use .md or .mdx extensions.
-
-    Args:
-        pattern: The file pattern to normalize
-
-    Returns:
-        The normalized pattern
-
-    """
-    if not pattern:
-        return None
-
-    # If the pattern ends with a file extension (.md or .mdx), strip it
-    if pattern.endswith(".md") or pattern.endswith(".mdx"):
-        # Get the base name without extension
-        return os.path.splitext(pattern)[0]
-
-    return pattern
-
-
-def parse_source_pattern(pattern: str | None) -> tuple[str, str | None]:
-    """Parse a pattern that may include a source prefix.
-
-    If pattern includes a source prefix like "mirascope:core/call.mdx",
-    extract the source name and file pattern. Otherwise, use the default source.
-    The pattern's file extension will be stripped to work with any extension.
-
-    Args:
-        pattern: The pattern string, possibly with a source prefix
-
-    Returns:
-        Tuple of (source_name, file_pattern)
-
-    """
-    if pattern and ":" in pattern:
-        # Pattern includes a source prefix
-        source_name, file_pattern = pattern.split(":", 1)
-        if source_name not in API_SOURCES:
-            raise ValueError(f"Unknown API source '{source_name}' in pattern")
-        return source_name, normalize_pattern(file_pattern)
-
-    # No source prefix or no pattern at all
-    return DEFAULT_SOURCE, normalize_pattern(pattern)
-
-
 def main(cmd_args: list[str] | None = None) -> int:
-    """Execute the API documentation regeneration process.
+    """Execute the API documentation generation process.
 
     Args:
         cmd_args: Command line arguments
@@ -146,35 +70,48 @@ def main(cmd_args: list[str] | None = None) -> int:
 
     """
     parser = argparse.ArgumentParser(
-        description="Regenerate API documentation from source repositories."
+        description="Generate MDX API documentation from Python source code."
     )
     parser.add_argument(
-        "pattern",
-        nargs="?",
-        help=(
-            "Optional pattern to regenerate only matching files. "
-            "Will match regardless of whether files use .md or .mdx extensions. "
-            "Can include a source prefix like 'mirascope:core/call.mdx'"
-        ),
+        "--source-path",
+        type=Path,
+        required=True,
+        help="Path to the source code directory",
+    )
+    parser.add_argument(
+        "--package",
+        required=True,
+        help="Python package name to document",
+    )
+    parser.add_argument(
+        "--docs-path",
+        default="docs/api",
+        help="Path within the package where docs are located (default: docs/api)",
+    )
+    parser.add_argument(
+        "--output",
+        type=Path,
+        required=True,
+        help="Path where generated documentation should be written",
+    )
+    parser.add_argument(
+        "--pattern",
+        help="Optional pattern to regenerate only matching files",
     )
 
     parsed_args = parser.parse_args(cmd_args)
 
-    # Get the project root directory
-    project_root = Path(__file__).parent.parent.parent
+    print(f"Generating documentation for {parsed_args.package}...")
+    print(f"Source path: {parsed_args.source_path}")
+    print(f"Output path: {parsed_args.output}")
 
-    # Determine the source and pattern
-    source_name, file_pattern = parse_source_pattern(parsed_args.pattern)
-
-    source_config = API_SOURCES[source_name]
-    print(f"\nProcessing {source_name}...")
-
-    # Generate documentation with or without a pattern
-    success = process_source(
-        source_name,
-        source_config,
-        project_root,
-        file_pattern,
+    # Generate documentation
+    success = generate_documentation(
+        source_path=parsed_args.source_path,
+        package=parsed_args.package,
+        docs_path=parsed_args.docs_path,
+        output_path=parsed_args.output,
+        pattern=parsed_args.pattern,
     )
 
     return 0 if success else 1

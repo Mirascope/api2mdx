@@ -25,11 +25,11 @@ from griffe import (
     Parser,
 )
 
-from scripts.apigen.doclinks import UpdateDocstringsExtension
-from scripts.apigen.mdx_renderer import (
+from api2mdx.doclinks import UpdateDocstringsExtension
+from api2mdx.mdx_renderer import (
     render_object,
 )
-from scripts.apigen.models import (
+from api2mdx.models import (
     process_object,
 )
 
@@ -38,14 +38,14 @@ MODULE_CONTENT_SUBPATH = "docs/mirascope"
 
 
 def get_loader(
-    source_repo_path: Path,
+    source_path: Path,
     content_dir: Path | None = None,
     content_subpath: str | None = None,
 ) -> GriffeLoader:
     """Create a configured Griffe loader.
 
     Args:
-        source_repo_path: Path to the source repository
+        source_path: Path to the source code directory
         content_dir: Path to the content directory for the doclinks extension
         content_subpath: Subpath (eg /docs/mirascope) for local link evaluation
 

@@ -13,17 +13,17 @@ import sys
 from pathlib import Path
 from typing import Any
 
-from scripts.apigen.admonition_converter import convert_admonitions
-from scripts.apigen.config import ApiSourceConfig
-from scripts.apigen.griffe_integration import (
+from api2mdx.admonition_converter import convert_admonitions
+from api2mdx.config import ApiSourceConfig
+from api2mdx.griffe_integration import (
     get_loader,
     process_directive_with_error_handling,
 )
-from scripts.apigen.meta import (
+from api2mdx.meta import (
     generate_meta_file_content,
     generate_meta_from_organized_files,
 )
-from scripts.apigen.structure import organize_api_files
+from api2mdx.structure import organize_api_files
 
 
 class DocumentationGenerator:
@@ -44,36 +44,35 @@ class DocumentationGenerator:
 
     """
 
-    def __init__(self, config: ApiSourceConfig, project_root: Path) -> None:
+    def __init__(self, source_path: Path, package: str, docs_path: str, output_path: Path) -> None:
         """Initialize the DocumentationGenerator.
 
         Args:
-            config: Configuration with repo, package, docs_path, and target_path
-            project_root: Root directory of the project
-            version: Version of the package to document
+            source_path: Path to the source code directory
+            package: Python package name to document
+            docs_path: Path within the package where docs are located
+            output_path: Path where generated documentation should be written
 
         """
-        self.config = config
-        self.project_root = project_root
-        self.repo_path: Path | None = None
+        self.source_path = source_path
+        self.package = package
+        self.docs_path = docs_path
+        self.output_path = output_path
         self.module: Any | None = None
         self.organized_files: dict[str, list[Path]] | None = None
 
     def setup(self) -> "DocumentationGenerator":
-        """Set up the generator by cloning repo, loading module, organizing files.
+        """Set up the generator by loading module and organizing files.
 
         Returns:
             Self for method chaining
 
         """
-        # Clone or update the repository
-        self.repo_path = self._clone_or_update_repo()
-
         # Load the module
         self.module = self._load_module()
 
         # Organize files
-        api_docs_path = self.repo_path / self.config.docs_path
+        api_docs_path = self.source_path / self.docs_path
         self.organized_files = organize_api_files(api_docs_path)
         file_count = sum(len(files) for files in self.organized_files.values())
         print(f"Found {file_count} API documentation files")
@@ -86,10 +85,9 @@ class DocumentationGenerator:
             raise RuntimeError("Setup must be called before generating documentation")
 
         # Clear target directory if it exists
-        target_path = self.project_root / self.config.target_path
-        if target_path.exists():
-            shutil.rmtree(target_path)
-        target_path.mkdir(parents=True, exist_ok=True)
+        if self.output_path.exists():
+            shutil.rmtree(self.output_path)
+        self.output_path.mkdir(parents=True, exist_ok=True)
 
         # Create index file
         self._create_index_file()
@@ -109,16 +107,12 @@ class DocumentationGenerator:
             file_path: Path to the source file relative to the docs_path
 
         """
-        if not self.repo_path or not self.module:
+        if not self.module:
             raise RuntimeError("Setup must be called before generating documentation")
 
         try:
-            src_path = self.repo_path / self.config.docs_path / file_path
-            target_path = (
-                self.project_root
-                / self.config.target_path
-                / file_path.with_suffix(".mdx")
-            )
+            src_path = self.source_path / self.docs_path / file_path
+            target_path = self.output_path / file_path.with_suffix(".mdx")
 
             # Ensure target directory exists
             target_path.parent.mkdir(exist_ok=True, parents=True)
@@ -142,11 +136,10 @@ class DocumentationGenerator:
             raise RuntimeError("Setup must be called before generating documentation")
 
         found = False
-        target_path = self.project_root / self.config.target_path
-        target_path.mkdir(parents=True, exist_ok=True)
+        self.output_path.mkdir(parents=True, exist_ok=True)
 
         # Create index file if it doesn't exist
-        index_path = target_path / "index.mdx"
+        index_path = self.output_path / "index.mdx"
         if not index_path.exists():
             self._create_index_file()
 
@@ -173,48 +166,6 @@ class DocumentationGenerator:
             print("Regenerating metadata file...")
             self._generate_meta_file()
 
-    def _clone_or_update_repo(self) -> Path:
-        """Clone or update the source repository.
-
-        Returns:
-            Path to the cloned repository
-
-        """
-        # Use a persistent repository directory to avoid repeated clones
-        repo_dir = self.project_root / ".api-generation-repos"
-        repo_dir.mkdir(exist_ok=True)
-
-        # Get repository name from URL
-        repo_name = self.config.repo.split("/")[-1].replace(".git", "")
-        repo_path = repo_dir / f"{repo_name}-repo"
-
-        # Clone or update the repository
-        if repo_path.exists():
-            print(f"Updating repository at {repo_path}...")
-            subprocess.run(
-                ["git", "-C", str(repo_path), "fetch", "--all"],
-                check=True,
-            )
-        else:
-            print(f"Cloning repository to {repo_path}...")
-            subprocess.run(
-                ["git", "clone", self.config.repo, str(repo_path)],
-                check=True,
-            )
-
-        # Checkout origin/main
-
-        try:
-            subprocess.run(
-                ["git", "-C", str(repo_path), "checkout", "origin/main"],
-                check=True,
-                capture_output=True,
-            )
-        except subprocess.CalledProcessError:
-            print("Warning: Could not checkout origin/mainh")
-
-        return repo_path
-
     def _load_module(self) -> Any:
         """Load the module using Griffe.
 
@@ -222,23 +173,12 @@ class DocumentationGenerator:
             Loaded Griffe module
 
         """
-        if not self.repo_path:
-            raise RuntimeError("Repository must be cloned before loading module")
-
         try:
-            # Add repo path to sys.path temporarily
-            sys.path.insert(0, str(self.repo_path))
+            # Add source path to sys.path temporarily
+            sys.path.insert(0, str(self.source_path))
 
-            # Get content directory for doclinks extension
-            content_dir = self.project_root / "content"
-
-            content_subpath = None
-            # Get content subpath from config
-            if hasattr(self.config, "content_subpath") and self.config.content_subpath:
-                content_subpath = self.config.content_subpath
-
-            # Load the module with doclinks extension
-            loader = get_loader(self.repo_path, content_dir, content_subpath)
+            # Load the module with basic loader
+            loader = get_loader(self.source_path)
 
             # Try to preload common external dependencies to improve alias resolution
             common_dependencies = [
@@ -262,7 +202,7 @@ class DocumentationGenerator:
                     print(f"Info: {dep} preload skipped: {e}")
 
             # Load the main module
-            module = loader.load(self.config.package)
+            module = loader.load(self.package)
 
             # Handle alias resolution errors gracefully
             try:
@@ -271,12 +211,12 @@ class DocumentationGenerator:
                 print(f"Warning: Some aliases could not be resolved: {e}")
                 print("Documentation generation will continue despite this warning.")
 
-            print(f"Loaded module {self.config.package}")
+            print(f"Loaded module {self.package}")
             return module
         finally:
             # Clean up sys.path
-            if str(self.repo_path) in sys.path:
-                sys.path.remove(str(self.repo_path))
+            if str(self.source_path) in sys.path:
+                sys.path.remove(str(self.source_path))
 
     def _process_file(self, src_path: Path, target_path: Path) -> None:
         """Process a source file and generate the corresponding MDX file.
@@ -314,9 +254,7 @@ class DocumentationGenerator:
             f.write(f"# {title}\n\n")
 
             # Get the relative file path for the API component
-            relative_path = target_path.relative_to(
-                self.project_root / self.config.target_path
-            )
+            relative_path = target_path.relative_to(self.output_path)
             doc_path = str(relative_path.with_suffix(""))  # Remove .mdx extension
 
             # Process the content line by line
@@ -351,11 +289,8 @@ class DocumentationGenerator:
 
     def _create_index_file(self) -> None:
         """Create the index.mdx file in the target directory."""
-        if not self.repo_path:
-            raise RuntimeError("Repository must be cloned before creating index file")
-
-        index_path = self.project_root / self.config.target_path / "index.mdx"
-        product_name = self.config.target_path.split("/")[-2].title()
+        index_path = self.output_path / "index.mdx"
+        product_name = self.package.title()
 
         with open(index_path, "w") as f:
             f.write("---\n")
@@ -390,7 +325,7 @@ class DocumentationGenerator:
         content = generate_meta_file_content(api_section, "apiMeta")
 
         # Write to file
-        meta_path = self.project_root / self.config.target_path / "_meta.ts"
+        meta_path = self.output_path / "_meta.ts"
         with open(meta_path, "w") as f:
             f.write(content)
         print(f"Generated API meta file at {meta_path}")
