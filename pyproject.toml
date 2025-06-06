@@ -26,4 +26,6 @@ include = [
 ]
 exclude = [
     "**/__pycache__",
+    ".venv",
+    "venv",
 ]

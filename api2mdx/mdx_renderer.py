@@ -7,7 +7,7 @@ with pre-processed data models rather than directly with Griffe objects.
 
 import json
 
-from scripts.apigen.models import (
+from api2mdx.models import (
     ProcessedAlias,
     ProcessedAttribute,
     ProcessedClass,
@@ -15,7 +15,7 @@ from scripts.apigen.models import (
     ProcessedModule,
     ProcessedObject,
 )
-from scripts.apigen.type_model import EnumEncoder, ParameterInfo
+from api2mdx.type_model import EnumEncoder, ParameterInfo
 
 
 def render_object(processed_obj: ProcessedObject, doc_path: str) -> str:

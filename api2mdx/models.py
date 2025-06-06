@@ -19,9 +19,9 @@ from griffe import (
     Object,
 )
 
-from scripts.apigen.parser import parse_type_string
-from scripts.apigen.type_extractor import extract_attribute_type_info, extract_type_info
-from scripts.apigen.type_model import ParameterInfo, ReturnInfo, SimpleType, TypeInfo
+from api2mdx.parser import parse_type_string
+from api2mdx.type_extractor import extract_attribute_type_info, extract_type_info
+from api2mdx.type_model import ParameterInfo, ReturnInfo, SimpleType, TypeInfo
 
 # Configure logging
 logging.basicConfig(
