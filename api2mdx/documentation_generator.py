@@ -14,7 +14,7 @@ from pathlib import Path
 from typing import Any
 
 from api2mdx.admonition_converter import convert_admonitions
-from api2mdx.api_discovery import discover_api_directives
+from api2mdx.api_discovery import discover_hierarchical_directives
 from api2mdx.config import ApiSourceConfig
 from api2mdx.griffe_integration import (
     get_loader,
@@ -73,7 +73,7 @@ class DocumentationGenerator:
         self.module = self._load_module()
 
         # Discover API directives from module structure
-        self.api_directives = discover_api_directives(self.module)
+        self.api_directives = discover_hierarchical_directives(self.module)
         print(f"Discovered {len(self.api_directives)} API directives")
 
         return self

@@ -73,7 +73,7 @@ def discover_api_directives(module: Module) -> list[tuple[str, str]]:
 def _get_module_exports(module: Module) -> list[str]:
     """Get the list of exports from a module.
     
-    Checks for __all__ first, falls back to public members (no underscore prefix).
+    Checks for __all__ first, falls back to meaningful public members.
     
     Args:
         module: The module to analyze
@@ -85,8 +85,43 @@ def _get_module_exports(module: Module) -> list[str]:
     if hasattr(module, 'all') and module.all:
         return list(module.all)
     
-    # Fallback to public members (no underscore prefix)
-    return [name for name in module.members.keys() if not name.startswith('_')]
+    # Fallback to meaningful public members, excluding common imports and type vars
+    excluded_names = {
+        # Common stdlib imports that shouldn't be documented
+        'ABC', 'abstractmethod', 'dataclass', 'Any', 'Generic', 'ParamSpec', 
+        'TypeVar', 'Callable', 'Union', 'Optional', 'List', 'Dict', 'Tuple',
+        'Sequence', 'Iterator', 'Literal', 'TypeAlias', 'Final', 'ClassVar',
+        'Protocol', 'runtime_checkable', 'overload', 'TYPE_CHECKING',
+        'annotations', 'Unpack', 'Self', 'Concatenate', 'Required', 'NotRequired',
+        
+        # Common single-letter type variables
+        'T', 'U', 'V', 'K', 'P', 'R', 'S', 'Args', 'Kwargs',
+        
+        # Common response type variables that are implementation details
+        'ResponseT', 'ClientT', 'ParamsT', 'MessageT', 'DepsT', 'NoDepsT'
+    }
+    
+    exports = []
+    for name, member in module.members.items():
+        # Skip private members
+        if name.startswith('_'):
+            continue
+        
+        # Skip excluded common imports and type variables
+        if name in excluded_names:
+            continue
+            
+        # Skip single-letter names that are likely type variables
+        if len(name) == 1 and name.isupper():
+            continue
+            
+        # Include classes, functions, and meaningful submodules
+        if hasattr(member, 'kind') and member.kind in ('class', 'function', 'module'):
+            exports.append(name)
+        elif isinstance(member, (Class, Function, Module)):
+            exports.append(name)
+    
+    return exports
 
 
 def _discover_member_directives(

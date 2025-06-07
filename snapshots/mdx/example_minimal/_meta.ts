@@ -20,8 +20,13 @@ export const apiMeta: SectionSpec = {
           weight: 0.25
         },
         {
-          slug: "Call",
-          label: "Call",
+          slug: "Response",
+          label: "Response",
+          weight: 0.25
+        },
+        {
+          slug: "Stream",
+          label: "Stream",
           weight: 0.25
         },
         {
@@ -30,8 +35,18 @@ export const apiMeta: SectionSpec = {
           weight: 0.25
         },
         {
+          slug: "Call",
+          label: "Call",
+          weight: 0.25
+        },
+        {
           slug: "call_decorator",
           label: "Call Decorator",
+          weight: 0.25
+        },
+        {
+          slug: "StructuredCall",
+          label: "Structuredcall",
           weight: 0.25
         }
       ]

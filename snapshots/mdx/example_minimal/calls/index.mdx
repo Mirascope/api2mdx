@@ -6,152 +6,36 @@ description: API documentation for calls
 
 # calls
 
-## <ApiType type="Module" path="calls/index" symbolName="example-py-minimal" /> example-py-minimal
+A minimal calls module for testing api2mdx documentation generation.
 
-A minimal example package for testing api2mdx.
+This module demonstrates various Python patterns that api2mdx should handle:
+- Classes with inheritance
+- Generic types
+- Async methods
+- Decorators
+- Complex docstrings with parameters and returns
 
-## <ApiType type="Alias" path="calls/index" symbolName="Call" /> Call
+## <ApiType type="Class" path="calls/index" symbolName="Response" /> Response
 
-A standard LLM call implementation.
+A response from an LLM call.
 
-This class implements the BaseCall interface for synchronous and
-asynchronous LLM interactions. It supports both regular responses
-and streaming responses.
+## <ApiType type="Class" path="calls/index" symbolName="Stream" /> Stream
 
+A streaming response from an LLM.
 
-**Alias to:** `example-py-minimal.calls.Call`
-
-## <ApiType type="Alias" path="calls/index" symbolName="BaseCall" /> BaseCall
+## <ApiType type="Class" path="calls/index" symbolName="BaseCall" /> BaseCall
 
 Abstract base class for LLM calls.
 
-This class provides the foundation for all LLM call implementations.
-It defines the common interface and shared functionality.
+## <ApiType type="Class" path="calls/index" symbolName="Call" /> Call
 
+A standard LLM call implementation.
 
-**Alias to:** `example-py-minimal.calls.BaseCall`
-
-## <ApiType type="Alias" path="calls/index" symbolName="call_decorator" /> call_decorator
+## <ApiType type="Function" path="calls/index" symbolName="call_decorator" /> call_decorator
 
 Decorator that converts a function into a Call instance.
 
-This decorator allows you to easily convert prompt template functions
-into LLM calls by adding the @call_decorator annotation.
+## <ApiType type="Class" path="calls/index" symbolName="StructuredCall" /> StructuredCall
 
-<ParametersTable
-  parameters={[
-  {
-    "name": "model",
-    "type_info": {
-      "type_str": "str",
-      "description": null,
-      "kind": "simple",
-      "doc_url": "https://docs.python.org/3/library/stdtypes.html#str"
-    },
-    "default": "'default-model'",
-    "description": "The LLM model to use for the call"
-  },
-  {
-    "name": "temperature",
-    "type_info": {
-      "type_str": "float",
-      "description": null,
-      "kind": "simple",
-      "doc_url": "https://docs.python.org/3/library/functions.html#float"
-    },
-    "default": "0.7",
-    "description": "Controls randomness in responses (0.0 to 1.0)"
-  },
-  {
-    "name": "max_tokens",
-    "type_info": {
-      "type_str": "int",
-      "description": null,
-      "kind": "simple",
-      "doc_url": "https://docs.python.org/3/library/functions.html#int"
-    },
-    "default": "1000",
-    "description": "Maximum number of tokens to generate"
-  }
-]}
-/>
-
-<ReturnTable
-  returnType={{
-  "type_info": {
-    "type_str": "Callable[[Callable[P, str]], Call[P]]",
-    "description": null,
-    "kind": "callable",
-    "base_type": {
-      "type_str": "Callable",
-      "description": null,
-      "kind": "simple",
-      "doc_url": "https://docs.python.org/3/library/typing.html#typing.Callable"
-    },
-    "parameters": [
-      {
-        "type_str": "[Callable[P, str]]",
-        "description": null,
-        "kind": "tuple",
-        "base_type": {
-          "type_str": "tuple",
-          "description": null,
-          "kind": "simple",
-          "doc_url": "https://docs.python.org/3/library/stdtypes.html#tuple"
-        },
-        "parameters": [
-          {
-            "type_str": "Callable[P, str]",
-            "description": null,
-            "kind": "callable",
-            "base_type": {
-              "type_str": "Callable",
-              "description": null,
-              "kind": "simple",
-              "doc_url": "https://docs.python.org/3/library/typing.html#typing.Callable"
-            },
-            "parameters": [
-              {
-                "type_str": "P",
-                "description": null,
-                "kind": "simple",
-                "doc_identifier": "P"
-              },
-              {
-                "type_str": "str",
-                "description": null,
-                "kind": "simple",
-                "doc_url": "https://docs.python.org/3/library/stdtypes.html#str"
-              }
-            ]
-          }
-        ]
-      },
-      {
-        "type_str": "Call[P]",
-        "description": null,
-        "kind": "generic",
-        "base_type": {
-          "type_str": "Call",
-          "description": null,
-          "kind": "simple",
-          "doc_url": "/docs/mirascope/api/calls/Call#call"
-        },
-        "parameters": [
-          {
-            "type_str": "P",
-            "description": null,
-            "kind": "simple",
-            "doc_identifier": "P"
-          }
-        ]
-      }
-    ]
-  },
-  "description": "A decorator function that creates Call instances"
-}}
-/>
-
-
-**Alias to:** `example-py-minimal.calls.call_decorator`
+A call that returns structured data instead of plain text.
 

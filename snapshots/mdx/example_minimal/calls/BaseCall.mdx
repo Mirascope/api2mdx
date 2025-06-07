@@ -6,40 +6,18 @@ description: API documentation for BaseCall
 
 # BaseCall
 
-## <ApiType type="Module" path="calls/BaseCall" symbolName="example-py-minimal" /> example-py-minimal
-
-A minimal example package for testing api2mdx.
-
-## <ApiType type="Alias" path="calls/BaseCall" symbolName="Call" /> Call
-
-A standard LLM call implementation.
-
-This class implements the BaseCall interface for synchronous and
-asynchronous LLM interactions. It supports both regular responses
-and streaming responses.
-
-
-**Alias to:** `example-py-minimal.calls.Call`
-
-## <ApiType type="Alias" path="calls/BaseCall" symbolName="BaseCall" /> BaseCall
+## <ApiType type="Class" path="calls/BaseCall" symbolName="BaseCall" /> BaseCall
 
 Abstract base class for LLM calls.
 
 This class provides the foundation for all LLM call implementations.
 It defines the common interface and shared functionality.
 
+**Bases:** 
+<TypeLink type={{"type_str": "Generic[P, ResponseT]", "description": null, "kind": "generic", "base_type": {"type_str": "Generic", "description": null, "kind": "simple", "doc_url": "https://docs.python.org/3/library/typing.html#typing.Generic"}, "parameters": [{"type_str": "P", "description": null, "kind": "simple", "doc_identifier": "P"}, {"type_str": "ResponseT", "description": null, "kind": "simple", "doc_url": "/docs/mirascope/api/calls/index#response"}]}} />, <TypeLink type={{"type_str": "ABC", "description": null, "kind": "simple", "doc_identifier": "ABC"}} />
 
-**Alias to:** `example-py-minimal.calls.BaseCall`
-
-## <ApiType type="Alias" path="calls/BaseCall" symbolName="call_decorator" /> call_decorator
-
-Decorator that converts a function into a Call instance.
-
-This decorator allows you to easily convert prompt template functions
-into LLM calls by adding the @call_decorator annotation.
-
-<ParametersTable
-  parameters={[
+<AttributesTable
+  attributes={[
   {
     "name": "model",
     "type_info": {
@@ -47,9 +25,7 @@ into LLM calls by adding the @call_decorator annotation.
       "description": null,
       "kind": "simple",
       "doc_url": "https://docs.python.org/3/library/stdtypes.html#str"
-    },
-    "default": "'default-model'",
-    "description": "The LLM model to use for the call"
+    }
   },
   {
     "name": "temperature",
@@ -58,9 +34,7 @@ into LLM calls by adding the @call_decorator annotation.
       "description": null,
       "kind": "simple",
       "doc_url": "https://docs.python.org/3/library/functions.html#float"
-    },
-    "default": "0.7",
-    "description": "Controls randomness in responses (0.0 to 1.0)"
+    }
   },
   {
     "name": "max_tokens",
@@ -69,9 +43,45 @@ into LLM calls by adding the @call_decorator annotation.
       "description": null,
       "kind": "simple",
       "doc_url": "https://docs.python.org/3/library/functions.html#int"
+    }
+  }
+]}
+/>
+
+## <ApiType type="Function" path="calls/BaseCall" symbolName="call_async" /> call_async
+
+Execute the call asynchronously.
+
+<ParametersTable
+  parameters={[
+  {
+    "name": "self",
+    "type_info": {
+      "type_str": "Any",
+      "description": null,
+      "kind": "simple",
+      "doc_identifier": null
+    }
+  },
+  {
+    "name": "args",
+    "type_info": {
+      "type_str": "P.args",
+      "description": null,
+      "kind": "simple",
+      "doc_identifier": "P.args"
     },
-    "default": "1000",
-    "description": "Maximum number of tokens to generate"
+    "default": "()"
+  },
+  {
+    "name": "kwargs",
+    "type_info": {
+      "type_str": "P.kwargs",
+      "description": null,
+      "kind": "simple",
+      "doc_identifier": "P.kwargs"
+    },
+    "default": "{}"
   }
 ]}
 />
@@ -79,79 +89,13 @@ into LLM calls by adding the @call_decorator annotation.
 <ReturnTable
   returnType={{
   "type_info": {
-    "type_str": "Callable[[Callable[P, str]], Call[P]]",
+    "type_str": "ResponseT",
     "description": null,
-    "kind": "callable",
-    "base_type": {
-      "type_str": "Callable",
-      "description": null,
-      "kind": "simple",
-      "doc_url": "https://docs.python.org/3/library/typing.html#typing.Callable"
-    },
-    "parameters": [
-      {
-        "type_str": "[Callable[P, str]]",
-        "description": null,
-        "kind": "tuple",
-        "base_type": {
-          "type_str": "tuple",
-          "description": null,
-          "kind": "simple",
-          "doc_url": "https://docs.python.org/3/library/stdtypes.html#tuple"
-        },
-        "parameters": [
-          {
-            "type_str": "Callable[P, str]",
-            "description": null,
-            "kind": "callable",
-            "base_type": {
-              "type_str": "Callable",
-              "description": null,
-              "kind": "simple",
-              "doc_url": "https://docs.python.org/3/library/typing.html#typing.Callable"
-            },
-            "parameters": [
-              {
-                "type_str": "P",
-                "description": null,
-                "kind": "simple",
-                "doc_identifier": "P"
-              },
-              {
-                "type_str": "str",
-                "description": null,
-                "kind": "simple",
-                "doc_url": "https://docs.python.org/3/library/stdtypes.html#str"
-              }
-            ]
-          }
-        ]
-      },
-      {
-        "type_str": "Call[P]",
-        "description": null,
-        "kind": "generic",
-        "base_type": {
-          "type_str": "Call",
-          "description": null,
-          "kind": "simple",
-          "doc_url": "/docs/mirascope/api/calls/Call#call"
-        },
-        "parameters": [
-          {
-            "type_str": "P",
-            "description": null,
-            "kind": "simple",
-            "doc_identifier": "P"
-          }
-        ]
-      }
-    ]
+    "kind": "simple",
+    "doc_url": "/docs/mirascope/api/calls/index#response"
   },
-  "description": "A decorator function that creates Call instances"
+  "description": "The response from the LLM"
 }}
 />
 
-
-**Alias to:** `example-py-minimal.calls.call_decorator`
 
