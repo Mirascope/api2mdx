@@ -14,6 +14,7 @@ from pathlib import Path
 from typing import Any
 
 from api2mdx.admonition_converter import convert_admonitions
+from api2mdx.api_discovery import discover_api_directives
 from api2mdx.config import ApiSourceConfig
 from api2mdx.griffe_integration import (
     get_loader,
@@ -21,7 +22,7 @@ from api2mdx.griffe_integration import (
 )
 from api2mdx.meta import (
     generate_meta_file_content,
-    generate_meta_from_organized_files,
+    generate_meta_from_directives,
 )
 from api2mdx.structure import organize_api_files
 
@@ -59,10 +60,10 @@ class DocumentationGenerator:
         self.docs_path = docs_path
         self.output_path = output_path
         self.module: Any | None = None
-        self.organized_files: dict[str, list[Path]] | None = None
+        self.api_directives: list[tuple[str, str]] | None = None
 
     def setup(self) -> "DocumentationGenerator":
-        """Set up the generator by loading module and organizing files.
+        """Set up the generator by loading module and discovering API structure.
 
         Returns:
             Self for method chaining
@@ -71,17 +72,15 @@ class DocumentationGenerator:
         # Load the module
         self.module = self._load_module()
 
-        # Organize files
-        api_docs_path = self.source_path / self.docs_path
-        self.organized_files = organize_api_files(api_docs_path)
-        file_count = sum(len(files) for files in self.organized_files.values())
-        print(f"Found {file_count} API documentation files")
+        # Discover API directives from module structure
+        self.api_directives = discover_api_directives(self.module)
+        print(f"Discovered {len(self.api_directives)} API directives")
 
         return self
 
     def generate_all(self) -> None:
         """Generate all documentation files."""
-        if not self.organized_files:
+        if not self.api_directives:
             raise RuntimeError("Setup must be called before generating documentation")
 
         # Clear target directory if it exists
@@ -89,16 +88,36 @@ class DocumentationGenerator:
             shutil.rmtree(self.output_path)
         self.output_path.mkdir(parents=True, exist_ok=True)
 
-        # Create index file
-        self._create_index_file()
-
-        # Generate all files
-        for _, files in self.organized_files.items():
-            for file_path in files:
-                self.generate_file(file_path)
+        # Generate files from discovered directives
+        for directive, output_path in self.api_directives:
+            self.generate_directive(directive, output_path)
 
         # Generate metadata
         self._generate_meta_file()
+
+    def generate_directive(self, directive: str, output_path: str) -> None:
+        """Generate documentation for a specific directive.
+
+        Args:
+            directive: The API directive (e.g., ":::package.module.Class")
+            output_path: Relative path for the output file (e.g., "module/Class.mdx")
+
+        """
+        if not self.module:
+            raise RuntimeError("Setup must be called before generating documentation")
+
+        try:
+            target_path = self.output_path / output_path
+
+            # Ensure target directory exists
+            target_path.parent.mkdir(exist_ok=True, parents=True)
+
+            # Process directive
+            self._process_directive(directive, target_path)
+        except Exception as e:
+            print(f"ERROR: Failed to process directive {directive}: {e}")
+            # Re-raise the exception to maintain the original behavior
+            raise
 
     def generate_file(self, file_path: Path) -> None:
         """Generate documentation for a specific file.
@@ -124,43 +143,33 @@ class DocumentationGenerator:
             # Re-raise the exception to maintain the original behavior
             raise
 
-    def generate_selected(self, file_pattern: str, skip_meta: bool = True) -> None:
-        """Generate documentation only for files matching the pattern.
+    def generate_selected(self, pattern: str, skip_meta: bool = True) -> None:
+        """Generate documentation only for directives matching the pattern.
 
         Args:
-            file_pattern: Pattern to match against file paths
+            pattern: Pattern to match against directive or output paths
             skip_meta: Whether to skip metadata generation (default: True)
 
         """
-        if not self.organized_files:
+        if not self.api_directives:
             raise RuntimeError("Setup must be called before generating documentation")
 
         found = False
         self.output_path.mkdir(parents=True, exist_ok=True)
 
-        # Create index file if it doesn't exist
-        index_path = self.output_path / "index.mdx"
-        if not index_path.exists():
-            self._create_index_file()
-
-        for _, files in self.organized_files.items():
-            for file_path in files:
-                # Check if file matches pattern - with/without extension
-                file_str = str(file_path)
-                base_name = str(file_path.with_suffix(""))
-
-                if (
-                    fnmatch.fnmatch(file_str, file_pattern)
-                    or fnmatch.fnmatch(file_str, file_pattern + ".md")
-                    or fnmatch.fnmatch(file_str, file_pattern + ".mdx")
-                    or fnmatch.fnmatch(base_name, file_pattern)
-                ):
-                    print(f"Generating: {file_path}")
-                    self.generate_file(file_path)
-                    found = True
+        for directive, output_path in self.api_directives:
+            # Check if directive or output path matches pattern
+            if (
+                fnmatch.fnmatch(directive, pattern)
+                or fnmatch.fnmatch(output_path, pattern)
+                or fnmatch.fnmatch(output_path.replace(".mdx", ""), pattern)
+            ):
+                print(f"Generating: {directive} -> {output_path}")
+                self.generate_directive(directive, output_path)
+                found = True
 
         if not found:
-            print(f"No files matched pattern: {file_pattern}")
+            print(f"No directives matched pattern: {pattern}")
         elif not skip_meta:
             # Regenerate metadata only if skip_meta is False
             print("Regenerating metadata file...")
@@ -287,6 +296,44 @@ class DocumentationGenerator:
                     f.write(line)
                     f.write("\n")
 
+    def _process_directive(self, directive: str, target_path: Path) -> None:
+        """Process a directive and generate the corresponding MDX file.
+
+        Args:
+            directive: The API directive to process
+            target_path: Path to the target MDX file
+
+        """
+        if not self.module:
+            raise RuntimeError("Module must be loaded before processing directives")
+
+        # Extract title from directive (e.g., ":::package.module.Class" -> "Class")
+        directive_parts = directive.replace(":::", "").split(".")
+        title = directive_parts[-1]
+        if title == directive_parts[0]:  # Main module (e.g., "example-py-minimal")
+            title = f"{directive_parts[0].replace('-', ' ').title()} API"
+
+        # Get the relative file path for the API component
+        relative_path = target_path.relative_to(self.output_path)
+        doc_path = str(relative_path.with_suffix(""))  # Remove .mdx extension
+
+        # Write the target file with frontmatter and processed content
+        with open(target_path, "w") as f:
+            f.write("---\n")
+            # Add auto-generation notice as a comment in the frontmatter
+            f.write("# AUTO-GENERATED API DOCUMENTATION - DO NOT EDIT\n")
+            f.write(f"title: {title}\n")
+            f.write(f"description: API documentation for {title}\n")
+            f.write("---\n\n")
+            f.write(f"# {title}\n\n")
+
+            # Process the directive
+            doc_content = process_directive_with_error_handling(
+                directive, self.module, doc_path
+            )
+            f.write(doc_content)
+            f.write("\n")
+
     def _create_index_file(self) -> None:
         """Create the index.mdx file in the target directory."""
         index_path = self.output_path / "index.mdx"
@@ -314,12 +361,12 @@ class DocumentationGenerator:
 
     def _generate_meta_file(self) -> None:
         """Generate metadata file and format it with prettier."""
-        if not self.organized_files:
-            raise RuntimeError("Files must be organized before generating metadata")
+        if not self.api_directives:
+            raise RuntimeError("API directives must be discovered before generating metadata")
 
         # Generate the metadata with weight 0.25 (API reference sections have lower weight)
-        api_section = generate_meta_from_organized_files(
-            self.organized_files,
+        api_section = generate_meta_from_directives(
+            self.api_directives,
             weight=0.25,  # API reference has lower weight in search results
         )
         content = generate_meta_file_content(api_section, "apiMeta")

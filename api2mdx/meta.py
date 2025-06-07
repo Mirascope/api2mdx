@@ -162,6 +162,96 @@ def generate_meta_file_content(section: SectionSpec, export_name: str) -> str:
     return "\n".join(content)
 
 
+def generate_meta_from_directives(
+    directives: list[tuple[str, str]],
+    weight: float = 0.25,  # Default weight for API sections
+) -> SectionSpec:
+    """Generate a SectionSpec from API directives.
+
+    Args:
+        directives: List of (directive, output_path) tuples
+        weight: Search weight for this section (default: 0.25)
+
+    Returns:
+        A SectionSpec object representing the API structure
+
+    """
+    # Create a SectionSpec for the API
+    section_slug = "api"
+    section_label = "API Reference"
+    children = []
+
+    # Build a tree structure from the directives
+    path_tree: dict[str, Any] = {}
+    
+    for directive, output_path in directives:
+        # Skip the main index file for now
+        if output_path == "index.mdx":
+            continue
+            
+        # Convert output_path to path parts
+        path_parts = output_path.replace(".mdx", "").split("/")
+        
+        # Navigate/create the tree structure
+        current_level = path_tree
+        for i, part in enumerate(path_parts):
+            if part not in current_level:
+                current_level[part] = {"_files": [], "_children": {}}
+            
+            if i == len(path_parts) - 1:
+                # This is a file
+                current_level[part]["_files"].append((directive, output_path))
+            else:
+                # This is a directory
+                current_level = current_level[part]["_children"]
+    
+    # Convert tree to DocSpec objects
+    children = _tree_to_docspecs(path_tree, weight)
+    
+    return SectionSpec(
+        slug=section_slug,
+        label=section_label,
+        children=children,
+        weight=weight,
+    )
+
+
+def _tree_to_docspecs(tree: dict[str, Any], weight: float) -> list[DocSpec]:
+    """Convert a path tree to DocSpec objects.
+    
+    Args:
+        tree: Tree structure from generate_meta_from_directives
+        weight: Weight to apply to items
+        
+    Returns:
+        List of DocSpec objects
+    """
+    specs = []
+    
+    for name, node in tree.items():
+        files = node.get("_files", [])
+        children_tree = node.get("_children", {})
+        
+        if children_tree:
+            # This is a directory with children
+            children = _tree_to_docspecs(children_tree, weight)
+            specs.append(DocSpec(
+                slug=name,
+                label=titleify(name),
+                children=children,
+                weight=weight
+            ))
+        elif files:
+            # This is a file
+            specs.append(DocSpec(
+                slug=name,
+                label=titleify(name),
+                weight=weight
+            ))
+    
+    return specs
+
+
 def generate_meta_from_organized_files(
     organized_files: dict[str, list[Path]],
     weight: float = 0.25,  # Default weight for API sections

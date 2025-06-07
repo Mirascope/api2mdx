@@ -43,7 +43,7 @@ def discover_api_directives(module: Module) -> list[tuple[str, str]]:
     submodules_seen = set()
     
     # Start with the main module
-    module_directive = f":::{module.canonical_path}"
+    module_directive = f"::: {module.canonical_path}"
     directives.append((module_directive, "index.mdx"))
     
     # Discover exports from __all__ or all public members
@@ -60,7 +60,7 @@ def discover_api_directives(module: Module) -> list[tuple[str, str]]:
                     submodule_path = output_path.split('/')[0]
                     if submodule_path not in submodules_seen:
                         # Add submodule index
-                        submodule_directive = f":::{module.canonical_path}.{submodule_path}"
+                        submodule_directive = f"::: {module.canonical_path}.{submodule_path}"
                         submodule_index_path = f"{submodule_path}/index.mdx"
                         directives.append((submodule_directive, submodule_index_path))
                         submodules_seen.add(submodule_path)
@@ -123,13 +123,13 @@ def _discover_member_directives(
         output_path = f"{member_name}.mdx"
     
     if isinstance(member, (Class, Function)):
-        directive = f":::{canonical_path}"
+        directive = f"::: {canonical_path}"
         directives.append((directive, output_path))
         
     elif hasattr(member, 'target') and member.target:
         # Handle aliases by documenting the target
         target_path = member.target.canonical_path if hasattr(member.target, 'canonical_path') else str(member.target)
-        directive = f":::{target_path}"
+        directive = f"::: {target_path}"
         directives.append((directive, output_path))
     
     return directives
@@ -152,7 +152,7 @@ def discover_hierarchical_directives(module: Module) -> list[tuple[str, str]]:
     directives = []
     
     # Main module index
-    module_directive = f":::{module.canonical_path}"
+    module_directive = f"::: {module.canonical_path}"
     directives.append((module_directive, "index.mdx"))
     
     # Process all submodules and their exports
@@ -188,7 +188,7 @@ def _discover_submodule_directives(
                 submodule_prefix = f"{path_prefix}{export_name}/" if path_prefix else f"{export_name}/"
                 
                 # Submodule index
-                submodule_directive = f":::{member.canonical_path}"
+                submodule_directive = f"::: {member.canonical_path}"
                 submodule_index_path = f"{submodule_prefix}index.mdx"
                 directives.append((submodule_directive, submodule_index_path))
                 
@@ -199,7 +199,7 @@ def _discover_submodule_directives(
                 # Regular member (class, function, etc.)
                 canonical_path = f"{module.canonical_path}.{export_name}"
                 output_path = f"{path_prefix}{export_name}.mdx"
-                directive = f":::{canonical_path}"
+                directive = f"::: {canonical_path}"
                 directives.append((directive, output_path))
     
     return directives
