@@ -30,20 +30,12 @@ def main() -> int:
     project_root = script_dir.parent.parent
     
     commands = [
-        # Regenerate minimal example
-        (
-            ["python", "-m", "api2mdx.main", 
-             "--source-path", "./snapshots/py", 
-             "--package", "example_minimal", 
-             "--output", "./snapshots/mdx/example_minimal"],
-            "Regenerating example_minimal snapshot"
-        ),
         # Regenerate mirascope v2 llm example  
         (
             ["python", "-m", "api2mdx.main",
-             "--source-path", "./snapshots/py",
+             "--source-path", "./snapshots",
              "--package", "mirascope_v2_llm", 
-             "--output", "./snapshots/mdx/mirascope_v2_llm"],
+             "--output", "./snapshots/mdx"],
             "Regenerating mirascope_v2_llm snapshot"
         ),
     ]
