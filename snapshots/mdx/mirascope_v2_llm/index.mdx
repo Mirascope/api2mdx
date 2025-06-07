@@ -12,6 +12,10 @@ This module provides a unified interface for interacting with different LLM prov
 including messages, tools, response formatting, and streaming. It allows you to write
 code that works with multiple LLM providers without changing your application logic.
 
+## <ApiType type="Alias" path="index" symbolName="LLM" /> LLM
+
+The base interface for LLM models.
+
 ## <ApiType type="Alias" path="index" symbolName="Agent" /> Agent
 
 Agent class for generating responses using LLMs with tools.
@@ -20,105 +24,61 @@ Agent class for generating responses using LLMs with tools.
 
 Asynchronous agent class for generating responses using LLMs with tools.
 
-## <ApiType type="Alias" path="index" symbolName="AsyncStructuredAgent" /> AsyncStructuredAgent
-
-Asynchronous structured agent class for generating structured responses using LLMs with tools.
-
-## <ApiType type="Alias" path="index" symbolName="StructuredAgent" /> StructuredAgent
-
-Structured agent class for generating structured responses using LLMs with tools.
-
-## <ApiType type="Alias" path="index" symbolName="agent" /> agent
-
-The `Agent` class for LLM agents.
-
 ## <ApiType type="Alias" path="index" symbolName="AsyncCall" /> AsyncCall
 
 A class for generating responses using LLMs asynchronously.
-
-## <ApiType type="Alias" path="index" symbolName="AsyncStructuredCall" /> AsyncStructuredCall
-
-A class for generating structured responses using LLMs asynchronously.
-
-## <ApiType type="Alias" path="index" symbolName="Call" /> Call
-
-A class for generating responses using LLMs.
-
-## <ApiType type="Alias" path="index" symbolName="StructuredCall" /> StructuredCall
-
-A class for generating structured responses using LLMs.
-
-## <ApiType type="Alias" path="index" symbolName="call" /> call
-
-The Call module for generating responses using LLMs.
-
-## <ApiType type="Alias" path="index" symbolName="Context" /> Context
-
-Context for LLM calls.
-
-## <ApiType type="Module" path="index" symbolName="context" /> context
-
-The Context module for providing context to LLM calls during generation.
-
-## <ApiType type="Alias" path="index" symbolName="Message" /> Message
-
-A message in an LLM interaction.
-
-## <ApiType type="Alias" path="index" symbolName="assistant" /> assistant
-
-Shorthand method for creating a `Message` with the assistant role.
-
-## <ApiType type="Alias" path="index" symbolName="system" /> system
-
-Shorthand method for creating a `Message` with the system role.
-
-## <ApiType type="Alias" path="index" symbolName="user" /> user
-
-Shorthand method for creating a `Message` with the user role.
-
-## <ApiType type="Alias" path="index" symbolName="LLM" /> LLM
-
-The base interface for LLM models.
-
-## <ApiType type="Alias" path="index" symbolName="Client" /> Client
-
-The base interface for LLM clients.
-
-## <ApiType type="Alias" path="index" symbolName="Params" /> Params
-
-The base interface for LLM parameters.
-
-## <ApiType type="Alias" path="index" symbolName="model" /> model
-
-Set the model context with the model of the given id.
-
-## <ApiType type="Alias" path="index" symbolName="DynamicConfig" /> DynamicConfig
-
-Class for specifying dynamic configuration in a prompt template method.
-
-## <ApiType type="Alias" path="index" symbolName="prompt_template" /> prompt_template
-
-Prompt template decorator for writing messages as a string template.
-
-## <ApiType type="Alias" path="index" symbolName="ResponseFormat" /> ResponseFormat
-
-Class representing a structured output format for LLM responses.
-
-## <ApiType type="Alias" path="index" symbolName="response_format" /> response_format
-
-Decorator that defines a structured response format for LLM outputs.
 
 ## <ApiType type="Alias" path="index" symbolName="AsyncStream" /> AsyncStream
 
 An asynchronous stream of response chunks from an LLM.
 
+## <ApiType type="Alias" path="index" symbolName="AsyncStructuredAgent" /> AsyncStructuredAgent
+
+Asynchronous structured agent class for generating structured responses using LLMs with tools.
+
+## <ApiType type="Alias" path="index" symbolName="AsyncStructuredCall" /> AsyncStructuredCall
+
+A class for generating structured responses using LLMs asynchronously.
+
 ## <ApiType type="Alias" path="index" symbolName="AsyncStructuredStream" /> AsyncStructuredStream
 
 An asynchronous stream of partial structured outputs from an LLM.
 
+## <ApiType type="Alias" path="index" symbolName="Call" /> Call
+
+A class for generating responses using LLMs.
+
+## <ApiType type="Alias" path="index" symbolName="Client" /> Client
+
+The base interface for LLM clients.
+
+## <ApiType type="Alias" path="index" symbolName="Content" /> Content
+
+Content types that can be included in messages.
+
+## <ApiType type="Alias" path="index" symbolName="Context" /> Context
+
+Context for LLM calls.
+
+## <ApiType type="Alias" path="index" symbolName="DynamicConfig" /> DynamicConfig
+
+Class for specifying dynamic configuration in a prompt template method.
+
+## <ApiType type="Alias" path="index" symbolName="Message" /> Message
+
+A message in an LLM interaction.
+
+## <ApiType type="Alias" path="index" symbolName="Params" /> Params
+
+The base interface for LLM parameters.
+
 ## <ApiType type="Alias" path="index" symbolName="Response" /> Response
 
 The response generated by an LLM.
+
+## <ApiType type="Alias" path="index" symbolName="ResponseFormat" /> ResponseFormat
+
+Class representing a structured output format for LLM responses.
 
 ## <ApiType type="Alias" path="index" symbolName="Stream" /> Stream
 
@@ -127,6 +87,14 @@ A synchronous stream of response chunks from an LLM.
 ## <ApiType type="Alias" path="index" symbolName="StreamChunk" /> StreamChunk
 
 A chunk of a streaming response from an LLM.
+
+## <ApiType type="Alias" path="index" symbolName="StructuredAgent" /> StructuredAgent
+
+Structured agent class for generating structured responses using LLMs with tools.
+
+## <ApiType type="Alias" path="index" symbolName="StructuredCall" /> StructuredCall
+
+A class for generating structured responses using LLMs.
 
 ## <ApiType type="Alias" path="index" symbolName="StructuredStream" /> StructuredStream
 
@@ -140,47 +108,47 @@ Tool instance with arguments provided by an LLM.
 
 Protocol defining a tool that can be used by LLMs.
 
-## <ApiType type="Alias" path="index" symbolName="tool" /> tool
+## <ApiType type="Alias" path="index" symbolName="agent" /> agent
 
-Decorator that turns a function into a tool definition.
+The `Agent` class for LLM agents.
 
-## <ApiType type="Module" path="index" symbolName="calls" /> calls
+## <ApiType type="Alias" path="index" symbolName="assistant" /> assistant
 
-The `llm.calls` module.
+Shorthand method for creating a `Message` with the assistant role.
 
-## <ApiType type="Module" path="index" symbolName="tools" /> tools
+## <ApiType type="Alias" path="index" symbolName="call" /> call
 
-The Tools module for LLMs.
-
-## <ApiType type="Module" path="index" symbolName="messages" /> messages
-
-The messages module for LLM interactions.
-
-## <ApiType type="Module" path="index" symbolName="types" /> types
-
-Types for the LLM module.
-
-## <ApiType type="Module" path="index" symbolName="responses" /> responses
-
-The Responses module for LLM responses.
-
-## <ApiType type="Module" path="index" symbolName="agents" /> agents
-
-The Agents module for creating and managing LLM agents.
+The Call module for generating responses using LLMs.
 
 ## <ApiType type="Module" path="index" symbolName="content" /> content
 
 The `llm.messages.content` module.
 
-## <ApiType type="Module" path="index" symbolName="models" /> models
+## <ApiType type="Module" path="index" symbolName="context" /> context
 
-The `llm.models` module for implementing the `Model` interface and utilities.
+The Context module for providing context to LLM calls during generation.
 
-## <ApiType type="Module" path="index" symbolName="response_formatting" /> response_formatting
+## <ApiType type="Alias" path="index" symbolName="model" /> model
 
-Response formatting interfaces for structuring LLM outputs.
+Set the model context with the model of the given id.
 
-## <ApiType type="Module" path="index" symbolName="prompt_templates" /> prompt_templates
+## <ApiType type="Alias" path="index" symbolName="prompt_template" /> prompt_template
 
-The prompt templates module for LLM interactions.
+Prompt template decorator for writing messages as a string template.
+
+## <ApiType type="Alias" path="index" symbolName="response_format" /> response_format
+
+Decorator that defines a structured response format for LLM outputs.
+
+## <ApiType type="Alias" path="index" symbolName="system" /> system
+
+Shorthand method for creating a `Message` with the system role.
+
+## <ApiType type="Alias" path="index" symbolName="tool" /> tool
+
+Decorator that turns a function into a tool definition.
+
+## <ApiType type="Alias" path="index" symbolName="user" /> user
+
+Shorthand method for creating a `Message` with the user role.
 

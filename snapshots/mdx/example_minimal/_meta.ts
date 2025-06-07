@@ -8,50 +8,7 @@ export const apiMeta: SectionSpec = {
   slug: "api",
   label: "API Reference",
   weight: 0.25,
-  children: [
-    {
-      slug: "calls",
-      label: "Calls",
-      weight: 0.25,
-      children: [
-        {
-          slug: "index",
-          label: "Index",
-          weight: 0.25
-        },
-        {
-          slug: "Response",
-          label: "Response",
-          weight: 0.25
-        },
-        {
-          slug: "Stream",
-          label: "Stream",
-          weight: 0.25
-        },
-        {
-          slug: "BaseCall",
-          label: "Basecall",
-          weight: 0.25
-        },
-        {
-          slug: "Call",
-          label: "Call",
-          weight: 0.25
-        },
-        {
-          slug: "call_decorator",
-          label: "Call Decorator",
-          weight: 0.25
-        },
-        {
-          slug: "StructuredCall",
-          label: "Structuredcall",
-          weight: 0.25
-        }
-      ]
-    }
-  ]
+  children: []
 };
 
 export default apiMeta;

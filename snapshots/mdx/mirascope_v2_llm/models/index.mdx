@@ -13,21 +13,25 @@ through the `Model` abstract class. The `llm.model` context manager allows you t
 easily run an LLM call with a model specified at runtime rather than definition
 time.
 
+## <ApiType type="Alias" path="models/index" symbolName="ANTHROPIC_REGISTERED_LLMS" /> ANTHROPIC_REGISTERED_LLMS
+
+The Anthropic models registered with Mirascope.
+
+## <ApiType type="Alias" path="models/index" symbolName="GOOGLE_REGISTERED_LLMS" /> GOOGLE_REGISTERED_LLMS
+
+The Google models registered with Mirascope.
+
 ## <ApiType type="Alias" path="models/index" symbolName="LLM" /> LLM
 
 The base interface for LLM models.
 
-## <ApiType type="Alias" path="models/index" symbolName="Client" /> Client
+## <ApiType type="Alias" path="models/index" symbolName="OPENAI_REGISTERED_LLMS" /> OPENAI_REGISTERED_LLMS
 
-The base interface for LLM clients.
+The OpenAI models registered with Mirascope.
 
-## <ApiType type="Alias" path="models/index" symbolName="Params" /> Params
+## <ApiType type="Alias" path="models/index" symbolName="REGISTERED_LLMS" /> REGISTERED_LLMS
 
-The base interface for LLM parameters.
-
-## <ApiType type="Alias" path="models/index" symbolName="model" /> model
-
-Set the model context with the model of the given id.
+The models registered with Mirascope.
 
 ## <ApiType type="Alias" path="models/index" symbolName="Anthropic" /> Anthropic
 
@@ -41,27 +45,15 @@ The client for the Anthropic LLM model.
 
 The parameters for the Anthropic LLM model.
 
-## <ApiType type="Module" path="models/index" symbolName="register" /> register
+## <ApiType type="Alias" path="models/index" symbolName="Client" /> Client
 
-The register of models known to Mirascope.
+The base interface for LLM clients.
 
-## <ApiType type="Module" path="models/index" symbolName="google" /> google
+## <ApiType type="Alias" path="models/index" symbolName="Params" /> Params
 
-The Google-specific implementation of the `LLM` interface.
+The base interface for LLM parameters.
 
-## <ApiType type="Module" path="models/index" symbolName="openai" /> openai
+## <ApiType type="Alias" path="models/index" symbolName="model" /> model
 
-The OpenAI-specific implementation of the `LLM` interface.
-
-## <ApiType type="Module" path="models/index" symbolName="context" /> context
-
-The model context manager for the `llm` module.
-
-## <ApiType type="Module" path="models/index" symbolName="anthropic" /> anthropic
-
-The Anthropic-specific implementation of the `LLM` interface.
-
-## <ApiType type="Module" path="models/index" symbolName="base" /> base
-
-The base abstract model interfaces for LLM models.
+Set the model context with the model of the given id.
 

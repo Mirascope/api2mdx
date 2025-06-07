@@ -5,9 +5,6 @@ from a loaded Griffe module, generating directive strings that can be processed
 by the existing documentation pipeline.
 """
 
-from pathlib import Path
-from typing import Any
-
 from griffe import Alias, Class, Function, Module, Object
 
 
@@ -70,6 +67,46 @@ def discover_api_directives(module: Module) -> list[tuple[str, str]]:
     return directives
 
 
+def _extract_all_exports(module: Module) -> list[str] | None:
+    """Extract __all__ exports from a Griffe module.
+    
+    Args:
+        module: The module to analyze
+        
+    Returns:
+        List of export names if __all__ is defined, None otherwise
+    """
+    if '__all__' not in module.members:
+        return None
+    
+    all_member = module.members['__all__']
+    if not hasattr(all_member, 'value'):
+        return None
+    
+    value = all_member.value
+    
+    # If it's a Griffe ExprList, extract the elements
+    if hasattr(value, 'elements'):
+        exports = []
+        for elem in value.elements:
+            if hasattr(elem, 'value'):
+                clean_name = elem.value.strip("'\"")
+                exports.append(clean_name)
+            else:
+                exports.append(str(elem).strip("'\""))
+        return exports
+    # If it's already a list, use it
+    elif isinstance(value, list):
+        return [str(item).strip("'\"") for item in value]
+    # If it's a string representation, try to safely evaluate it
+    elif isinstance(value, str):
+        import ast
+        return ast.literal_eval(value)
+
+    
+    return None
+
+
 def _get_module_exports(module: Module) -> list[str]:
     """Get the list of exports from a module.
     
@@ -81,47 +118,23 @@ def _get_module_exports(module: Module) -> list[str]:
     Returns:
         List of export names
     """
-    # Check if module has __all__ defined
-    if hasattr(module, 'all') and getattr(module, 'all'):
-        return list(getattr(module, 'all'))
+    # Try to get __all__ exports first
+    exports = _extract_all_exports(module)
+    if exports is not None:
+        return exports
     
-    # Fallback to meaningful public members, excluding common imports and type vars
-    excluded_names = {
-        # Common stdlib imports that shouldn't be documented
-        'ABC', 'abstractmethod', 'dataclass', 'Any', 'Generic', 'ParamSpec', 
-        'TypeVar', 'Callable', 'Union', 'Optional', 'List', 'Dict', 'Tuple',
-        'Sequence', 'Iterator', 'Literal', 'TypeAlias', 'Final', 'ClassVar',
-        'Protocol', 'runtime_checkable', 'overload', 'TYPE_CHECKING',
-        'annotations', 'Unpack', 'Self', 'Concatenate', 'Required', 'NotRequired',
-        
-        # Common single-letter type variables
-        'T', 'U', 'V', 'K', 'P', 'R', 'S', 'Args', 'Kwargs',
-        
-        # Common response type variables that are implementation details
-        'ResponseT', 'ClientT', 'ParamsT', 'MessageT', 'DepsT', 'NoDepsT'
-    }
-    
-    exports = []
+    # Fallback to public members (no hacky filtering)
+    fallback_exports = []
     for name, member in module.members.items():
         # Skip private members
         if name.startswith('_'):
             continue
-        
-        # Skip excluded common imports and type variables
-        if name in excluded_names:
-            continue
             
-        # Skip single-letter names that are likely type variables
-        if len(name) == 1 and name.isupper():
-            continue
-            
-        # Include classes, functions, and meaningful submodules
-        if hasattr(member, 'kind') and member.kind in ('class', 'function', 'module'):
-            exports.append(name)
-        elif isinstance(member, (Class, Function, Module)):
-            exports.append(name)
+        # Include classes, functions, and modules
+        if isinstance(member, (Class, Function, Module)):
+            fallback_exports.append(name)
     
-    return exports
+    return fallback_exports
 
 
 def _discover_member_directives(
@@ -186,56 +199,58 @@ def discover_hierarchical_directives(module: Module) -> list[tuple[str, str]]:
         List of (directive, output_path) tuples with hierarchical paths
     """
     directives = []
+    submodules_seen = set()
     
     # Main module index
     module_directive = f"::: {module.canonical_path}"
     directives.append((module_directive, "index.mdx"))
     
-    # Process all submodules and their exports
-    directives.extend(_discover_submodule_directives(module, ""))
+    # Process the main module's exports (respecting its __all__)
+    member_directives = _discover_main_module_directives(module)
+    
+    # Check if we need to add submodule index files
+    for directive, output_path in member_directives:
+        if '/' in output_path:  # This is in a submodule
+            submodule_path = output_path.split('/')[0]
+            if submodule_path not in submodules_seen:
+                # Add submodule index
+                submodule_directive = f"::: {module.canonical_path}.{submodule_path}"
+                submodule_index_path = f"{submodule_path}/index.mdx"
+                directives.append((submodule_directive, submodule_index_path))
+                submodules_seen.add(submodule_path)
+    
+    directives.extend(member_directives)
     
     return directives
 
 
-def _discover_submodule_directives(
-    module: Module, 
-    path_prefix: str
-) -> list[tuple[str, str]]:
-    """Recursively discover directives for submodules.
+def _discover_main_module_directives(module: Module) -> list[tuple[str, str]]:
+    """Discover directives for the main module's __all__ exports.
+    
+    This processes only what the main module explicitly exports,
+    creating hierarchical paths based on where the exports come from.
     
     Args:
-        module: The module to process
-        path_prefix: The current path prefix for output files
+        module: The main module to process
         
     Returns:
         List of (directive, output_path) tuples
     """
     directives = []
     
-    # Get exports for this module
-    exports = _get_module_exports(module)
+    # Get exports using the consolidated function
+    exports = _extract_all_exports(module)
+    if exports is None:
+        return directives
     
     for export_name in exports:
         if export_name in module.members:
             member = module.members[export_name]
             
-            if isinstance(member, Module):
-                # Submodule - create hierarchical structure
-                submodule_prefix = f"{path_prefix}{export_name}/" if path_prefix else f"{export_name}/"
-                
-                # Submodule index
-                submodule_directive = f"::: {member.canonical_path}"
-                submodule_index_path = f"{submodule_prefix}index.mdx"
-                directives.append((submodule_directive, submodule_index_path))
-                
-                # Recursively process submodule
-                directives.extend(_discover_submodule_directives(member, submodule_prefix))
-                
-            else:
-                # Regular member (class, function, etc.)
-                canonical_path = f"{module.canonical_path}.{export_name}"
-                output_path = f"{path_prefix}{export_name}.mdx"
-                directive = f"::: {canonical_path}"
-                directives.append((directive, output_path))
+            # Use the existing member directive logic to get hierarchical paths
+            member_directives = _discover_member_directives(member, module.canonical_path)
+            directives.extend(member_directives)
     
     return directives
+
+

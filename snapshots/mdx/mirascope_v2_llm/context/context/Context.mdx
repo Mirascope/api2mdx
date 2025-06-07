@@ -1,74 +1,45 @@
 ---
 # AUTO-GENERATED API DOCUMENTATION - DO NOT EDIT
-title: context
-description: API documentation for context
+title: Context
+description: API documentation for Context
 ---
 
-# context
+# Context
 
-## <ApiType type="Function" path="context/context/context" symbolName="context" /> context
+## <ApiType type="Class" path="context/context/Context" symbolName="Context" /> Context
 
-Set the context for LLM calls.
+Context for LLM calls.
 
-Example:
+This class provides a context for LLM calls, including the model,
+parameters, and any dependencies needed for the call.
 
-    ```python
-    from mirascope import llm
+**Bases:** 
+<TypeLink type={{"type_str": "Generic[DepsT]", "description": null, "kind": "generic", "base_type": {"type_str": "Generic", "description": null, "kind": "simple", "doc_url": "https://docs.python.org/3/library/typing.html#typing.Generic"}, "parameters": [{"type_str": "DepsT", "description": null, "kind": "simple", "doc_identifier": "DepsT"}]}} />
 
-    class Book:
-        ...
-
-    @llm.call("openai:gpt-4o-mini", tools=[])
-    def answer_question(ctx: Context[Book], question: str) -> str:
-        return f"Answer this question: {question}"
-
-    ctx = Context()
-    with llm.context() as ctx:
-        response = answer_question(ctx, "What is the capital of France?")
-
-<ParametersTable
-  parameters={[
+<AttributesTable
+  attributes={[
   {
     "name": "messages",
     "type_info": {
-      "type_str": "list[Message] | None",
+      "type_str": "list[Message]",
       "description": null,
-      "kind": "union",
+      "kind": "generic",
       "base_type": {
-        "type_str": "Union",
+        "type_str": "list",
         "description": null,
         "kind": "simple",
-        "doc_url": "https://docs.python.org/3/library/typing.html#typing.Union"
+        "doc_url": "https://docs.python.org/3/library/stdtypes.html#list"
       },
       "parameters": [
         {
-          "type_str": "list[Message]",
-          "description": null,
-          "kind": "generic",
-          "base_type": {
-            "type_str": "list",
-            "description": null,
-            "kind": "simple",
-            "doc_url": "https://docs.python.org/3/library/stdtypes.html#list"
-          },
-          "parameters": [
-            {
-              "type_str": "Message",
-              "description": null,
-              "kind": "simple",
-              "doc_url": "/docs/mirascope/api/prompt_templates/decorator/Message#message"
-            }
-          ]
-        },
-        {
-          "type_str": "None",
+          "type_str": "Message",
           "description": null,
           "kind": "simple",
-          "doc_url": "https://docs.python.org/3/library/constants.html#None"
+          "doc_url": "/docs/mirascope/api/messages/message/Message#message"
         }
       ]
     },
-    "default": "None"
+    "description": "The array of messages that have been sent so far (i.e. history)."
   },
   {
     "name": "deps",
@@ -78,45 +49,8 @@ Example:
       "kind": "simple",
       "doc_identifier": "DepsT"
     },
-    "default": "None"
+    "description": "The dependencies needed for a call."
   }
 ]}
-/>
-
-<ReturnTable
-  returnType={{
-  "type_info": {
-    "type_str": "Iterator[Context[DepsT]]",
-    "description": null,
-    "kind": "generic",
-    "base_type": {
-      "type_str": "Iterator",
-      "description": null,
-      "kind": "simple",
-      "doc_identifier": "Iterator"
-    },
-    "parameters": [
-      {
-        "type_str": "Context[DepsT]",
-        "description": null,
-        "kind": "generic",
-        "base_type": {
-          "type_str": "Context",
-          "description": null,
-          "kind": "simple",
-          "doc_url": "/docs/mirascope/api/prompt_templates/decorator/Context#context"
-        },
-        "parameters": [
-          {
-            "type_str": "DepsT",
-            "description": null,
-            "kind": "simple",
-            "doc_identifier": "DepsT"
-          }
-        ]
-      }
-    ]
-  }
-}}
 />
 
