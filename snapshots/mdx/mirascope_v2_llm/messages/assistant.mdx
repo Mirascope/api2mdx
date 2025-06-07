@@ -1,0 +1,103 @@
+---
+# AUTO-GENERATED API DOCUMENTATION - DO NOT EDIT
+title: assistant
+description: API documentation for assistant
+---
+
+# assistant
+
+## <ApiType type="Alias" path="messages/assistant" symbolName="assistant" /> assistant
+
+Shorthand method for creating a `Message` with the assistant role.
+
+<ParametersTable
+  parameters={[
+  {
+    "name": "content",
+    "type_info": {
+      "type_str": "Content | Sequence[Content]",
+      "description": null,
+      "kind": "union",
+      "base_type": {
+        "type_str": "Union",
+        "description": null,
+        "kind": "simple",
+        "doc_url": "https://docs.python.org/3/library/typing.html#typing.Union"
+      },
+      "parameters": [
+        {
+          "type_str": "Content",
+          "description": null,
+          "kind": "simple",
+          "doc_identifier": "Content"
+        },
+        {
+          "type_str": "Sequence[Content]",
+          "description": null,
+          "kind": "generic",
+          "base_type": {
+            "type_str": "Sequence",
+            "description": null,
+            "kind": "simple",
+            "doc_identifier": "Sequence"
+          },
+          "parameters": [
+            {
+              "type_str": "Content",
+              "description": null,
+              "kind": "simple",
+              "doc_identifier": "Content"
+            }
+          ]
+        }
+      ]
+    },
+    "description": "The content of the message, which can be a string, a Content-type\nobject, or a sequence of Content-type objects."
+  },
+  {
+    "name": "name",
+    "type_info": {
+      "type_str": "str | None",
+      "description": null,
+      "kind": "union",
+      "base_type": {
+        "type_str": "Union",
+        "description": null,
+        "kind": "simple",
+        "doc_url": "https://docs.python.org/3/library/typing.html#typing.Union"
+      },
+      "parameters": [
+        {
+          "type_str": "str",
+          "description": null,
+          "kind": "simple",
+          "doc_url": "https://docs.python.org/3/library/stdtypes.html#str"
+        },
+        {
+          "type_str": "None",
+          "description": null,
+          "kind": "simple",
+          "doc_url": "https://docs.python.org/3/library/constants.html#None"
+        }
+      ]
+    },
+    "default": "None",
+    "description": "Optional name to identify a specific assistant in multi-party conversations."
+  }
+]}
+/>
+
+<ReturnTable
+  returnType={{
+  "type_info": {
+    "type_str": "Message",
+    "description": null,
+    "kind": "simple",
+    "doc_url": "/docs/mirascope/api/prompt_templates/decorator/Message#message"
+  },
+  "description": "A Message with the assistant role."
+}}
+/>
+
+
+**Alias to:** `mirascope_v2_llm.messages.message.assistant`

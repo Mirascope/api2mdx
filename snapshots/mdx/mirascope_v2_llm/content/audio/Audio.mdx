@@ -1,0 +1,181 @@
+---
+# AUTO-GENERATED API DOCUMENTATION - DO NOT EDIT
+title: Audio
+description: API documentation for Audio
+---
+
+# Audio
+
+## <ApiType type="Class" path="content/audio/Audio" symbolName="Audio" /> Audio
+
+Audio content for a message.
+
+Audio can be included in messages for voice or sound-based interactions.
+
+<AttributesTable
+  attributes={[
+  {
+    "name": "type",
+    "type_info": {
+      "type_str": "Literal['audio']",
+      "description": null,
+      "kind": "generic",
+      "base_type": {
+        "type_str": "Literal",
+        "description": null,
+        "kind": "simple",
+        "doc_url": "https://docs.python.org/3/library/typing.html#typing.Literal"
+      },
+      "parameters": [
+        {
+          "type_str": "'audio'",
+          "description": null,
+          "kind": "simple",
+          "doc_identifier": "'audio'"
+        }
+      ]
+    }
+  },
+  {
+    "name": "id",
+    "type_info": {
+      "type_str": "str | None",
+      "description": null,
+      "kind": "union",
+      "base_type": {
+        "type_str": "Union",
+        "description": null,
+        "kind": "simple",
+        "doc_url": "https://docs.python.org/3/library/typing.html#typing.Union"
+      },
+      "parameters": [
+        {
+          "type_str": "str",
+          "description": null,
+          "kind": "simple",
+          "doc_url": "https://docs.python.org/3/library/stdtypes.html#str"
+        },
+        {
+          "type_str": "None",
+          "description": null,
+          "kind": "simple",
+          "doc_url": "https://docs.python.org/3/library/constants.html#None"
+        }
+      ]
+    },
+    "description": "A unique identifier for this audio content. This is useful for tracking and referencing generated audio."
+  },
+  {
+    "name": "data",
+    "type_info": {
+      "type_str": "str | bytes",
+      "description": null,
+      "kind": "union",
+      "base_type": {
+        "type_str": "Union",
+        "description": null,
+        "kind": "simple",
+        "doc_url": "https://docs.python.org/3/library/typing.html#typing.Union"
+      },
+      "parameters": [
+        {
+          "type_str": "str",
+          "description": null,
+          "kind": "simple",
+          "doc_url": "https://docs.python.org/3/library/stdtypes.html#str"
+        },
+        {
+          "type_str": "bytes",
+          "description": null,
+          "kind": "simple",
+          "doc_url": "https://docs.python.org/3/library/stdtypes.html#bytes"
+        }
+      ]
+    },
+    "description": "The audio data, which can be a URL, file path, base64-encoded string, or binary data."
+  },
+  {
+    "name": "transcript",
+    "type_info": {
+      "type_str": "str | None",
+      "description": null,
+      "kind": "union",
+      "base_type": {
+        "type_str": "Union",
+        "description": null,
+        "kind": "simple",
+        "doc_url": "https://docs.python.org/3/library/typing.html#typing.Union"
+      },
+      "parameters": [
+        {
+          "type_str": "str",
+          "description": null,
+          "kind": "simple",
+          "doc_url": "https://docs.python.org/3/library/stdtypes.html#str"
+        },
+        {
+          "type_str": "None",
+          "description": null,
+          "kind": "simple",
+          "doc_url": "https://docs.python.org/3/library/constants.html#None"
+        }
+      ]
+    },
+    "description": "The transcript of the audio, if available. This is useful for accessibility and search."
+  },
+  {
+    "name": "mime_type",
+    "type_info": {
+      "type_str": "Literal['audio/wav', 'audio/mp3', 'audio/aiff', 'audio/aac', 'audio/ogg', 'audio/flac']",
+      "description": null,
+      "kind": "generic",
+      "base_type": {
+        "type_str": "Literal",
+        "description": null,
+        "kind": "simple",
+        "doc_url": "https://docs.python.org/3/library/typing.html#typing.Literal"
+      },
+      "parameters": [
+        {
+          "type_str": "'audio/wav'",
+          "description": null,
+          "kind": "simple",
+          "doc_identifier": "'audio/wav'"
+        },
+        {
+          "type_str": "'audio/mp3'",
+          "description": null,
+          "kind": "simple",
+          "doc_identifier": "'audio/mp3'"
+        },
+        {
+          "type_str": "'audio/aiff'",
+          "description": null,
+          "kind": "simple",
+          "doc_identifier": "'audio/aiff'"
+        },
+        {
+          "type_str": "'audio/aac'",
+          "description": null,
+          "kind": "simple",
+          "doc_identifier": "'audio/aac'"
+        },
+        {
+          "type_str": "'audio/ogg'",
+          "description": null,
+          "kind": "simple",
+          "doc_identifier": "'audio/ogg'"
+        },
+        {
+          "type_str": "'audio/flac'",
+          "description": null,
+          "kind": "simple",
+          "doc_identifier": "'audio/flac'"
+        }
+      ]
+    },
+    "description": "The MIME type of the audio, e.g., 'audio/mp3', 'audio/wav'."
+  }
+]}
+/>
+

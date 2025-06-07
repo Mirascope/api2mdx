@@ -1,0 +1,276 @@
+---
+# AUTO-GENERATED API DOCUMENTATION - DO NOT EDIT
+title: AsyncStructuredContextCall
+description: API documentation for AsyncStructuredContextCall
+---
+
+# AsyncStructuredContextCall
+
+## <ApiType type="Class" path="calls/async_structured_context_call/AsyncStructuredContextCall" symbolName="AsyncStructuredContextCall" /> AsyncStructuredContextCall
+
+A class for generating structured responses using LLMs asynchronously.
+
+**Bases:** 
+<TypeLink type={{"type_str": "BaseStructuredContextCall[P, AsyncPromptTemplate, T, DepsT]", "description": null, "kind": "generic", "base_type": {"type_str": "BaseStructuredContextCall", "description": null, "kind": "simple", "doc_url": "/docs/mirascope/api/calls/structured_context_call/index#basestructuredcontextcall"}, "parameters": [{"type_str": "P", "description": null, "kind": "simple", "doc_identifier": "P"}, {"type_str": "AsyncPromptTemplate", "description": null, "kind": "simple", "doc_identifier": "AsyncPromptTemplate"}, {"type_str": "T", "description": null, "kind": "simple", "doc_identifier": "T"}, {"type_str": "DepsT", "description": null, "kind": "simple", "doc_identifier": "DepsT"}]}} />
+
+## <ApiType type="Function" path="calls/async_structured_context_call/AsyncStructuredContextCall" symbolName="call_async" /> call_async
+
+Generates an asynchronous structured response using the LLM.
+
+<ParametersTable
+  parameters={[
+  {
+    "name": "self",
+    "type_info": {
+      "type_str": "Any",
+      "description": null,
+      "kind": "simple",
+      "doc_identifier": null
+    }
+  },
+  {
+    "name": "ctx",
+    "type_info": {
+      "type_str": "Context[DepsT]",
+      "description": null,
+      "kind": "generic",
+      "base_type": {
+        "type_str": "Context",
+        "description": null,
+        "kind": "simple",
+        "doc_url": "/docs/mirascope/api/prompt_templates/decorator/Context#context"
+      },
+      "parameters": [
+        {
+          "type_str": "DepsT",
+          "description": null,
+          "kind": "simple",
+          "doc_identifier": "DepsT"
+        }
+      ]
+    }
+  },
+  {
+    "name": "args",
+    "type_info": {
+      "type_str": "P.args",
+      "description": null,
+      "kind": "simple",
+      "doc_identifier": "P.args"
+    },
+    "default": "()"
+  },
+  {
+    "name": "kwargs",
+    "type_info": {
+      "type_str": "P.kwargs",
+      "description": null,
+      "kind": "simple",
+      "doc_identifier": "P.kwargs"
+    },
+    "default": "{}"
+  }
+]}
+/>
+
+<ReturnTable
+  returnType={{
+  "type_info": {
+    "type_str": "ContextResponse[DepsT, T]",
+    "description": null,
+    "kind": "generic",
+    "base_type": {
+      "type_str": "ContextResponse",
+      "description": null,
+      "kind": "simple",
+      "doc_url": "/docs/mirascope/api/models/base/ContextResponse#contextresponse"
+    },
+    "parameters": [
+      {
+        "type_str": "DepsT",
+        "description": null,
+        "kind": "simple",
+        "doc_identifier": "DepsT"
+      },
+      {
+        "type_str": "T",
+        "description": null,
+        "kind": "simple",
+        "doc_identifier": "T"
+      }
+    ]
+  }
+}}
+/>
+
+
+## <ApiType type="Function" path="calls/async_structured_context_call/AsyncStructuredContextCall" symbolName="stream" /> stream
+
+Generates a streaming structured response using the LLM asynchronously.
+
+<ParametersTable
+  parameters={[
+  {
+    "name": "self",
+    "type_info": {
+      "type_str": "Any",
+      "description": null,
+      "kind": "simple",
+      "doc_identifier": null
+    }
+  },
+  {
+    "name": "ctx",
+    "type_info": {
+      "type_str": "Context[DepsT]",
+      "description": null,
+      "kind": "generic",
+      "base_type": {
+        "type_str": "Context",
+        "description": null,
+        "kind": "simple",
+        "doc_url": "/docs/mirascope/api/prompt_templates/decorator/Context#context"
+      },
+      "parameters": [
+        {
+          "type_str": "DepsT",
+          "description": null,
+          "kind": "simple",
+          "doc_identifier": "DepsT"
+        }
+      ]
+    }
+  },
+  {
+    "name": "args",
+    "type_info": {
+      "type_str": "P.args",
+      "description": null,
+      "kind": "simple",
+      "doc_identifier": "P.args"
+    },
+    "default": "()"
+  },
+  {
+    "name": "kwargs",
+    "type_info": {
+      "type_str": "P.kwargs",
+      "description": null,
+      "kind": "simple",
+      "doc_identifier": "P.kwargs"
+    },
+    "default": "{}"
+  }
+]}
+/>
+
+<ReturnTable
+  returnType={{
+  "type_info": {
+    "type_str": "AsyncStructuredStream[T]",
+    "description": null,
+    "kind": "generic",
+    "base_type": {
+      "type_str": "AsyncStructuredStream",
+      "description": null,
+      "kind": "simple",
+      "doc_url": "/docs/mirascope/api/models/base/AsyncStructuredStream#asyncstructuredstream"
+    },
+    "parameters": [
+      {
+        "type_str": "T",
+        "description": null,
+        "kind": "simple",
+        "doc_identifier": "T"
+      }
+    ]
+  }
+}}
+/>
+
+
+## <ApiType type="Function" path="calls/async_structured_context_call/AsyncStructuredContextCall" symbolName="stream_async" /> stream_async
+
+Generates an asynchronous streaming structured response using the LLM.
+
+<ParametersTable
+  parameters={[
+  {
+    "name": "self",
+    "type_info": {
+      "type_str": "Any",
+      "description": null,
+      "kind": "simple",
+      "doc_identifier": null
+    }
+  },
+  {
+    "name": "ctx",
+    "type_info": {
+      "type_str": "Context[DepsT]",
+      "description": null,
+      "kind": "generic",
+      "base_type": {
+        "type_str": "Context",
+        "description": null,
+        "kind": "simple",
+        "doc_url": "/docs/mirascope/api/prompt_templates/decorator/Context#context"
+      },
+      "parameters": [
+        {
+          "type_str": "DepsT",
+          "description": null,
+          "kind": "simple",
+          "doc_identifier": "DepsT"
+        }
+      ]
+    }
+  },
+  {
+    "name": "args",
+    "type_info": {
+      "type_str": "P.args",
+      "description": null,
+      "kind": "simple",
+      "doc_identifier": "P.args"
+    },
+    "default": "()"
+  },
+  {
+    "name": "kwargs",
+    "type_info": {
+      "type_str": "P.kwargs",
+      "description": null,
+      "kind": "simple",
+      "doc_identifier": "P.kwargs"
+    },
+    "default": "{}"
+  }
+]}
+/>
+
+<ReturnTable
+  returnType={{
+  "type_info": {
+    "type_str": "AsyncStructuredStream[T]",
+    "description": null,
+    "kind": "generic",
+    "base_type": {
+      "type_str": "AsyncStructuredStream",
+      "description": null,
+      "kind": "simple",
+      "doc_url": "/docs/mirascope/api/models/base/AsyncStructuredStream#asyncstructuredstream"
+    },
+    "parameters": [
+      {
+        "type_str": "T",
+        "description": null,
+        "kind": "simple",
+        "doc_identifier": "T"
+      }
+    ]
+  }
+}}
+/>
+
+

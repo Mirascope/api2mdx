@@ -1,0 +1,125 @@
+---
+# AUTO-GENERATED API DOCUMENTATION - DO NOT EDIT
+title: model
+description: API documentation for model
+---
+
+# model
+
+## <ApiType type="Function" path="models/context/model" symbolName="model" /> model
+
+Set the model context with the model of the given id.
+
+Any call to a function decorated with `@llm.call` will attempt to use the model
+that's set in the model context first. If no model is set in the context, the
+default model will be used.
+
+This is useful for overriding the default model at runtime.
+
+Example:
+
+    ```python
+    from mirascope import llm
+
+    @llm.call("openai:gpt-4.1-nano")
+    def answer_question(question: str) -> str:
+        return f"Answer this question: {question}"
+
+    # Run the call with a different model from the default
+    with llm.model("anthropic:claude-3-5-sonnet-latest"):
+        response: llm.Response = answer_question("What is the capital of France?")
+        print(response.content)
+    ```
+
+<ParametersTable
+  parameters={[
+  {
+    "name": "id",
+    "type_info": {
+      "type_str": "REGISTERED_LLMS",
+      "description": null,
+      "kind": "simple",
+      "doc_identifier": "REGISTERED_LLMS"
+    },
+    "description": "The id of the model in format \"provider:name\" (e.g., \"openai:gpt-4\")."
+  },
+  {
+    "name": "client",
+    "type_info": {
+      "type_str": "Client | None",
+      "description": null,
+      "kind": "union",
+      "base_type": {
+        "type_str": "Union",
+        "description": null,
+        "kind": "simple",
+        "doc_url": "https://docs.python.org/3/library/typing.html#typing.Union"
+      },
+      "parameters": [
+        {
+          "type_str": "Client",
+          "description": null,
+          "kind": "simple",
+          "doc_url": "/docs/mirascope/api/models/openai/Client#client"
+        },
+        {
+          "type_str": "None",
+          "description": null,
+          "kind": "simple",
+          "doc_url": "https://docs.python.org/3/library/constants.html#None"
+        }
+      ]
+    },
+    "default": "None",
+    "description": "Optional custom client to use for API requests. If not provided, a\ndefault client will be created."
+  },
+  {
+    "name": "params",
+    "type_info": {
+      "type_str": "Unpack[Params]",
+      "description": null,
+      "kind": "generic",
+      "base_type": {
+        "type_str": "Unpack",
+        "description": null,
+        "kind": "simple",
+        "doc_identifier": "Unpack"
+      },
+      "parameters": [
+        {
+          "type_str": "Params",
+          "description": null,
+          "kind": "simple",
+          "doc_url": "/docs/mirascope/api/models/openai/Params#params"
+        }
+      ]
+    },
+    "default": "{}"
+  }
+]}
+/>
+
+<ReturnTable
+  returnType={{
+  "type_info": {
+    "type_str": "Iterator[LLM]",
+    "description": null,
+    "kind": "generic",
+    "base_type": {
+      "type_str": "Iterator",
+      "description": null,
+      "kind": "simple",
+      "doc_identifier": "Iterator"
+    },
+    "parameters": [
+      {
+        "type_str": "LLM",
+        "description": null,
+        "kind": "simple",
+        "doc_url": "/docs/mirascope/api/models/openai/LLM#llm"
+      }
+    ]
+  }
+}}
+/>
+

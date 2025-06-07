@@ -1,0 +1,91 @@
+---
+# AUTO-GENERATED API DOCUMENTATION - DO NOT EDIT
+title: ToolCall
+description: API documentation for ToolCall
+---
+
+# ToolCall
+
+## <ApiType type="Class" path="content/tool_call/ToolCall" symbolName="ToolCall" /> ToolCall
+
+Tool call content for a message.
+
+Represents a request from the assistant to call a tool. This is part of
+an assistant message's content.
+
+<AttributesTable
+  attributes={[
+  {
+    "name": "type",
+    "type_info": {
+      "type_str": "Literal['tool_call']",
+      "description": null,
+      "kind": "generic",
+      "base_type": {
+        "type_str": "Literal",
+        "description": null,
+        "kind": "simple",
+        "doc_url": "https://docs.python.org/3/library/typing.html#typing.Literal"
+      },
+      "parameters": [
+        {
+          "type_str": "'tool_call'",
+          "description": null,
+          "kind": "simple",
+          "doc_identifier": "'tool_call'"
+        }
+      ]
+    }
+  },
+  {
+    "name": "id",
+    "type_info": {
+      "type_str": "str",
+      "description": null,
+      "kind": "simple",
+      "doc_url": "https://docs.python.org/3/library/stdtypes.html#str"
+    },
+    "description": "A unique identifier for this tool call."
+  },
+  {
+    "name": "name",
+    "type_info": {
+      "type_str": "str",
+      "description": null,
+      "kind": "simple",
+      "doc_url": "https://docs.python.org/3/library/stdtypes.html#str"
+    },
+    "description": "The name of the tool to call."
+  },
+  {
+    "name": "args",
+    "type_info": {
+      "type_str": "dict[str, Jsonable]",
+      "description": null,
+      "kind": "generic",
+      "base_type": {
+        "type_str": "dict",
+        "description": null,
+        "kind": "simple",
+        "doc_url": "https://docs.python.org/3/library/stdtypes.html#dict"
+      },
+      "parameters": [
+        {
+          "type_str": "str",
+          "description": null,
+          "kind": "simple",
+          "doc_url": "https://docs.python.org/3/library/stdtypes.html#str"
+        },
+        {
+          "type_str": "Jsonable",
+          "description": null,
+          "kind": "simple",
+          "doc_identifier": "Jsonable"
+        }
+      ]
+    },
+    "description": "The arguments to pass to the tool."
+  }
+]}
+/>
+

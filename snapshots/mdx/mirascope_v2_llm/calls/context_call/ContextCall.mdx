@@ -1,0 +1,244 @@
+---
+# AUTO-GENERATED API DOCUMENTATION - DO NOT EDIT
+title: ContextCall
+description: API documentation for ContextCall
+---
+
+# ContextCall
+
+## <ApiType type="Class" path="calls/context_call/ContextCall" symbolName="ContextCall" /> ContextCall
+
+A class for generating responses using LLMs.
+
+**Bases:** 
+<TypeLink type={{"type_str": "BaseContextCall[P, PromptTemplate, DepsT]", "description": null, "kind": "generic", "base_type": {"type_str": "BaseContextCall", "description": null, "kind": "simple", "doc_url": "/docs/mirascope/api/calls/context_call/BaseContextCall#basecontextcall"}, "parameters": [{"type_str": "P", "description": null, "kind": "simple", "doc_identifier": "P"}, {"type_str": "PromptTemplate", "description": null, "kind": "simple", "doc_identifier": "PromptTemplate"}, {"type_str": "DepsT", "description": null, "kind": "simple", "doc_identifier": "DepsT"}]}} />
+
+## <ApiType type="Function" path="calls/context_call/ContextCall" symbolName="call_async" /> call_async
+
+Generates an asynchronous response using the LLM.
+
+<ParametersTable
+  parameters={[
+  {
+    "name": "self",
+    "type_info": {
+      "type_str": "Any",
+      "description": null,
+      "kind": "simple",
+      "doc_identifier": null
+    }
+  },
+  {
+    "name": "ctx",
+    "type_info": {
+      "type_str": "Context[DepsT]",
+      "description": null,
+      "kind": "generic",
+      "base_type": {
+        "type_str": "Context",
+        "description": null,
+        "kind": "simple",
+        "doc_url": "/docs/mirascope/api/prompt_templates/decorator/Context#context"
+      },
+      "parameters": [
+        {
+          "type_str": "DepsT",
+          "description": null,
+          "kind": "simple",
+          "doc_identifier": "DepsT"
+        }
+      ]
+    }
+  },
+  {
+    "name": "args",
+    "type_info": {
+      "type_str": "P.args",
+      "description": null,
+      "kind": "simple",
+      "doc_identifier": "P.args"
+    },
+    "default": "()"
+  },
+  {
+    "name": "kwargs",
+    "type_info": {
+      "type_str": "P.kwargs",
+      "description": null,
+      "kind": "simple",
+      "doc_identifier": "P.kwargs"
+    },
+    "default": "{}"
+  }
+]}
+/>
+
+<ReturnTable
+  returnType={{
+  "type_info": {
+    "type_str": "ContextResponse[DepsT]",
+    "description": null,
+    "kind": "generic",
+    "base_type": {
+      "type_str": "ContextResponse",
+      "description": null,
+      "kind": "simple",
+      "doc_url": "/docs/mirascope/api/models/base/ContextResponse#contextresponse"
+    },
+    "parameters": [
+      {
+        "type_str": "DepsT",
+        "description": null,
+        "kind": "simple",
+        "doc_identifier": "DepsT"
+      }
+    ]
+  }
+}}
+/>
+
+
+## <ApiType type="Function" path="calls/context_call/ContextCall" symbolName="stream" /> stream
+
+Generates a streaming response using the LLM.
+
+<ParametersTable
+  parameters={[
+  {
+    "name": "self",
+    "type_info": {
+      "type_str": "Any",
+      "description": null,
+      "kind": "simple",
+      "doc_identifier": null
+    }
+  },
+  {
+    "name": "ctx",
+    "type_info": {
+      "type_str": "Context[DepsT]",
+      "description": null,
+      "kind": "generic",
+      "base_type": {
+        "type_str": "Context",
+        "description": null,
+        "kind": "simple",
+        "doc_url": "/docs/mirascope/api/prompt_templates/decorator/Context#context"
+      },
+      "parameters": [
+        {
+          "type_str": "DepsT",
+          "description": null,
+          "kind": "simple",
+          "doc_identifier": "DepsT"
+        }
+      ]
+    }
+  },
+  {
+    "name": "args",
+    "type_info": {
+      "type_str": "P.args",
+      "description": null,
+      "kind": "simple",
+      "doc_identifier": "P.args"
+    },
+    "default": "()"
+  },
+  {
+    "name": "kwargs",
+    "type_info": {
+      "type_str": "P.kwargs",
+      "description": null,
+      "kind": "simple",
+      "doc_identifier": "P.kwargs"
+    },
+    "default": "{}"
+  }
+]}
+/>
+
+<ReturnTable
+  returnType={{
+  "type_info": {
+    "type_str": "Stream",
+    "description": null,
+    "kind": "simple",
+    "doc_url": "/docs/mirascope/api/models/base/index#stream"
+  }
+}}
+/>
+
+
+## <ApiType type="Function" path="calls/context_call/ContextCall" symbolName="stream_async" /> stream_async
+
+Generates an asynchronous streaming response using the LLM.
+
+<ParametersTable
+  parameters={[
+  {
+    "name": "self",
+    "type_info": {
+      "type_str": "Any",
+      "description": null,
+      "kind": "simple",
+      "doc_identifier": null
+    }
+  },
+  {
+    "name": "ctx",
+    "type_info": {
+      "type_str": "Context[DepsT]",
+      "description": null,
+      "kind": "generic",
+      "base_type": {
+        "type_str": "Context",
+        "description": null,
+        "kind": "simple",
+        "doc_url": "/docs/mirascope/api/prompt_templates/decorator/Context#context"
+      },
+      "parameters": [
+        {
+          "type_str": "DepsT",
+          "description": null,
+          "kind": "simple",
+          "doc_identifier": "DepsT"
+        }
+      ]
+    }
+  },
+  {
+    "name": "args",
+    "type_info": {
+      "type_str": "P.args",
+      "description": null,
+      "kind": "simple",
+      "doc_identifier": "P.args"
+    },
+    "default": "()"
+  },
+  {
+    "name": "kwargs",
+    "type_info": {
+      "type_str": "P.kwargs",
+      "description": null,
+      "kind": "simple",
+      "doc_identifier": "P.kwargs"
+    },
+    "default": "{}"
+  }
+]}
+/>
+
+<ReturnTable
+  returnType={{
+  "type_info": {
+    "type_str": "AsyncStream",
+    "description": null,
+    "kind": "simple",
+    "doc_url": "/docs/mirascope/api/models/base/index#asyncstream"
+  }
+}}
+/>
+
+

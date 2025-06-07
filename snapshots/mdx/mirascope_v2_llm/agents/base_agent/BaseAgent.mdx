@@ -1,0 +1,95 @@
+---
+# AUTO-GENERATED API DOCUMENTATION - DO NOT EDIT
+title: BaseAgent
+description: API documentation for BaseAgent
+---
+
+# BaseAgent
+
+## <ApiType type="Class" path="agents/base_agent/BaseAgent" symbolName="BaseAgent" /> BaseAgent
+
+Agent class for generating responses using LLMs with tools.
+
+**Bases:** 
+<TypeLink type={{"type_str": "Generic[DepsT]", "description": null, "kind": "generic", "base_type": {"type_str": "Generic", "description": null, "kind": "simple", "doc_url": "https://docs.python.org/3/library/typing.html#typing.Generic"}, "parameters": [{"type_str": "DepsT", "description": null, "kind": "simple", "doc_identifier": "DepsT"}]}} />, <TypeLink type={{"type_str": "ABC", "description": null, "kind": "simple", "doc_identifier": "ABC"}} />
+
+<AttributesTable
+  attributes={[
+  {
+    "name": "ctx",
+    "type_info": {
+      "type_str": "Context[DepsT]",
+      "description": null,
+      "kind": "generic",
+      "base_type": {
+        "type_str": "Context",
+        "description": null,
+        "kind": "simple",
+        "doc_url": "/docs/mirascope/api/prompt_templates/decorator/Context#context"
+      },
+      "parameters": [
+        {
+          "type_str": "DepsT",
+          "description": null,
+          "kind": "simple",
+          "doc_identifier": "DepsT"
+        }
+      ]
+    },
+    "description": "The context for the agent, such as the history of messages."
+  },
+  {
+    "name": "tools",
+    "type_info": {
+      "type_str": "Sequence[ToolDef] | None",
+      "description": null,
+      "kind": "union",
+      "base_type": {
+        "type_str": "Union",
+        "description": null,
+        "kind": "simple",
+        "doc_url": "https://docs.python.org/3/library/typing.html#typing.Union"
+      },
+      "parameters": [
+        {
+          "type_str": "Sequence[ToolDef]",
+          "description": null,
+          "kind": "generic",
+          "base_type": {
+            "type_str": "Sequence",
+            "description": null,
+            "kind": "simple",
+            "doc_identifier": "Sequence"
+          },
+          "parameters": [
+            {
+              "type_str": "ToolDef",
+              "description": null,
+              "kind": "simple",
+              "doc_url": "/docs/mirascope/api/prompt_templates/dynamic_config/ToolDef#tooldef"
+            }
+          ]
+        },
+        {
+          "type_str": "None",
+          "description": null,
+          "kind": "simple",
+          "doc_url": "https://docs.python.org/3/library/constants.html#None"
+        }
+      ]
+    },
+    "description": "The tools available to the agent, if any."
+  },
+  {
+    "name": "model",
+    "type_info": {
+      "type_str": "LLM",
+      "description": null,
+      "kind": "simple",
+      "doc_url": "/docs/mirascope/api/models/openai/LLM#llm"
+    },
+    "description": "The default model the agent will use if not specified through context."
+  }
+]}
+/>
+

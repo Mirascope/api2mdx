@@ -82,8 +82,8 @@ def _get_module_exports(module: Module) -> list[str]:
         List of export names
     """
     # Check if module has __all__ defined
-    if hasattr(module, 'all') and module.all:
-        return list(module.all)
+    if hasattr(module, 'all') and getattr(module, 'all'):
+        return list(getattr(module, 'all'))
     
     # Fallback to meaningful public members, excluding common imports and type vars
     excluded_names = {
@@ -161,9 +161,10 @@ def _discover_member_directives(
         directive = f"::: {canonical_path}"
         directives.append((directive, output_path))
         
-    elif hasattr(member, 'target') and member.target:
+    elif hasattr(member, 'target') and getattr(member, 'target'):
         # Handle aliases by documenting the target
-        target_path = member.target.canonical_path if hasattr(member.target, 'canonical_path') else str(member.target)
+        target = getattr(member, 'target')
+        target_path = target.canonical_path if hasattr(target, 'canonical_path') else str(target)
         directive = f"::: {target_path}"
         directives.append((directive, output_path))
     

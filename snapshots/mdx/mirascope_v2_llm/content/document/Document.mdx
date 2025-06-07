@@ -1,0 +1,153 @@
+---
+# AUTO-GENERATED API DOCUMENTATION - DO NOT EDIT
+title: Document
+description: API documentation for Document
+---
+
+# Document
+
+## <ApiType type="Class" path="content/document/Document" symbolName="Document" /> Document
+
+Document content for a message.
+
+Documents (like PDFs) can be included for the model to analyze or reference.
+
+<AttributesTable
+  attributes={[
+  {
+    "name": "type",
+    "type_info": {
+      "type_str": "Literal['document']",
+      "description": null,
+      "kind": "generic",
+      "base_type": {
+        "type_str": "Literal",
+        "description": null,
+        "kind": "simple",
+        "doc_url": "https://docs.python.org/3/library/typing.html#typing.Literal"
+      },
+      "parameters": [
+        {
+          "type_str": "'document'",
+          "description": null,
+          "kind": "simple",
+          "doc_identifier": "'document'"
+        }
+      ]
+    }
+  },
+  {
+    "name": "data",
+    "type_info": {
+      "type_str": "str | bytes",
+      "description": null,
+      "kind": "union",
+      "base_type": {
+        "type_str": "Union",
+        "description": null,
+        "kind": "simple",
+        "doc_url": "https://docs.python.org/3/library/typing.html#typing.Union"
+      },
+      "parameters": [
+        {
+          "type_str": "str",
+          "description": null,
+          "kind": "simple",
+          "doc_url": "https://docs.python.org/3/library/stdtypes.html#str"
+        },
+        {
+          "type_str": "bytes",
+          "description": null,
+          "kind": "simple",
+          "doc_url": "https://docs.python.org/3/library/stdtypes.html#bytes"
+        }
+      ]
+    },
+    "description": "The document data, which can be a URL, file path, base64-encoded string, or binary data."
+  },
+  {
+    "name": "mime_type",
+    "type_info": {
+      "type_str": "Literal['application/pdf', 'application/json', 'text/plain', 'application/x-javascript', 'text/javascript', 'application/x-python', 'text/x-python', 'text/html', 'text/css', 'text/xml', 'text/rtf']",
+      "description": null,
+      "kind": "generic",
+      "base_type": {
+        "type_str": "Literal",
+        "description": null,
+        "kind": "simple",
+        "doc_url": "https://docs.python.org/3/library/typing.html#typing.Literal"
+      },
+      "parameters": [
+        {
+          "type_str": "'application/pdf'",
+          "description": null,
+          "kind": "simple",
+          "doc_identifier": "'application/pdf'"
+        },
+        {
+          "type_str": "'application/json'",
+          "description": null,
+          "kind": "simple",
+          "doc_identifier": "'application/json'"
+        },
+        {
+          "type_str": "'text/plain'",
+          "description": null,
+          "kind": "simple",
+          "doc_identifier": "'text/plain'"
+        },
+        {
+          "type_str": "'application/x-javascript'",
+          "description": null,
+          "kind": "simple",
+          "doc_identifier": "'application/x-javascript'"
+        },
+        {
+          "type_str": "'text/javascript'",
+          "description": null,
+          "kind": "simple",
+          "doc_identifier": "'text/javascript'"
+        },
+        {
+          "type_str": "'application/x-python'",
+          "description": null,
+          "kind": "simple",
+          "doc_identifier": "'application/x-python'"
+        },
+        {
+          "type_str": "'text/x-python'",
+          "description": null,
+          "kind": "simple",
+          "doc_identifier": "'text/x-python'"
+        },
+        {
+          "type_str": "'text/html'",
+          "description": null,
+          "kind": "simple",
+          "doc_identifier": "'text/html'"
+        },
+        {
+          "type_str": "'text/css'",
+          "description": null,
+          "kind": "simple",
+          "doc_identifier": "'text/css'"
+        },
+        {
+          "type_str": "'text/xml'",
+          "description": null,
+          "kind": "simple",
+          "doc_identifier": "'text/xml'"
+        },
+        {
+          "type_str": "'text/rtf'",
+          "description": null,
+          "kind": "simple",
+          "doc_identifier": "'text/rtf'"
+        }
+      ]
+    },
+    "description": "The MIME type of the document, e.g., 'application/pdf'."
+  }
+]}
+/>
+

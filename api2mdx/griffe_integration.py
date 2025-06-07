@@ -178,17 +178,30 @@ def process_directive(directive: str, module: Module, doc_path: str) -> str:
     # Split the path to navigate to the object
     path_parts = object_path.split(".")
 
-    # Skip the top-level module name since we already have it loaded
+    # Start with the loaded module
     current_obj: Object | Alias = module
-
-    # Navigate through the object path
-    for i, part in enumerate(path_parts[1:], 1):
-        if hasattr(current_obj, "members") and part in current_obj.members:
-            current_obj = current_obj.members[part]
-        else:
-            raise ValueError(
-                f"Could not find {'.'.join(path_parts[: i + 1])} in the module."
-            )
+    
+    # If the directive path exactly matches the loaded module path, return the module itself
+    if object_path == module.canonical_path:
+        pass  # current_obj is already the target module
+    else:
+        # Navigate through the object path, skipping parts that match the module path
+        module_parts = module.canonical_path.split(".")
+        
+        # Find the starting index - skip parts that match the loaded module path
+        start_index = 0
+        if len(path_parts) >= len(module_parts):
+            if path_parts[:len(module_parts)] == module_parts:
+                start_index = len(module_parts)
+        
+        # Navigate from the starting index
+        for i, part in enumerate(path_parts[start_index:], start_index):
+            if hasattr(current_obj, "members") and part in current_obj.members:
+                current_obj = current_obj.members[part]
+            else:
+                raise ValueError(
+                    f"Could not find {'.'.join(path_parts[: i + 1])} in the module."
+                )
 
     # Use the document_object dispatcher function
     return document_object(current_obj, doc_path)

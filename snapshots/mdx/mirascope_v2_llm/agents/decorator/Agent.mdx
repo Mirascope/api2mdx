@@ -1,0 +1,297 @@
+---
+# AUTO-GENERATED API DOCUMENTATION - DO NOT EDIT
+title: agent
+description: API documentation for agent
+---
+
+# agent
+
+## <ApiType type="Function" path="agents/decorator/agent" symbolName="agent" /> agent
+
+Decorator for creating an agent or structured agent.
+
+<ParametersTable
+  parameters={[
+  {
+    "name": "model",
+    "type_info": {
+      "type_str": "REGISTERED_LLMS",
+      "description": null,
+      "kind": "simple",
+      "doc_identifier": "REGISTERED_LLMS"
+    },
+    "description": "The model to use for the agent."
+  },
+  {
+    "name": "deps_type",
+    "type_info": {
+      "type_str": "type[DepsT]",
+      "description": null,
+      "kind": "generic",
+      "base_type": {
+        "type_str": "type",
+        "description": null,
+        "kind": "simple",
+        "doc_url": "https://docs.python.org/3/library/functions.html#type"
+      },
+      "parameters": [
+        {
+          "type_str": "DepsT",
+          "description": null,
+          "kind": "simple",
+          "doc_identifier": "DepsT"
+        }
+      ]
+    },
+    "default": "NoneType",
+    "description": "The type of dependencies for the agent, injected into the context."
+  },
+  {
+    "name": "tools",
+    "type_info": {
+      "type_str": "Sequence[ToolDef | ContextToolDef[..., Any, DepsT]] | None",
+      "description": null,
+      "kind": "union",
+      "base_type": {
+        "type_str": "Union",
+        "description": null,
+        "kind": "simple",
+        "doc_url": "https://docs.python.org/3/library/typing.html#typing.Union"
+      },
+      "parameters": [
+        {
+          "type_str": "Sequence[ToolDef | ContextToolDef[..., Any, DepsT]]",
+          "description": null,
+          "kind": "generic",
+          "base_type": {
+            "type_str": "Sequence",
+            "description": null,
+            "kind": "simple",
+            "doc_identifier": "Sequence"
+          },
+          "parameters": [
+            {
+              "type_str": "ToolDef | ContextToolDef[..., Any, DepsT]",
+              "description": null,
+              "kind": "union",
+              "base_type": {
+                "type_str": "Union",
+                "description": null,
+                "kind": "simple",
+                "doc_url": "https://docs.python.org/3/library/typing.html#typing.Union"
+              },
+              "parameters": [
+                {
+                  "type_str": "ToolDef",
+                  "description": null,
+                  "kind": "simple",
+                  "doc_url": "/docs/mirascope/api/prompt_templates/dynamic_config/ToolDef#tooldef"
+                },
+                {
+                  "type_str": "ContextToolDef[..., Any, DepsT]",
+                  "description": null,
+                  "kind": "generic",
+                  "base_type": {
+                    "type_str": "ContextToolDef",
+                    "description": null,
+                    "kind": "simple",
+                    "doc_url": "/docs/mirascope/api/models/base/ContextToolDef#contexttooldef"
+                  },
+                  "parameters": [
+                    {
+                      "type_str": "...",
+                      "description": null,
+                      "kind": "simple",
+                      "doc_identifier": "..."
+                    },
+                    {
+                      "type_str": "Any",
+                      "description": null,
+                      "kind": "simple",
+                      "doc_url": "https://docs.python.org/3/library/typing.html#typing.Any"
+                    },
+                    {
+                      "type_str": "DepsT",
+                      "description": null,
+                      "kind": "simple",
+                      "doc_identifier": "DepsT"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type_str": "None",
+          "description": null,
+          "kind": "simple",
+          "doc_url": "https://docs.python.org/3/library/constants.html#None"
+        }
+      ]
+    },
+    "default": "None",
+    "description": "The tools available to the agent."
+  },
+  {
+    "name": "response_format",
+    "type_info": {
+      "type_str": "type[T] | None",
+      "description": null,
+      "kind": "union",
+      "base_type": {
+        "type_str": "Union",
+        "description": null,
+        "kind": "simple",
+        "doc_url": "https://docs.python.org/3/library/typing.html#typing.Union"
+      },
+      "parameters": [
+        {
+          "type_str": "type[T]",
+          "description": null,
+          "kind": "generic",
+          "base_type": {
+            "type_str": "type",
+            "description": null,
+            "kind": "simple",
+            "doc_url": "https://docs.python.org/3/library/functions.html#type"
+          },
+          "parameters": [
+            {
+              "type_str": "T",
+              "description": null,
+              "kind": "simple",
+              "doc_identifier": "T"
+            }
+          ]
+        },
+        {
+          "type_str": "None",
+          "description": null,
+          "kind": "simple",
+          "doc_url": "https://docs.python.org/3/library/constants.html#None"
+        }
+      ]
+    },
+    "default": "None",
+    "description": "The response format type for the agent."
+  },
+  {
+    "name": "client",
+    "type_info": {
+      "type_str": "Client | None",
+      "description": null,
+      "kind": "union",
+      "base_type": {
+        "type_str": "Union",
+        "description": null,
+        "kind": "simple",
+        "doc_url": "https://docs.python.org/3/library/typing.html#typing.Union"
+      },
+      "parameters": [
+        {
+          "type_str": "Client",
+          "description": null,
+          "kind": "simple",
+          "doc_url": "/docs/mirascope/api/models/openai/Client#client"
+        },
+        {
+          "type_str": "None",
+          "description": null,
+          "kind": "simple",
+          "doc_url": "https://docs.python.org/3/library/constants.html#None"
+        }
+      ]
+    },
+    "default": "None",
+    "description": "The client to use for the agent."
+  },
+  {
+    "name": "params",
+    "type_info": {
+      "type_str": "Unpack[Params]",
+      "description": null,
+      "kind": "generic",
+      "base_type": {
+        "type_str": "Unpack",
+        "description": null,
+        "kind": "simple",
+        "doc_identifier": "Unpack"
+      },
+      "parameters": [
+        {
+          "type_str": "Params",
+          "description": null,
+          "kind": "simple",
+          "doc_url": "/docs/mirascope/api/models/openai/Params#params"
+        }
+      ]
+    },
+    "default": "{}"
+  }
+]}
+/>
+
+<ReturnTable
+  returnType={{
+  "type_info": {
+    "type_str": "AgentDecorator[DepsT] | StructuredAgentDecorator[DepsT, T]",
+    "description": null,
+    "kind": "union",
+    "base_type": {
+      "type_str": "Union",
+      "description": null,
+      "kind": "simple",
+      "doc_url": "https://docs.python.org/3/library/typing.html#typing.Union"
+    },
+    "parameters": [
+      {
+        "type_str": "AgentDecorator[DepsT]",
+        "description": null,
+        "kind": "generic",
+        "base_type": {
+          "type_str": "AgentDecorator",
+          "description": null,
+          "kind": "simple",
+          "doc_url": "/docs/mirascope/api/agents/decorator/AgentDecorator#agentdecorator"
+        },
+        "parameters": [
+          {
+            "type_str": "DepsT",
+            "description": null,
+            "kind": "simple",
+            "doc_identifier": "DepsT"
+          }
+        ]
+      },
+      {
+        "type_str": "StructuredAgentDecorator[DepsT, T]",
+        "description": null,
+        "kind": "generic",
+        "base_type": {
+          "type_str": "StructuredAgentDecorator",
+          "description": null,
+          "kind": "simple",
+          "doc_url": "/docs/mirascope/api/agents/decorator/StructuredAgentDecorator#structuredagentdecorator"
+        },
+        "parameters": [
+          {
+            "type_str": "DepsT",
+            "description": null,
+            "kind": "simple",
+            "doc_identifier": "DepsT"
+          },
+          {
+            "type_str": "T",
+            "description": null,
+            "kind": "simple",
+            "doc_identifier": "T"
+          }
+        ]
+      }
+    ]
+  },
+  "description": "An instance of `AgentDecorator` or `StructuredAgentDecorator`."
+}}
+/>
+

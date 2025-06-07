@@ -28,4 +28,5 @@ exclude = [
     "**/__pycache__",
     ".venv",
     "venv",
+    "snapshots",  # Exclude example code from type checking
 ]

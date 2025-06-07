@@ -73,6 +73,8 @@ class DocumentationGenerator:
         self.module = self._load_module()
 
         # Discover API directives from module structure
+        if self.module is None:
+            raise RuntimeError("Module must be loaded before discovering directives")
         self.api_directives = discover_hierarchical_directives(self.module)
         print(f"Discovered {len(self.api_directives)} API directives")
 

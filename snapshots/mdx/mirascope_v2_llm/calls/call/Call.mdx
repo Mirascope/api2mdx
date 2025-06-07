@@ -1,0 +1,165 @@
+---
+# AUTO-GENERATED API DOCUMENTATION - DO NOT EDIT
+title: Call
+description: API documentation for Call
+---
+
+# Call
+
+## <ApiType type="Class" path="calls/call/Call" symbolName="Call" /> Call
+
+A class for generating responses using LLMs.
+
+**Bases:** 
+<TypeLink type={{"type_str": "BaseCall[P, PromptTemplate]", "description": null, "kind": "generic", "base_type": {"type_str": "BaseCall", "description": null, "kind": "simple", "doc_url": "/docs/mirascope/api/calls/base_call/BaseCall#basecall"}, "parameters": [{"type_str": "P", "description": null, "kind": "simple", "doc_identifier": "P"}, {"type_str": "PromptTemplate", "description": null, "kind": "simple", "doc_identifier": "PromptTemplate"}]}} />
+
+## <ApiType type="Function" path="calls/call/Call" symbolName="call_async" /> call_async
+
+Generates an asynchronous response using the LLM.
+
+<ParametersTable
+  parameters={[
+  {
+    "name": "self",
+    "type_info": {
+      "type_str": "Any",
+      "description": null,
+      "kind": "simple",
+      "doc_identifier": null
+    }
+  },
+  {
+    "name": "args",
+    "type_info": {
+      "type_str": "P.args",
+      "description": null,
+      "kind": "simple",
+      "doc_identifier": "P.args"
+    },
+    "default": "()"
+  },
+  {
+    "name": "kwargs",
+    "type_info": {
+      "type_str": "P.kwargs",
+      "description": null,
+      "kind": "simple",
+      "doc_identifier": "P.kwargs"
+    },
+    "default": "{}"
+  }
+]}
+/>
+
+<ReturnTable
+  returnType={{
+  "type_info": {
+    "type_str": "Response",
+    "description": null,
+    "kind": "simple",
+    "doc_url": "/docs/mirascope/api/models/base/index#response"
+  }
+}}
+/>
+
+
+## <ApiType type="Function" path="calls/call/Call" symbolName="stream" /> stream
+
+Generates a streaming response using the LLM.
+
+<ParametersTable
+  parameters={[
+  {
+    "name": "self",
+    "type_info": {
+      "type_str": "Any",
+      "description": null,
+      "kind": "simple",
+      "doc_identifier": null
+    }
+  },
+  {
+    "name": "args",
+    "type_info": {
+      "type_str": "P.args",
+      "description": null,
+      "kind": "simple",
+      "doc_identifier": "P.args"
+    },
+    "default": "()"
+  },
+  {
+    "name": "kwargs",
+    "type_info": {
+      "type_str": "P.kwargs",
+      "description": null,
+      "kind": "simple",
+      "doc_identifier": "P.kwargs"
+    },
+    "default": "{}"
+  }
+]}
+/>
+
+<ReturnTable
+  returnType={{
+  "type_info": {
+    "type_str": "Stream",
+    "description": null,
+    "kind": "simple",
+    "doc_url": "/docs/mirascope/api/models/base/index#stream"
+  }
+}}
+/>
+
+
+## <ApiType type="Function" path="calls/call/Call" symbolName="stream_async" /> stream_async
+
+Generates an asynchronous streaming response using the LLM.
+
+<ParametersTable
+  parameters={[
+  {
+    "name": "self",
+    "type_info": {
+      "type_str": "Any",
+      "description": null,
+      "kind": "simple",
+      "doc_identifier": null
+    }
+  },
+  {
+    "name": "args",
+    "type_info": {
+      "type_str": "P.args",
+      "description": null,
+      "kind": "simple",
+      "doc_identifier": "P.args"
+    },
+    "default": "()"
+  },
+  {
+    "name": "kwargs",
+    "type_info": {
+      "type_str": "P.kwargs",
+      "description": null,
+      "kind": "simple",
+      "doc_identifier": "P.kwargs"
+    },
+    "default": "{}"
+  }
+]}
+/>
+
+<ReturnTable
+  returnType={{
+  "type_info": {
+    "type_str": "AsyncStream",
+    "description": null,
+    "kind": "simple",
+    "doc_url": "/docs/mirascope/api/models/base/index#asyncstream"
+  }
+}}
+/>
+
+

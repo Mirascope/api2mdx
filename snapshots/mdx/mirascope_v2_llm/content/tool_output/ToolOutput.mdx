@@ -1,0 +1,65 @@
+---
+# AUTO-GENERATED API DOCUMENTATION - DO NOT EDIT
+title: ToolOutput
+description: API documentation for ToolOutput
+---
+
+# ToolOutput
+
+## <ApiType type="Class" path="content/tool_output/ToolOutput" symbolName="ToolOutput" /> ToolOutput
+
+Tool output content for a message.
+
+Represents the output from a tool call. This is part of a user message's
+content, typically following a tool call from the assistant.
+
+**Bases:** 
+<TypeLink type={{"type_str": "Generic[R]", "description": null, "kind": "generic", "base_type": {"type_str": "Generic", "description": null, "kind": "simple", "doc_url": "https://docs.python.org/3/library/typing.html#typing.Generic"}, "parameters": [{"type_str": "R", "description": null, "kind": "simple", "doc_identifier": "R"}]}} />
+
+<AttributesTable
+  attributes={[
+  {
+    "name": "type",
+    "type_info": {
+      "type_str": "Literal['tool_response']",
+      "description": null,
+      "kind": "generic",
+      "base_type": {
+        "type_str": "Literal",
+        "description": null,
+        "kind": "simple",
+        "doc_url": "https://docs.python.org/3/library/typing.html#typing.Literal"
+      },
+      "parameters": [
+        {
+          "type_str": "'tool_response'",
+          "description": null,
+          "kind": "simple",
+          "doc_identifier": "'tool_response'"
+        }
+      ]
+    }
+  },
+  {
+    "name": "id",
+    "type_info": {
+      "type_str": "str",
+      "description": null,
+      "kind": "simple",
+      "doc_url": "https://docs.python.org/3/library/stdtypes.html#str"
+    },
+    "description": "The ID of the tool call that this output is for."
+  },
+  {
+    "name": "value",
+    "type_info": {
+      "type_str": "R",
+      "description": null,
+      "kind": "simple",
+      "doc_identifier": "R"
+    },
+    "description": "The output value from the tool call."
+  }
+]}
+/>
+

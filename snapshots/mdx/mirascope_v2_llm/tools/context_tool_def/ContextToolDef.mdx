@@ -1,0 +1,169 @@
+---
+# AUTO-GENERATED API DOCUMENTATION - DO NOT EDIT
+title: ContextToolDef
+description: API documentation for ContextToolDef
+---
+
+# ContextToolDef
+
+## <ApiType type="Class" path="tools/context_tool_def/ContextToolDef" symbolName="ContextToolDef" /> ContextToolDef
+
+Protocol defining a tool that can be used by LLMs.
+
+A ToolDef represents a function that can be called by an LLM during a call.
+It includes metadata like name, description, and parameter schema.
+
+This class is not instantiated directly but created by the `@tool()` decorator.
+
+**Bases:** 
+<TypeLink type={{"type_str": "BaseToolDef[P, R]", "description": null, "kind": "generic", "base_type": {"type_str": "BaseToolDef", "description": null, "kind": "simple", "doc_url": "/docs/mirascope/api/tools/tool_def/index#basetooldef"}, "parameters": [{"type_str": "P", "description": null, "kind": "simple", "doc_identifier": "P"}, {"type_str": "R", "description": null, "kind": "simple", "doc_identifier": "R"}]}} />, <TypeLink type={{"type_str": "Generic[P, R, DepsT]", "description": null, "kind": "generic", "base_type": {"type_str": "Generic", "description": null, "kind": "simple", "doc_url": "https://docs.python.org/3/library/typing.html#typing.Generic"}, "parameters": [{"type_str": "P", "description": null, "kind": "simple", "doc_identifier": "P"}, {"type_str": "R", "description": null, "kind": "simple", "doc_identifier": "R"}, {"type_str": "DepsT", "description": null, "kind": "simple", "doc_identifier": "DepsT"}]}} />
+
+<AttributesTable
+  attributes={[
+  {
+    "name": "fn",
+    "type_info": {
+      "type_str": "Callable[Concatenate[Context[DepsT], P], R]",
+      "description": null,
+      "kind": "callable",
+      "base_type": {
+        "type_str": "Callable",
+        "description": null,
+        "kind": "simple",
+        "doc_url": "https://docs.python.org/3/library/typing.html#typing.Callable"
+      },
+      "parameters": [
+        {
+          "type_str": "Concatenate[Context[DepsT], P]",
+          "description": null,
+          "kind": "generic",
+          "base_type": {
+            "type_str": "Concatenate",
+            "description": null,
+            "kind": "simple",
+            "doc_identifier": "Concatenate"
+          },
+          "parameters": [
+            {
+              "type_str": "Context[DepsT]",
+              "description": null,
+              "kind": "generic",
+              "base_type": {
+                "type_str": "Context",
+                "description": null,
+                "kind": "simple",
+                "doc_url": "/docs/mirascope/api/prompt_templates/decorator/Context#context"
+              },
+              "parameters": [
+                {
+                  "type_str": "DepsT",
+                  "description": null,
+                  "kind": "simple",
+                  "doc_identifier": "DepsT"
+                }
+              ]
+            },
+            {
+              "type_str": "P",
+              "description": null,
+              "kind": "simple",
+              "doc_identifier": "P"
+            }
+          ]
+        },
+        {
+          "type_str": "R",
+          "description": null,
+          "kind": "simple",
+          "doc_identifier": "R"
+        }
+      ]
+    },
+    "description": "The function that implements the tool's functionality."
+  }
+]}
+/>
+
+## <ApiType type="Function" path="tools/context_tool_def/ContextToolDef" symbolName="defines" /> defines
+
+Check if this ToolDef matches a specific Tool instance.
+
+This method is used to ensure that the ToolDef was created from a specific
+function, allowing for type-safe access to the return value when calling
+the tool.
+
+<ParametersTable
+  parameters={[
+  {
+    "name": "self",
+    "type_info": {
+      "type_str": "Any",
+      "description": null,
+      "kind": "simple",
+      "doc_identifier": null
+    }
+  },
+  {
+    "name": "tool",
+    "type_info": {
+      "type_str": "BaseTool",
+      "description": null,
+      "kind": "simple",
+      "doc_url": "/docs/mirascope/api/tools/tool/BaseTool#basetool"
+    },
+    "description": "The Tool instance to compare against."
+  }
+]}
+/>
+
+<ReturnTable
+  returnType={{
+  "type_info": {
+    "type_str": "TypeGuard[ContextTool[P, R, DepsT]]",
+    "description": null,
+    "kind": "generic",
+    "base_type": {
+      "type_str": "TypeGuard",
+      "description": null,
+      "kind": "simple",
+      "doc_url": "/docs/mirascope/api/tools/tool_def/TypeGuard#typeguard"
+    },
+    "parameters": [
+      {
+        "type_str": "ContextTool[P, R, DepsT]",
+        "description": null,
+        "kind": "generic",
+        "base_type": {
+          "type_str": "ContextTool",
+          "description": null,
+          "kind": "simple",
+          "doc_url": "/docs/mirascope/api/responses/context_response/ContextTool#contexttool"
+        },
+        "parameters": [
+          {
+            "type_str": "P",
+            "description": null,
+            "kind": "simple",
+            "doc_identifier": "P"
+          },
+          {
+            "type_str": "R",
+            "description": null,
+            "kind": "simple",
+            "doc_identifier": "R"
+          },
+          {
+            "type_str": "DepsT",
+            "description": null,
+            "kind": "simple",
+            "doc_identifier": "DepsT"
+          }
+        ]
+      }
+    ]
+  },
+  "description": "True if the ToolDef defines the Tool instance, False otherwise."
+}}
+/>
+
+

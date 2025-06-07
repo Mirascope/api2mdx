@@ -18,8 +18,12 @@ def test_discover_minimal_example():
         loader = get_loader(example_path)
         module = loader.load("example-py-minimal")
         
-        # Discover directives
-        directives = discover_api_directives(module)
+        # Discover directives - cast to Module since we know it's loaded correctly
+        from griffe import Module
+        if isinstance(module, Module):
+            directives = discover_api_directives(module)
+        else:
+            raise RuntimeError("Failed to load module as Module type")
         
         # Print results for manual verification
         print("Discovered directives:")
