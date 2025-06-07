@@ -4,7 +4,7 @@ version = "0.1.0"
 description = "Generate MDX API documentation from Python source code"
 readme = "README.md"
 requires-python = ">=3.10"
-license = { text = "MIT" }
+license = "MIT"
 
 dependencies = [
     # Core dependencies
@@ -12,8 +12,15 @@ dependencies = [
     "pymdown-extensions>=10.5.0",
 ]
 
+[tool.setuptools]
+packages = ["api2mdx"]
+
+
+[project.scripts]
+regenerate-snapshots = "api2mdx.scripts.regenerate_snapshots:main"
 
 [tool.uv]
+package = true
 dev-dependencies = [
     "pyright>=1.1.396",
     "ruff>=0.1.6",
