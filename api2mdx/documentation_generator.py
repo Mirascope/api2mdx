@@ -80,10 +80,18 @@ class DocumentationGenerator:
 
         return self
 
-    def generate_all(self) -> None:
-        """Generate all documentation files."""
+    def generate_all(self, directive_output_path: Path | None = None) -> None:
+        """Generate all documentation files.
+        
+        Args:
+            directive_output_path: Optional path to output intermediate directive files
+        """
         if not self.api_directives:
             raise RuntimeError("Setup must be called before generating documentation")
+
+        # Output directive snapshots if requested
+        if directive_output_path:
+            self.output_directive_snapshots(directive_output_path)
 
         # Clear target directory if it exists
         if self.output_path.exists():
@@ -176,6 +184,35 @@ class DocumentationGenerator:
             # Regenerate metadata only if skip_meta is False
             print("Regenerating metadata file...")
             self._generate_meta_file()
+
+    def output_directive_snapshots(self, directive_output_path: Path) -> None:
+        """Output directives as intermediate .md files for debugging/inspection.
+        
+        Args:
+            directive_output_path: Path where directive files should be written
+        """
+        if not self.api_directives:
+            raise RuntimeError("API directives must be discovered before output")
+        
+        # Clear and create directive output directory
+        if directive_output_path.exists():
+            shutil.rmtree(directive_output_path)
+        directive_output_path.mkdir(parents=True, exist_ok=True)
+        
+        for directive, output_path in self.api_directives:
+            # Create directive content
+            directive_content = f"# Directive: {directive}\n\n"
+            directive_content += f"**Output Path**: {output_path}\n\n"
+            directive_content += f"**Directive String**: `{directive}`\n\n"
+            
+            # Write to .md file in directive output directory
+            directive_file_path = directive_output_path / output_path.replace('.mdx', '.md')
+            directive_file_path.parent.mkdir(parents=True, exist_ok=True)
+            
+            with open(directive_file_path, 'w') as f:
+                f.write(directive_content)
+        
+        print(f"Generated {len(self.api_directives)} directive files in {directive_output_path}")
 
     def _load_module(self) -> Any:
         """Load the module using Griffe.

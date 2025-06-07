@@ -22,6 +22,7 @@ def generate_documentation(
     docs_path: str,
     output_path: Path,
     pattern: str | None = None,
+    directive_output_path: Path | None = None,
 ) -> bool:
     """Generate API documentation from source code.
 
@@ -31,6 +32,7 @@ def generate_documentation(
         docs_path: Path within the package where docs are located
         output_path: Path where generated documentation should be written
         pattern: Optional file pattern to regenerate only specific files
+        directive_output_path: Optional path to output intermediate directive files
 
     Returns:
         True if successful, False otherwise
@@ -46,7 +48,7 @@ def generate_documentation(
             # Always regenerate metadata for consistency
             generator.generate_selected(pattern, skip_meta=False)
         else:
-            generator.generate_all()
+            generator.generate_all(directive_output_path=directive_output_path)
 
         # Process documentation links
         modified_count = process_doc_links(str(output_path))
@@ -98,6 +100,11 @@ def main(cmd_args: list[str] | None = None) -> int:
         "--pattern",
         help="Optional pattern to regenerate only matching files",
     )
+    parser.add_argument(
+        "--output-directives",
+        type=Path,
+        help="Optional path to output intermediate directive files (e.g., snapshots/directives/)",
+    )
 
     parsed_args = parser.parse_args(cmd_args)
 
@@ -112,6 +119,7 @@ def main(cmd_args: list[str] | None = None) -> int:
         docs_path=parsed_args.docs_path,
         output_path=parsed_args.output,
         pattern=parsed_args.pattern,
+        directive_output_path=parsed_args.output_directives,
     )
 
     return 0 if success else 1

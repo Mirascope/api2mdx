@@ -35,7 +35,8 @@ def main() -> int:
             ["python", "-m", "api2mdx.main",
              "--source-path", "./snapshots",
              "--package", "mirascope_v2_llm", 
-             "--output", "./snapshots/mdx"],
+             "--output", "./snapshots/mdx",
+             "--output-directives", "./snapshots/directives"],
             "Regenerating mirascope_v2_llm snapshot"
         ),
     ]
