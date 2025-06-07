@@ -139,13 +139,13 @@ def _get_module_exports(module: Module) -> list[str]:
 
 def _discover_member_directives(
     member: Object | Alias, 
-    module_path: str
+    exporting_module_path: str
 ) -> list[tuple[str, str]]:
     """Discover directives for a specific module member.
     
     Args:
         member: The Griffe object to document
-        module_path: The canonical path of the containing module
+        exporting_module_path: The path of the module that exports this member
         
     Returns:
         List of (directive, output_path) tuples
@@ -153,17 +153,16 @@ def _discover_member_directives(
     directives = []
     member_name = member.name
     
-    # For aliases, use the canonical path of the target
+    # Use canonical path for directive (what to document)
     if hasattr(member, 'canonical_path'):
         canonical_path = member.canonical_path
     else:
-        canonical_path = f"{module_path}.{member_name}"
+        canonical_path = f"{exporting_module_path}.{member_name}"
     
-    # Extract the submodule path for hierarchical structure
-    # e.g., "example-py-minimal.calls.Call" -> "calls/Call.mdx"
-    path_parts = canonical_path.split('.')
-    if len(path_parts) > 2:  # package.module.member
-        submodule_parts = path_parts[1:-1]  # Skip package and member name
+    # Use exporting module path for output structure (where to put it)
+    path_parts = exporting_module_path.split('.')
+    if len(path_parts) > 1:  # package.submodule
+        submodule_parts = path_parts[1:]  # Skip package name
         submodule_path = '/'.join(submodule_parts)
         output_path = f"{submodule_path}/{member_name}.mdx"
     else:

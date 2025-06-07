@@ -1,0 +1,56 @@
+---
+# AUTO-GENERATED API DOCUMENTATION - DO NOT EDIT
+title: Context
+description: API documentation for Context
+---
+
+# Context
+
+## <ApiType type="Class" path="Context" symbolName="Context" /> Context
+
+Context for LLM calls.
+
+This class provides a context for LLM calls, including the model,
+parameters, and any dependencies needed for the call.
+
+**Bases:** 
+<TypeLink type={{"type_str": "Generic[DepsT]", "description": null, "kind": "generic", "base_type": {"type_str": "Generic", "description": null, "kind": "simple", "doc_url": "https://docs.python.org/3/library/typing.html#typing.Generic"}, "parameters": [{"type_str": "DepsT", "description": null, "kind": "simple", "doc_identifier": "DepsT"}]}} />
+
+<AttributesTable
+  attributes={[
+  {
+    "name": "messages",
+    "type_info": {
+      "type_str": "list[Message]",
+      "description": null,
+      "kind": "generic",
+      "base_type": {
+        "type_str": "list",
+        "description": null,
+        "kind": "simple",
+        "doc_url": "https://docs.python.org/3/library/stdtypes.html#list"
+      },
+      "parameters": [
+        {
+          "type_str": "Message",
+          "description": null,
+          "kind": "simple",
+          "doc_url": "/docs/mirascope/api/Message#message"
+        }
+      ]
+    },
+    "description": "The array of messages that have been sent so far (i.e. history)."
+  },
+  {
+    "name": "deps",
+    "type_info": {
+      "type_str": "DepsT",
+      "description": null,
+      "kind": "simple",
+      "doc_identifier": "DepsT"
+    },
+    "description": "The dependencies needed for a call."
+  }
+]}
+/>
+

@@ -1,0 +1,103 @@
+---
+# AUTO-GENERATED API DOCUMENTATION - DO NOT EDIT
+title: DynamicConfig
+description: API documentation for DynamicConfig
+---
+
+# DynamicConfig
+
+## <ApiType type="Class" path="DynamicConfig" symbolName="DynamicConfig" /> DynamicConfig
+
+Class for specifying dynamic configuration in a prompt template method.
+
+This class allows prompt template functions to return additional configuration
+options that will be applied during message rendering, such as computed fields
+that should be injected into the template or tools that should be made available
+to the LLM.
+
+**Bases:** 
+<TypeLink type={{"type_str": "TypedDict", "description": null, "kind": "simple", "doc_url": "https://docs.python.org/3/library/typing.html#typing.TypedDict"}} />
+
+<AttributesTable
+  attributes={[
+  {
+    "name": "computed_fields",
+    "type_info": {
+      "type_str": "NotRequired[dict[str, Jsonable]]",
+      "description": null,
+      "kind": "generic",
+      "base_type": {
+        "type_str": "NotRequired",
+        "description": null,
+        "kind": "simple",
+        "doc_url": "https://docs.python.org/3/library/typing.html#typing.NotRequired"
+      },
+      "parameters": [
+        {
+          "type_str": "dict[str, Jsonable]",
+          "description": null,
+          "kind": "generic",
+          "base_type": {
+            "type_str": "dict",
+            "description": null,
+            "kind": "simple",
+            "doc_url": "https://docs.python.org/3/library/stdtypes.html#dict"
+          },
+          "parameters": [
+            {
+              "type_str": "str",
+              "description": null,
+              "kind": "simple",
+              "doc_url": "https://docs.python.org/3/library/stdtypes.html#str"
+            },
+            {
+              "type_str": "Jsonable",
+              "description": null,
+              "kind": "simple",
+              "doc_identifier": "Jsonable"
+            }
+          ]
+        }
+      ]
+    },
+    "description": "The fields injected into the messages that are computed dynamically.\n\nThese fields will be available for use in the template with the \\{\\{ field_name \\}\\} syntax,\nand will override any fields with the same name provided in the function arguments."
+  },
+  {
+    "name": "tools",
+    "type_info": {
+      "type_str": "NotRequired[Sequence[ToolDef]]",
+      "description": null,
+      "kind": "generic",
+      "base_type": {
+        "type_str": "NotRequired",
+        "description": null,
+        "kind": "simple",
+        "doc_url": "https://docs.python.org/3/library/typing.html#typing.NotRequired"
+      },
+      "parameters": [
+        {
+          "type_str": "Sequence[ToolDef]",
+          "description": null,
+          "kind": "generic",
+          "base_type": {
+            "type_str": "Sequence",
+            "description": null,
+            "kind": "simple",
+            "doc_identifier": "Sequence"
+          },
+          "parameters": [
+            {
+              "type_str": "ToolDef",
+              "description": null,
+              "kind": "simple",
+              "doc_url": "/docs/mirascope/api/ToolDef#tooldef"
+            }
+          ]
+        }
+      ]
+    },
+    "description": "The list of dynamic tools to merge into the existing tools in the LLM call.\n\nThese tools will be added to any tools specified in the call decorator."
+  }
+]}
+/>
+
