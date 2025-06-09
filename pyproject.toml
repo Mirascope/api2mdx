@@ -5,6 +5,22 @@ description = "Generate MDX API documentation from Python source code"
 readme = "README.md"
 requires-python = ">=3.10"
 license = "MIT"
+authors = [
+    { name = "Dandelion Mané", email = "dandelion@mirascope.com" }
+]
+keywords = ["documentation", "api", "mdx", "python"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Documentation",
+    "Topic :: Software Development :: Documentation",
+]
+urls = { Homepage = "https://github.com/Mirascope/api2mdx", Repository = "https://github.com/Mirascope/api2mdx" }
 
 dependencies = [
     # Core dependencies
@@ -17,6 +33,7 @@ packages = ["api2mdx"]
 
 
 [project.scripts]
+api2mdx = "api2mdx.main:main"
 regenerate-snapshots = "api2mdx.scripts.regenerate_snapshots:main"
 
 [tool.uv]
