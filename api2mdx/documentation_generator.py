@@ -124,9 +124,9 @@ class DocumentationGenerator:
             target_path.parent.mkdir(exist_ok=True, parents=True)
 
             # Process directive
-            self._process_directive(api_directive.directive, target_path)
+            self._process_directive(api_directive)
         except Exception as e:
-            print(f"ERROR: Failed to process directive {api_directive.directive}: {e}")
+            print(f"ERROR: Failed to process directive {api_directive.directives}: {e}")
             # Re-raise the exception to maintain the original behavior
             raise
 
@@ -169,13 +169,14 @@ class DocumentationGenerator:
         self.output_path.mkdir(parents=True, exist_ok=True)
 
         for api_directive in self.api_directives:
-            # Check if directive or output path matches pattern
+            # Check if any directive or output path matches pattern
+            directive_matches = any(fnmatch.fnmatch(directive, pattern) for directive in api_directive.directives)
             if (
-                fnmatch.fnmatch(api_directive.directive, pattern)
+                directive_matches
                 or fnmatch.fnmatch(api_directive.slug, pattern)
                 or fnmatch.fnmatch(api_directive.slug.replace(".mdx", ""), pattern)
             ):
-                print(f"Generating: {api_directive.directive} -> {api_directive.slug}")
+                print(f"Generating: {api_directive.directives} -> {api_directive.slug}")
                 self.generate_directive(api_directive)
                 found = True
 
@@ -201,7 +202,7 @@ class DocumentationGenerator:
         directive_output_path.mkdir(parents=True, exist_ok=True)
 
         for api_directive in self.api_directives:
-            directive_content = f"# {api_directive.name}\n\n{api_directive.directive}"
+            directive_content = f"# {api_directive.name}\n\n" + "\n\n".join(api_directive.directives)
 
             # Write to .md file in directive output directory
             directive_file_path = directive_output_path / api_directive.slug.replace(
@@ -334,22 +335,21 @@ class DocumentationGenerator:
                     f.write(line)
                     f.write("\n")
 
-    def _process_directive(self, directive: str, target_path: Path) -> None:
-        """Process a directive and generate the corresponding MDX file.
+    def _process_directive(self, api_directive: ApiDirective) -> None:
+        """Process directives and generate the corresponding MDX file.
 
         Args:
-            directive: The API directive to process
-            target_path: Path to the target MDX file
+            api_directive: The ApiDirective object containing directives and output info
 
         """
         if not self.module:
             raise RuntimeError("Module must be loaded before processing directives")
 
-        # Extract title from directive (e.g., ":::package.module.Class" -> "Class")
-        directive_parts = directive.replace(":::", "").split(".")
-        title = directive_parts[-1]
-        if title == directive_parts[0]:  # Main module (e.g., "example-py-minimal")
-            title = f"{directive_parts[0].replace('-', ' ').title()} API"
+        # Get target path from the directive's slug
+        target_path = self.output_path / api_directive.slug
+        
+        # Extract title from directive name
+        title = api_directive.name
 
         # Get the relative file path for the API component
         relative_path = target_path.relative_to(self.output_path)
@@ -365,12 +365,14 @@ class DocumentationGenerator:
             f.write("---\n\n")
             f.write(f"# {title}\n\n")
 
-            # Process the directive
-            doc_content = process_directive_with_error_handling(
-                directive, self.module, doc_path
-            )
-            f.write(doc_content)
-            f.write("\n")
+            # Process each directive
+            for directive in api_directive.directives:
+                if directive.strip():  # Skip empty directives
+                    doc_content = process_directive_with_error_handling(
+                        directive.strip(), self.module, doc_path
+                    )
+                    f.write(doc_content)
+                    f.write("\n\n")
 
     def _create_index_file(self) -> None:
         """Create the index.mdx file in the target directory."""

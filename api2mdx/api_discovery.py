@@ -14,12 +14,12 @@ class ApiDirective:
     """Represents an API directive with its output path and original name.
 
     Attributes:
-        directive: The API directive string (e.g., ":::package.module.Class")
+        directives: List of API directive strings (e.g., [":::package.module.Class", ":::package.module.Function"])
         slug: The lowercase output path/slug (e.g., "agent.mdx" or "agent-fn.mdx")
         name: The original name with proper casing (e.g., "Agent" or "agent")
     """
 
-    directive: str
+    directives: list[str]
     slug: str
     name: str
 
@@ -114,8 +114,13 @@ def _discover_module_directive(module: Module, module_name: str) -> ApiDirective
     """
     module_exports = _get_module_exports(module)
 
-    # Create combined directive with all exports from this module
-    module_directives = []
+    # Create lowercase filename
+    filename = module_name.lower()
+    output_path = f"{filename}.mdx"
+    
+    # Create ApiDirective and populate directives in a loop
+    api_directive = ApiDirective([], output_path, module_name)
+    
     for export_name in module_exports:
         if export_name not in module.members:
             raise ValueError(
@@ -124,19 +129,13 @@ def _discover_module_directive(module: Module, module_name: str) -> ApiDirective
 
         export_member = module.members[export_name]
         if isinstance(export_member, (Class, Function)):
-            module_directives.append(f"::: {export_member.canonical_path}")
+            api_directive.directives.append(f"::: {export_member.canonical_path}")
         elif hasattr(export_member, "target") and getattr(export_member, "target"):
             # Handle aliases
             target = getattr(export_member, "target")
-            module_directives.append(f"::: {target.canonical_path}")
+            api_directive.directives.append(f"::: {target.canonical_path}")
 
-    # Create lowercase filename
-    filename = module_name.lower()
-    output_path = f"{filename}.mdx"
-
-    # Combine all directives into a single directive string
-    combined_directive = "\n\n".join(module_directives)
-    return ApiDirective(combined_directive, output_path, module_name)
+    return api_directive
 
 
 def _discover_member_directives(
@@ -176,7 +175,7 @@ def _discover_member_directives(
 
     if isinstance(member, (Class, Function)):
         directive = f"::: {canonical_path}"
-        directives.append(ApiDirective(directive, output_path, original_name))
+        directives.append(ApiDirective([directive], output_path, original_name))
 
     elif isinstance(member, Module):
         module_directive = _discover_module_directive(member, member_name)
@@ -189,7 +188,7 @@ def _discover_member_directives(
             target.canonical_path if hasattr(target, "canonical_path") else str(target)
         )
         directive = f"::: {target_path}"
-        directives.append(ApiDirective(directive, output_path, original_name))
+        directives.append(ApiDirective([directive], output_path, original_name))
 
     return directives
 
@@ -213,7 +212,7 @@ def discover_api_directives(module: Module) -> list[ApiDirective]:
 
     # Main module index
     module_directive = f"::: {module.canonical_path}"
-    directives.append(ApiDirective(module_directive, "index.mdx", "index"))
+    directives.append(ApiDirective([module_directive], "index.mdx", "index"))
 
     # Process the main module's exports (respecting its __all__)
     member_directives = _discover_main_module_directives(module)
@@ -228,7 +227,7 @@ def discover_api_directives(module: Module) -> list[ApiDirective]:
                 submodule_index_path = f"{submodule_path}/index.mdx"
                 directives.append(
                     ApiDirective(
-                        submodule_directive, submodule_index_path, submodule_path
+                        [submodule_directive], submodule_index_path, submodule_path
                     )
                 )
                 submodules_seen.add(submodule_path)
@@ -288,22 +287,22 @@ def _resolve_case_conflicts(directives: list[ApiDirective]) -> list[ApiDirective
         List of ApiDirective objects with conflicts resolved
     """
     # Group by lowercase slug to find conflicts
-    path_groups = {}
+    path_groups: dict[str, list[ApiDirective]] = {}
     for directive_obj in directives:
         lower_slug = directive_obj.slug.lower()
         if lower_slug not in path_groups:
             path_groups[lower_slug] = []
         path_groups[lower_slug].append(directive_obj)
 
-    resolved = []
+    resolved: list[ApiDirective] = []
     for lower_slug, group in path_groups.items():
         if len(group) == 1:
             # No conflict
             resolved.extend(group)
         else:
             # We have a conflict - resolve it
-            capitalized_items = []
-            lowercase_items = []
+            capitalized_items: list[ApiDirective] = []
+            lowercase_items: list[ApiDirective] = []
 
             for directive_obj in group:
                 # Check the original name, not the lowercase slug
@@ -326,7 +325,7 @@ def _resolve_case_conflicts(directives: list[ApiDirective]) -> list[ApiDirective
                 base_slug = directive_obj.slug.replace(".mdx", "")
                 new_slug = f"{base_slug}-fn.mdx"
                 resolved.append(
-                    ApiDirective(directive_obj.directive, new_slug, directive_obj.name)
+                    ApiDirective(directive_obj.directives, new_slug, directive_obj.name)
                 )
 
     return resolved
