@@ -41,6 +41,94 @@ class DirectivesPage:
     name: str
 
 
+def _resolve_member(module: Module, name: str) -> Object | Alias:
+    """Resolve a member name, prioritizing imports over submodules for name conflicts."""
+    # Try custom import resolution first
+    if hasattr(module, "imports") and name in module.imports:
+        import_path = module.imports[name]
+
+        # Determine the base module for resolution
+        if import_path.startswith("."):
+            # Relative import - use current module as base
+            base_module = module
+        else:
+            # Absolute import - use root module as base
+            base_module = module
+            while base_module.parent is not None:
+                parent = base_module.parent
+                if isinstance(parent, Module):
+                    base_module = parent
+                else:
+                    break
+
+        member = _resolve_import_path(import_path, base_module)
+        if member is not None:
+            return member
+
+    # Fall back to normal resolution
+    try:
+        return module[name]
+    except Exception:
+        return module.members[name]
+
+
+def _resolve_import_path(
+    import_path: str, root_module: Module
+) -> Object | Alias | None:
+    """Recursive import resolution with final-step import prioritization.
+
+    This allows us to correctly resolve "shadowed imports" despite an underlying bug in
+    Griffe. Consider the case with imports like:
+    from .call import Call
+    from .decorator import call
+
+    The call symbol resolves to a function from decorator.py, but Griffe will try to resolve
+    it to the module corresponding to call.py.
+
+    So instead we resolve it by checking the imports. However, we only do this on the last
+    step. That way if we have the following situation:
+
+    from .calls import call, Call
+
+    When Call resolves to .calls.call.Call, we do not want the middle step in resolution
+    to get the decorator - in that case we really do want to step into the call.py module
+    and find Call
+    """
+
+    parts = import_path.split(".")
+    current = root_module
+
+    # Skip the root module name if it matches the first part
+    start_index = 0
+    if parts[0] == current.name:
+        start_index = 1
+
+    # Navigate down the path
+    for i in range(start_index, len(parts)):
+        part = parts[i]
+        is_final_step = i == len(parts) - 1
+
+        if is_final_step:
+            # Final step: prioritize imports (the actual target we want)
+            if hasattr(current, "imports") and part in current.imports:
+                nested_import_path = current.imports[part]
+                return _resolve_import_path(nested_import_path, root_module)
+
+            # Fall back to members for final step
+            if hasattr(current, "members") and part in current.members:
+                current = current.members[part]
+            else:
+                return None
+        else:
+            # Intermediate step: prioritize members (navigation through module structure)
+            if hasattr(current, "members") and part in current.members:
+                current = current.members[part]
+            else:
+                return None
+
+    return current
+
+
 def _extract_all_exports(module: Module) -> list[str] | None:
     """Extract __all__ exports from a Griffe module.
 
@@ -157,7 +245,7 @@ def discover_module_pages(module: Module, base_path: str = "") -> list[Directive
                 f"Export '{export_name}' in __all__ not found in module {module.canonical_path}"
             )
 
-        member = module.members[export_name]
+        member = _resolve_member(module, export_name)
 
         if isinstance(member, Module):
             # This is a submodule - give it dedicated page(s) (recursive)

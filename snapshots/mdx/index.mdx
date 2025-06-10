@@ -6,54 +6,291 @@ description: API documentation for mirascope_v2_llm
 
 # mirascope_v2_llm
 
-## <ApiType type="Module" path="index" symbolName="call" /> call
+## <ApiType type="Function" path="index" symbolName="call" /> call
 
-The Call module for generating responses using LLMs.
+Returns a decorator for turning prompt template functions into generations.
 
-## <ApiType type="Attribute" path="index" symbolName="P" /> P
+Example:
 
-**Type:** <TypeLink type={{"type_str": "ParamSpec('P')", "description": null, "kind": "simple", "doc_identifier": "ParamSpec('P')"}} />
+    ```python
+    from mirascope import llm
 
+    @llm.call("openai:gpt-4o-mini")
+    def answer_question(question: str) -> str:
+        return f"Answer this question: {question}"
 
-## <ApiType type="Class" path="index" symbolName="Call" /> Call
-
-A class for generating responses using LLMs.
-
-**Bases:** 
-<TypeLink type={{"type_str": "BaseCall[P, PromptTemplate]", "description": null, "kind": "generic", "base_type": {"type_str": "BaseCall", "description": null, "kind": "simple", "doc_identifier": "BaseCall"}, "parameters": [{"type_str": "P", "description": null, "kind": "simple", "doc_url": "/docs/mirascope/api/index#p"}, {"type_str": "PromptTemplate", "description": null, "kind": "simple", "doc_identifier": "PromptTemplate"}]}} />
-
-## <ApiType type="Function" path="index" symbolName="call_async" /> call_async
-
-Generates an asynchronous response using the LLM.
+    response: llm.Response = answer_question("What is the capital of France?")
+    print(response.text)
+    ```
 
 <ParametersTable
   parameters={[
   {
-    "name": "self",
+    "name": "model",
     "type_info": {
-      "type_str": "Any",
+      "type_str": "REGISTERED_LLMS",
       "description": null,
       "kind": "simple",
-      "doc_identifier": null
+      "doc_identifier": "REGISTERED_LLMS"
     }
   },
   {
-    "name": "args",
+    "name": "deps_type",
     "type_info": {
-      "type_str": "P.args",
+      "type_str": "type[DepsT] | type[None] | None",
       "description": null,
-      "kind": "simple",
-      "doc_identifier": "P.args"
+      "kind": "union",
+      "base_type": {
+        "type_str": "Union",
+        "description": null,
+        "kind": "simple",
+        "doc_url": "https://docs.python.org/3/library/typing.html#typing.Union"
+      },
+      "parameters": [
+        {
+          "type_str": "type[DepsT]",
+          "description": null,
+          "kind": "generic",
+          "base_type": {
+            "type_str": "type",
+            "description": null,
+            "kind": "simple",
+            "doc_url": "https://docs.python.org/3/library/functions.html#type"
+          },
+          "parameters": [
+            {
+              "type_str": "DepsT",
+              "description": null,
+              "kind": "simple",
+              "doc_identifier": "DepsT"
+            }
+          ]
+        },
+        {
+          "type_str": "type[None]",
+          "description": null,
+          "kind": "generic",
+          "base_type": {
+            "type_str": "type",
+            "description": null,
+            "kind": "simple",
+            "doc_url": "https://docs.python.org/3/library/functions.html#type"
+          },
+          "parameters": [
+            {
+              "type_str": "None",
+              "description": null,
+              "kind": "simple",
+              "doc_url": "https://docs.python.org/3/library/constants.html#None"
+            }
+          ]
+        },
+        {
+          "type_str": "None",
+          "description": null,
+          "kind": "simple",
+          "doc_url": "https://docs.python.org/3/library/constants.html#None"
+        }
+      ]
     },
-    "default": "()"
+    "default": "None"
   },
   {
-    "name": "kwargs",
+    "name": "tools",
     "type_info": {
-      "type_str": "P.kwargs",
+      "type_str": "Sequence[ToolDef] | Sequence[ToolDef | ContextToolDef[..., Any, DepsT]] | None",
       "description": null,
-      "kind": "simple",
-      "doc_identifier": "P.kwargs"
+      "kind": "union",
+      "base_type": {
+        "type_str": "Union",
+        "description": null,
+        "kind": "simple",
+        "doc_url": "https://docs.python.org/3/library/typing.html#typing.Union"
+      },
+      "parameters": [
+        {
+          "type_str": "Sequence[ToolDef]",
+          "description": null,
+          "kind": "generic",
+          "base_type": {
+            "type_str": "Sequence",
+            "description": null,
+            "kind": "simple",
+            "doc_identifier": "Sequence"
+          },
+          "parameters": [
+            {
+              "type_str": "ToolDef",
+              "description": null,
+              "kind": "simple",
+              "doc_identifier": "ToolDef"
+            }
+          ]
+        },
+        {
+          "type_str": "Sequence[ToolDef | ContextToolDef[..., Any, DepsT]]",
+          "description": null,
+          "kind": "generic",
+          "base_type": {
+            "type_str": "Sequence",
+            "description": null,
+            "kind": "simple",
+            "doc_identifier": "Sequence"
+          },
+          "parameters": [
+            {
+              "type_str": "ToolDef | ContextToolDef[..., Any, DepsT]",
+              "description": null,
+              "kind": "union",
+              "base_type": {
+                "type_str": "Union",
+                "description": null,
+                "kind": "simple",
+                "doc_url": "https://docs.python.org/3/library/typing.html#typing.Union"
+              },
+              "parameters": [
+                {
+                  "type_str": "ToolDef",
+                  "description": null,
+                  "kind": "simple",
+                  "doc_identifier": "ToolDef"
+                },
+                {
+                  "type_str": "ContextToolDef[..., Any, DepsT]",
+                  "description": null,
+                  "kind": "generic",
+                  "base_type": {
+                    "type_str": "ContextToolDef",
+                    "description": null,
+                    "kind": "simple",
+                    "doc_identifier": "ContextToolDef"
+                  },
+                  "parameters": [
+                    {
+                      "type_str": "...",
+                      "description": null,
+                      "kind": "simple",
+                      "doc_identifier": "..."
+                    },
+                    {
+                      "type_str": "Any",
+                      "description": null,
+                      "kind": "simple",
+                      "doc_url": "https://docs.python.org/3/library/typing.html#typing.Any"
+                    },
+                    {
+                      "type_str": "DepsT",
+                      "description": null,
+                      "kind": "simple",
+                      "doc_identifier": "DepsT"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type_str": "None",
+          "description": null,
+          "kind": "simple",
+          "doc_url": "https://docs.python.org/3/library/constants.html#None"
+        }
+      ]
+    },
+    "default": "None"
+  },
+  {
+    "name": "response_format",
+    "type_info": {
+      "type_str": "type[T] | None",
+      "description": null,
+      "kind": "union",
+      "base_type": {
+        "type_str": "Union",
+        "description": null,
+        "kind": "simple",
+        "doc_url": "https://docs.python.org/3/library/typing.html#typing.Union"
+      },
+      "parameters": [
+        {
+          "type_str": "type[T]",
+          "description": null,
+          "kind": "generic",
+          "base_type": {
+            "type_str": "type",
+            "description": null,
+            "kind": "simple",
+            "doc_url": "https://docs.python.org/3/library/functions.html#type"
+          },
+          "parameters": [
+            {
+              "type_str": "T",
+              "description": null,
+              "kind": "simple",
+              "doc_identifier": "T"
+            }
+          ]
+        },
+        {
+          "type_str": "None",
+          "description": null,
+          "kind": "simple",
+          "doc_url": "https://docs.python.org/3/library/constants.html#None"
+        }
+      ]
+    },
+    "default": "None"
+  },
+  {
+    "name": "client",
+    "type_info": {
+      "type_str": "Client | None",
+      "description": null,
+      "kind": "union",
+      "base_type": {
+        "type_str": "Union",
+        "description": null,
+        "kind": "simple",
+        "doc_url": "https://docs.python.org/3/library/typing.html#typing.Union"
+      },
+      "parameters": [
+        {
+          "type_str": "Client",
+          "description": null,
+          "kind": "simple",
+          "doc_identifier": "Client"
+        },
+        {
+          "type_str": "None",
+          "description": null,
+          "kind": "simple",
+          "doc_url": "https://docs.python.org/3/library/constants.html#None"
+        }
+      ]
+    },
+    "default": "None"
+  },
+  {
+    "name": "params",
+    "type_info": {
+      "type_str": "Unpack[Params]",
+      "description": null,
+      "kind": "generic",
+      "base_type": {
+        "type_str": "Unpack",
+        "description": null,
+        "kind": "simple",
+        "doc_identifier": "Unpack"
+      },
+      "parameters": [
+        {
+          "type_str": "Params",
+          "description": null,
+          "kind": "simple",
+          "doc_identifier": "Params"
+        }
+      ]
     },
     "default": "{}"
   }
@@ -63,115 +300,89 @@ Generates an asynchronous response using the LLM.
 <ReturnTable
   returnType={{
   "type_info": {
-    "type_str": "Response",
+    "type_str": "CallDecorator | ContextCallDecorator[DepsT] | StructuredCallDecorator[T] | StructuredContextCallDecorator[T, DepsT]",
     "description": null,
-    "kind": "simple",
-    "doc_identifier": "Response"
+    "kind": "union",
+    "base_type": {
+      "type_str": "Union",
+      "description": null,
+      "kind": "simple",
+      "doc_url": "https://docs.python.org/3/library/typing.html#typing.Union"
+    },
+    "parameters": [
+      {
+        "type_str": "CallDecorator",
+        "description": null,
+        "kind": "simple",
+        "doc_identifier": "CallDecorator"
+      },
+      {
+        "type_str": "ContextCallDecorator[DepsT]",
+        "description": null,
+        "kind": "generic",
+        "base_type": {
+          "type_str": "ContextCallDecorator",
+          "description": null,
+          "kind": "simple",
+          "doc_identifier": "ContextCallDecorator"
+        },
+        "parameters": [
+          {
+            "type_str": "DepsT",
+            "description": null,
+            "kind": "simple",
+            "doc_identifier": "DepsT"
+          }
+        ]
+      },
+      {
+        "type_str": "StructuredCallDecorator[T]",
+        "description": null,
+        "kind": "generic",
+        "base_type": {
+          "type_str": "StructuredCallDecorator",
+          "description": null,
+          "kind": "simple",
+          "doc_identifier": "StructuredCallDecorator"
+        },
+        "parameters": [
+          {
+            "type_str": "T",
+            "description": null,
+            "kind": "simple",
+            "doc_identifier": "T"
+          }
+        ]
+      },
+      {
+        "type_str": "StructuredContextCallDecorator[T, DepsT]",
+        "description": null,
+        "kind": "generic",
+        "base_type": {
+          "type_str": "StructuredContextCallDecorator",
+          "description": null,
+          "kind": "simple",
+          "doc_identifier": "StructuredContextCallDecorator"
+        },
+        "parameters": [
+          {
+            "type_str": "T",
+            "description": null,
+            "kind": "simple",
+            "doc_identifier": "T"
+          },
+          {
+            "type_str": "DepsT",
+            "description": null,
+            "kind": "simple",
+            "doc_identifier": "DepsT"
+          }
+        ]
+      }
+    ]
   }
 }}
 />
-
-
-## <ApiType type="Function" path="index" symbolName="stream" /> stream
-
-Generates a streaming response using the LLM.
-
-<ParametersTable
-  parameters={[
-  {
-    "name": "self",
-    "type_info": {
-      "type_str": "Any",
-      "description": null,
-      "kind": "simple",
-      "doc_identifier": null
-    }
-  },
-  {
-    "name": "args",
-    "type_info": {
-      "type_str": "P.args",
-      "description": null,
-      "kind": "simple",
-      "doc_identifier": "P.args"
-    },
-    "default": "()"
-  },
-  {
-    "name": "kwargs",
-    "type_info": {
-      "type_str": "P.kwargs",
-      "description": null,
-      "kind": "simple",
-      "doc_identifier": "P.kwargs"
-    },
-    "default": "{}"
-  }
-]}
-/>
-
-<ReturnTable
-  returnType={{
-  "type_info": {
-    "type_str": "Stream",
-    "description": null,
-    "kind": "simple",
-    "doc_identifier": "Stream"
-  }
-}}
-/>
-
-
-## <ApiType type="Function" path="index" symbolName="stream_async" /> stream_async
-
-Generates an asynchronous streaming response using the LLM.
-
-<ParametersTable
-  parameters={[
-  {
-    "name": "self",
-    "type_info": {
-      "type_str": "Any",
-      "description": null,
-      "kind": "simple",
-      "doc_identifier": null
-    }
-  },
-  {
-    "name": "args",
-    "type_info": {
-      "type_str": "P.args",
-      "description": null,
-      "kind": "simple",
-      "doc_identifier": "P.args"
-    },
-    "default": "()"
-  },
-  {
-    "name": "kwargs",
-    "type_info": {
-      "type_str": "P.kwargs",
-      "description": null,
-      "kind": "simple",
-      "doc_identifier": "P.kwargs"
-    },
-    "default": "{}"
-  }
-]}
-/>
-
-<ReturnTable
-  returnType={{
-  "type_info": {
-    "type_str": "AsyncStream",
-    "description": null,
-    "kind": "simple",
-    "doc_identifier": "AsyncStream"
-  }
-}}
-/>
-
-
 
 
 ## <ApiType type="Module" path="index" symbolName="calls" /> calls
@@ -403,13 +614,294 @@ Generates an asynchronous streaming response using the LLM.
 
 
 
-## <ApiType type="Module" path="index" symbolName="agent" /> agent
+## <ApiType type="Function" path="index" symbolName="agent" /> agent
 
-The `Agent` class for LLM agents.
+Decorator for creating an agent or structured agent.
 
-## <ApiType type="Attribute" path="index" symbolName="DepsT" /> DepsT
+<ParametersTable
+  parameters={[
+  {
+    "name": "model",
+    "type_info": {
+      "type_str": "REGISTERED_LLMS",
+      "description": null,
+      "kind": "simple",
+      "doc_identifier": "REGISTERED_LLMS"
+    },
+    "description": "The model to use for the agent."
+  },
+  {
+    "name": "deps_type",
+    "type_info": {
+      "type_str": "type[DepsT]",
+      "description": null,
+      "kind": "generic",
+      "base_type": {
+        "type_str": "type",
+        "description": null,
+        "kind": "simple",
+        "doc_url": "https://docs.python.org/3/library/functions.html#type"
+      },
+      "parameters": [
+        {
+          "type_str": "DepsT",
+          "description": null,
+          "kind": "simple",
+          "doc_identifier": "DepsT"
+        }
+      ]
+    },
+    "default": "NoneType",
+    "description": "The type of dependencies for the agent, injected into the context."
+  },
+  {
+    "name": "tools",
+    "type_info": {
+      "type_str": "Sequence[ToolDef | ContextToolDef[..., Any, DepsT]] | None",
+      "description": null,
+      "kind": "union",
+      "base_type": {
+        "type_str": "Union",
+        "description": null,
+        "kind": "simple",
+        "doc_url": "https://docs.python.org/3/library/typing.html#typing.Union"
+      },
+      "parameters": [
+        {
+          "type_str": "Sequence[ToolDef | ContextToolDef[..., Any, DepsT]]",
+          "description": null,
+          "kind": "generic",
+          "base_type": {
+            "type_str": "Sequence",
+            "description": null,
+            "kind": "simple",
+            "doc_identifier": "Sequence"
+          },
+          "parameters": [
+            {
+              "type_str": "ToolDef | ContextToolDef[..., Any, DepsT]",
+              "description": null,
+              "kind": "union",
+              "base_type": {
+                "type_str": "Union",
+                "description": null,
+                "kind": "simple",
+                "doc_url": "https://docs.python.org/3/library/typing.html#typing.Union"
+              },
+              "parameters": [
+                {
+                  "type_str": "ToolDef",
+                  "description": null,
+                  "kind": "simple",
+                  "doc_identifier": "ToolDef"
+                },
+                {
+                  "type_str": "ContextToolDef[..., Any, DepsT]",
+                  "description": null,
+                  "kind": "generic",
+                  "base_type": {
+                    "type_str": "ContextToolDef",
+                    "description": null,
+                    "kind": "simple",
+                    "doc_identifier": "ContextToolDef"
+                  },
+                  "parameters": [
+                    {
+                      "type_str": "...",
+                      "description": null,
+                      "kind": "simple",
+                      "doc_identifier": "..."
+                    },
+                    {
+                      "type_str": "Any",
+                      "description": null,
+                      "kind": "simple",
+                      "doc_url": "https://docs.python.org/3/library/typing.html#typing.Any"
+                    },
+                    {
+                      "type_str": "DepsT",
+                      "description": null,
+                      "kind": "simple",
+                      "doc_identifier": "DepsT"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type_str": "None",
+          "description": null,
+          "kind": "simple",
+          "doc_url": "https://docs.python.org/3/library/constants.html#None"
+        }
+      ]
+    },
+    "default": "None",
+    "description": "The tools available to the agent."
+  },
+  {
+    "name": "response_format",
+    "type_info": {
+      "type_str": "type[T] | None",
+      "description": null,
+      "kind": "union",
+      "base_type": {
+        "type_str": "Union",
+        "description": null,
+        "kind": "simple",
+        "doc_url": "https://docs.python.org/3/library/typing.html#typing.Union"
+      },
+      "parameters": [
+        {
+          "type_str": "type[T]",
+          "description": null,
+          "kind": "generic",
+          "base_type": {
+            "type_str": "type",
+            "description": null,
+            "kind": "simple",
+            "doc_url": "https://docs.python.org/3/library/functions.html#type"
+          },
+          "parameters": [
+            {
+              "type_str": "T",
+              "description": null,
+              "kind": "simple",
+              "doc_identifier": "T"
+            }
+          ]
+        },
+        {
+          "type_str": "None",
+          "description": null,
+          "kind": "simple",
+          "doc_url": "https://docs.python.org/3/library/constants.html#None"
+        }
+      ]
+    },
+    "default": "None",
+    "description": "The response format type for the agent."
+  },
+  {
+    "name": "client",
+    "type_info": {
+      "type_str": "Client | None",
+      "description": null,
+      "kind": "union",
+      "base_type": {
+        "type_str": "Union",
+        "description": null,
+        "kind": "simple",
+        "doc_url": "https://docs.python.org/3/library/typing.html#typing.Union"
+      },
+      "parameters": [
+        {
+          "type_str": "Client",
+          "description": null,
+          "kind": "simple",
+          "doc_identifier": "Client"
+        },
+        {
+          "type_str": "None",
+          "description": null,
+          "kind": "simple",
+          "doc_url": "https://docs.python.org/3/library/constants.html#None"
+        }
+      ]
+    },
+    "default": "None",
+    "description": "The client to use for the agent."
+  },
+  {
+    "name": "params",
+    "type_info": {
+      "type_str": "Unpack[Params]",
+      "description": null,
+      "kind": "generic",
+      "base_type": {
+        "type_str": "Unpack",
+        "description": null,
+        "kind": "simple",
+        "doc_identifier": "Unpack"
+      },
+      "parameters": [
+        {
+          "type_str": "Params",
+          "description": null,
+          "kind": "simple",
+          "doc_identifier": "Params"
+        }
+      ]
+    },
+    "default": "{}"
+  }
+]}
+/>
 
-**Type:** <TypeLink type={{"type_str": "TypeVar('DepsT', default=None)", "description": null, "kind": "simple", "doc_identifier": null}} />
+<ReturnTable
+  returnType={{
+  "type_info": {
+    "type_str": "AgentDecorator[DepsT] | StructuredAgentDecorator[DepsT, T]",
+    "description": null,
+    "kind": "union",
+    "base_type": {
+      "type_str": "Union",
+      "description": null,
+      "kind": "simple",
+      "doc_url": "https://docs.python.org/3/library/typing.html#typing.Union"
+    },
+    "parameters": [
+      {
+        "type_str": "AgentDecorator[DepsT]",
+        "description": null,
+        "kind": "generic",
+        "base_type": {
+          "type_str": "AgentDecorator",
+          "description": null,
+          "kind": "simple",
+          "doc_identifier": "AgentDecorator"
+        },
+        "parameters": [
+          {
+            "type_str": "DepsT",
+            "description": null,
+            "kind": "simple",
+            "doc_identifier": "DepsT"
+          }
+        ]
+      },
+      {
+        "type_str": "StructuredAgentDecorator[DepsT, T]",
+        "description": null,
+        "kind": "generic",
+        "base_type": {
+          "type_str": "StructuredAgentDecorator",
+          "description": null,
+          "kind": "simple",
+          "doc_identifier": "StructuredAgentDecorator"
+        },
+        "parameters": [
+          {
+            "type_str": "DepsT",
+            "description": null,
+            "kind": "simple",
+            "doc_identifier": "DepsT"
+          },
+          {
+            "type_str": "T",
+            "description": null,
+            "kind": "simple",
+            "doc_identifier": "T"
+          }
+        ]
+      }
+    ]
+  },
+  "description": "An instance of `AgentDecorator` or `StructuredAgentDecorator`."
+}}
+/>
 
 
 ## <ApiType type="Class" path="index" symbolName="Agent" /> Agent
@@ -417,7 +909,7 @@ The `Agent` class for LLM agents.
 Agent class for generating responses using LLMs with tools.
 
 **Bases:** 
-<TypeLink type={{"type_str": "BaseAgent[DepsT]", "description": null, "kind": "generic", "base_type": {"type_str": "BaseAgent", "description": null, "kind": "simple", "doc_identifier": "BaseAgent"}, "parameters": [{"type_str": "DepsT", "description": null, "kind": "simple", "doc_url": "/docs/mirascope/api/index#depst"}]}} />
+<TypeLink type={{"type_str": "BaseAgent[DepsT]", "description": null, "kind": "generic", "base_type": {"type_str": "BaseAgent", "description": null, "kind": "simple", "doc_identifier": "BaseAgent"}, "parameters": [{"type_str": "DepsT", "description": null, "kind": "simple", "doc_identifier": "DepsT"}]}} />
 
 ## <ApiType type="Function" path="index" symbolName="run_async" /> run_async
 
@@ -481,7 +973,7 @@ Generates a response by running the agent loop asynchronously.
       "type_str": "DepsT",
       "description": null,
       "kind": "simple",
-      "doc_url": "/docs/mirascope/api/index#depst"
+      "doc_identifier": "DepsT"
     },
     "default": "None"
   }
@@ -505,7 +997,7 @@ Generates a response by running the agent loop asynchronously.
         "type_str": "DepsT",
         "description": null,
         "kind": "simple",
-        "doc_url": "/docs/mirascope/api/index#depst"
+        "doc_identifier": "DepsT"
       }
     ]
   }
@@ -575,7 +1067,7 @@ Streams the response generated by running the agent loop.
       "type_str": "DepsT",
       "description": null,
       "kind": "simple",
-      "doc_url": "/docs/mirascope/api/index#depst"
+      "doc_identifier": "DepsT"
     },
     "default": "None"
   }
@@ -656,272 +1148,7 @@ Streams the response generated by running the agent loop asynchronously.
       "type_str": "DepsT",
       "description": null,
       "kind": "simple",
-      "doc_url": "/docs/mirascope/api/index#depst"
-    },
-    "default": "None"
-  }
-]}
-/>
-
-<ReturnTable
-  returnType={{
-  "type_info": {
-    "type_str": "AsyncStream",
-    "description": null,
-    "kind": "simple",
-    "doc_identifier": "AsyncStream"
-  }
-}}
-/>
-
-
-
-
-## <ApiType type="Class" path="index" symbolName="Agent" /> Agent
-
-Agent class for generating responses using LLMs with tools.
-
-**Bases:** 
-<TypeLink type={{"type_str": "BaseAgent[DepsT]", "description": null, "kind": "generic", "base_type": {"type_str": "BaseAgent", "description": null, "kind": "simple", "doc_identifier": "BaseAgent"}, "parameters": [{"type_str": "DepsT", "description": null, "kind": "simple", "doc_url": "/docs/mirascope/api/index#depst"}]}} />
-
-## <ApiType type="Function" path="index" symbolName="run_async" /> run_async
-
-Generates a response by running the agent loop asynchronously.
-
-<ParametersTable
-  parameters={[
-  {
-    "name": "self",
-    "type_info": {
-      "type_str": "Any",
-      "description": null,
-      "kind": "simple",
-      "doc_identifier": null
-    }
-  },
-  {
-    "name": "query",
-    "type_info": {
-      "type_str": "Content | Sequence[Content]",
-      "description": null,
-      "kind": "union",
-      "base_type": {
-        "type_str": "Union",
-        "description": null,
-        "kind": "simple",
-        "doc_url": "https://docs.python.org/3/library/typing.html#typing.Union"
-      },
-      "parameters": [
-        {
-          "type_str": "Content",
-          "description": null,
-          "kind": "simple",
-          "doc_identifier": "Content"
-        },
-        {
-          "type_str": "Sequence[Content]",
-          "description": null,
-          "kind": "generic",
-          "base_type": {
-            "type_str": "Sequence",
-            "description": null,
-            "kind": "simple",
-            "doc_identifier": "Sequence"
-          },
-          "parameters": [
-            {
-              "type_str": "Content",
-              "description": null,
-              "kind": "simple",
-              "doc_identifier": "Content"
-            }
-          ]
-        }
-      ]
-    }
-  },
-  {
-    "name": "deps",
-    "type_info": {
-      "type_str": "DepsT",
-      "description": null,
-      "kind": "simple",
-      "doc_url": "/docs/mirascope/api/index#depst"
-    },
-    "default": "None"
-  }
-]}
-/>
-
-<ReturnTable
-  returnType={{
-  "type_info": {
-    "type_str": "ContextResponse[DepsT]",
-    "description": null,
-    "kind": "generic",
-    "base_type": {
-      "type_str": "ContextResponse",
-      "description": null,
-      "kind": "simple",
-      "doc_identifier": "ContextResponse"
-    },
-    "parameters": [
-      {
-        "type_str": "DepsT",
-        "description": null,
-        "kind": "simple",
-        "doc_url": "/docs/mirascope/api/index#depst"
-      }
-    ]
-  }
-}}
-/>
-
-
-## <ApiType type="Function" path="index" symbolName="stream" /> stream
-
-Streams the response generated by running the agent loop.
-
-<ParametersTable
-  parameters={[
-  {
-    "name": "self",
-    "type_info": {
-      "type_str": "Any",
-      "description": null,
-      "kind": "simple",
-      "doc_identifier": null
-    }
-  },
-  {
-    "name": "query",
-    "type_info": {
-      "type_str": "Content | Sequence[Content]",
-      "description": null,
-      "kind": "union",
-      "base_type": {
-        "type_str": "Union",
-        "description": null,
-        "kind": "simple",
-        "doc_url": "https://docs.python.org/3/library/typing.html#typing.Union"
-      },
-      "parameters": [
-        {
-          "type_str": "Content",
-          "description": null,
-          "kind": "simple",
-          "doc_identifier": "Content"
-        },
-        {
-          "type_str": "Sequence[Content]",
-          "description": null,
-          "kind": "generic",
-          "base_type": {
-            "type_str": "Sequence",
-            "description": null,
-            "kind": "simple",
-            "doc_identifier": "Sequence"
-          },
-          "parameters": [
-            {
-              "type_str": "Content",
-              "description": null,
-              "kind": "simple",
-              "doc_identifier": "Content"
-            }
-          ]
-        }
-      ]
-    }
-  },
-  {
-    "name": "deps",
-    "type_info": {
-      "type_str": "DepsT",
-      "description": null,
-      "kind": "simple",
-      "doc_url": "/docs/mirascope/api/index#depst"
-    },
-    "default": "None"
-  }
-]}
-/>
-
-<ReturnTable
-  returnType={{
-  "type_info": {
-    "type_str": "Stream",
-    "description": null,
-    "kind": "simple",
-    "doc_identifier": "Stream"
-  }
-}}
-/>
-
-
-## <ApiType type="Function" path="index" symbolName="stream_async" /> stream_async
-
-Streams the response generated by running the agent loop asynchronously.
-
-<ParametersTable
-  parameters={[
-  {
-    "name": "self",
-    "type_info": {
-      "type_str": "Any",
-      "description": null,
-      "kind": "simple",
-      "doc_identifier": null
-    }
-  },
-  {
-    "name": "query",
-    "type_info": {
-      "type_str": "Content | Sequence[Content]",
-      "description": null,
-      "kind": "union",
-      "base_type": {
-        "type_str": "Union",
-        "description": null,
-        "kind": "simple",
-        "doc_url": "https://docs.python.org/3/library/typing.html#typing.Union"
-      },
-      "parameters": [
-        {
-          "type_str": "Content",
-          "description": null,
-          "kind": "simple",
-          "doc_identifier": "Content"
-        },
-        {
-          "type_str": "Sequence[Content]",
-          "description": null,
-          "kind": "generic",
-          "base_type": {
-            "type_str": "Sequence",
-            "description": null,
-            "kind": "simple",
-            "doc_identifier": "Sequence"
-          },
-          "parameters": [
-            {
-              "type_str": "Content",
-              "description": null,
-              "kind": "simple",
-              "doc_identifier": "Content"
-            }
-          ]
-        }
-      ]
-    }
-  },
-  {
-    "name": "deps",
-    "type_info": {
-      "type_str": "DepsT",
-      "description": null,
-      "kind": "simple",
-      "doc_url": "/docs/mirascope/api/index#depst"
+      "doc_identifier": "DepsT"
     },
     "default": "None"
   }

@@ -4,13 +4,7 @@
   "children": [
     {
       "slug": "calls",
-      "label": "Calls",
-      "children": [
-        {
-          "slug": "call",
-          "label": "call"
-        }
-      ]
+      "label": "calls"
     }
   ]
 }
