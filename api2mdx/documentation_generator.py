@@ -12,7 +12,7 @@ from pathlib import Path
 from typing import Any
 
 from api2mdx.admonition_converter import convert_admonitions
-from api2mdx.api_discovery import ApiDocumentation, DirectivesPage, discover_api_directives
+from api2mdx.api_discovery import ApiDocumentation, DirectivesPage
 from api2mdx.griffe_integration import (
     get_loader,
     render_directive,
@@ -70,7 +70,7 @@ class DocumentationGenerator:
         # Discover API directives from module structure
         if self.module is None:
             raise RuntimeError("Module must be loaded before discovering directives")
-        self.api_documentation = discover_api_directives(self.module)
+        self.api_documentation = ApiDocumentation.from_module(self.module)
         print(f"Discovered {len(self.api_documentation)} API directives")
 
         # Output directive snapshots if requested
@@ -100,7 +100,7 @@ class DocumentationGenerator:
             raise RuntimeError("Setup must be called before generating documentation")
 
         try:
-            target_path = self.output_path / api_directive.slug
+            target_path = self.output_path / api_directive.file_path
 
             # Ensure target directory exists
             target_path.parent.mkdir(exist_ok=True, parents=True)
@@ -132,7 +132,7 @@ class DocumentationGenerator:
             )
 
             # Write to .md file in directive output directory
-            directive_file_path = directive_output_path / api_directive.slug.replace(
+            directive_file_path = directive_output_path / api_directive.file_path.replace(
                 ".mdx", ".md"
             )
             directive_file_path.parent.mkdir(parents=True, exist_ok=True)
@@ -204,7 +204,7 @@ class DocumentationGenerator:
             raise RuntimeError("Module must be loaded before processing directives")
 
         # Get target path from the directive's slug
-        target_path = self.output_path / directives_page.slug
+        target_path = self.output_path / directives_page.file_path
 
         # Extract title from directive name
         title = directives_page.name

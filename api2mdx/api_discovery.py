@@ -58,13 +58,22 @@ class DirectivesPage:
 
     Attributes:
         directives: List of Directive objects for this documentation file
-        slug: The lowercase output path/slug (e.g., "agent.mdx" or "agent-fn.mdx")
+        directory: Directory path for nested structures (e.g., "calls" or "" for root)
+        slug: The clean slug identifier (e.g., "agent" or "base-tool")
         name: The original name with proper casing (e.g., "Agent" or "agent")
     """
 
     directives: list[Directive]
-    slug: str
+    directory: str
+    slug: Slug
     name: str
+    
+    @property
+    def file_path(self) -> str:
+        """Get the full file path with .mdx extension."""
+        if self.directory:
+            return f"{self.directory}/{self.slug}.mdx"
+        return f"{self.slug}.mdx"
 
 
 class ApiDocumentation:
@@ -77,6 +86,13 @@ class ApiDocumentation:
     """
 
     def __init__(self, pages: list[DirectivesPage]):
+        # Validate unique file paths
+        file_paths = set()
+        for page in pages:
+            if page.file_path in file_paths:
+                raise ValueError(f"Duplicate file path: {page.file_path}")
+            file_paths.add(page.file_path)
+        
         self.pages = pages
         self._symbol_registry = self._build_symbol_registry()
 
@@ -112,6 +128,26 @@ class ApiDocumentation:
     def __len__(self):
         """Return number of pages."""
         return len(self.pages)
+    
+    @classmethod
+    def from_module(cls, module: Module) -> "ApiDocumentation":
+        """Discover API directives with hierarchical organization.
+
+        This creates a structure like:
+        - index.mdx (main module with its exports)
+        - submodule.mdx (submodule with its exports)
+        - nested/submodule.mdx (nested submodules)
+
+        Args:
+            module: The loaded Griffe module to analyze
+
+        Returns:
+            ApiDocumentation object containing all pages with symbol registry
+        """
+        # Use the new recursive discovery function
+        pages = discover_module_pages(module)
+
+        return cls(pages)
 
 
 def _resolve_member(module: Module, name: str) -> Object | Alias:
@@ -301,8 +337,15 @@ def discover_module_pages(module: Module, base_path: str = "") -> list[Directive
         List of DirectivesPage objects for this module and all submodules
     """
 
-    output_path = f"{base_path or 'index'}.mdx"
-    module_page = DirectivesPage([], output_path, module.name)
+    if base_path:
+        parts = base_path.split("/")
+        directory = "/".join(parts[:-1]) if len(parts) > 1 else ""
+        slug_name = parts[-1]
+    else:
+        directory = ""
+        slug_name = "index"
+    
+    module_page = DirectivesPage([], directory, Slug.from_name(slug_name), module.name)
     pages = [module_page]
 
     # Get all exports from this module
@@ -335,87 +378,5 @@ def discover_module_pages(module: Module, base_path: str = "") -> list[Directive
     return pages
 
 
-def discover_api_directives(module: Module) -> ApiDocumentation:
-    """Discover API directives with hierarchical organization.
-
-    This creates a structure like:
-    - index.mdx (main module with its exports)
-    - submodule.mdx (submodule with its exports)
-    - nested/submodule.mdx (nested submodules)
-
-    Args:
-        module: The loaded Griffe module to analyze
-
-    Returns:
-        ApiDocumentation object containing all pages with symbol registry
-    """
-    # Use the new recursive discovery function
-    pages = discover_module_pages(module)
-
-    # Resolve case-insensitive filename conflicts
-    resolved_pages = _resolve_case_conflicts(pages)
-
-    return ApiDocumentation(resolved_pages)
 
 
-def _resolve_case_conflicts(directives: list[DirectivesPage]) -> list[DirectivesPage]:
-    """Resolve case-insensitive filename conflicts by adding -fn suffix.
-
-    When there are conflicts (e.g., "agent.mdx" from both "Agent" and "agent"), we:
-    1. Keep the one that starts with a capital letter as-is
-    2. Add "-fn" suffix to the one that starts with lowercase
-    3. If neither starts with capital, throw exception for fast fail
-
-    Args:
-        directives: List of ApiDirective objects
-
-    Returns:
-        List of ApiDirective objects with conflicts resolved
-    """
-    # Group by lowercase slug to find conflicts
-    path_groups: dict[str, list[DirectivesPage]] = {}
-    for directive_obj in directives:
-        lower_slug = directive_obj.slug.lower()
-        if lower_slug not in path_groups:
-            path_groups[lower_slug] = []
-        path_groups[lower_slug].append(directive_obj)
-
-    resolved: list[DirectivesPage] = []
-    for lower_slug, group in path_groups.items():
-        if len(group) == 1:
-            # No conflict
-            resolved.extend(group)
-        else:
-            # We have a conflict - resolve it
-            capitalized_items: list[DirectivesPage] = []
-            lowercase_items: list[DirectivesPage] = []
-
-            for directive_obj in group:
-                # Check the original name, not the lowercase slug
-                if directive_obj.name[0].isupper():
-                    capitalized_items.append(directive_obj)
-                else:
-                    lowercase_items.append(directive_obj)
-
-            # Check that we have exactly one capitalized and one+ lowercase
-            if len(capitalized_items) == 0:
-                raise ValueError(
-                    f"Case conflict with no capitalized names: {[item.name for item in group]}"
-                )
-
-            # Add capitalized items as-is
-            resolved.extend(capitalized_items)
-
-            # Add -fn suffix to lowercase items
-            for directive_obj in lowercase_items:
-                base_slug = directive_obj.slug.replace(".mdx", "")
-                new_slug = f"{base_slug}-fn.mdx"
-                resolved.append(
-                    DirectivesPage(
-                        directive_obj.directives,
-                        Slug.from_name(new_slug),
-                        directive_obj.name,
-                    )
-                )
-
-    return resolved

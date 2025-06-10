@@ -168,11 +168,11 @@ def generate_meta_from_directives(
 
     for api_directive in directives:
         # Skip the main index file for now
-        if api_directive.slug == "index.mdx":
+        if api_directive.file_path == "index.mdx":
             continue
 
-        # Convert slug to path parts
-        path_parts = api_directive.slug.replace(".mdx", "").split("/")
+        # Convert file path to path parts
+        path_parts = api_directive.file_path.replace(".mdx", "").split("/")
 
         # Navigate/create the tree structure
         current_level = path_tree
