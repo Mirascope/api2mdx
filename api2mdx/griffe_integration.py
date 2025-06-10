@@ -17,9 +17,7 @@ from pathlib import Path
 
 from griffe import (
     Alias,
-    Class,
     Extensions,
-    Function,
     GriffeLoader,
     Module,
     Object,
@@ -30,7 +28,7 @@ from api2mdx.doclinks import UpdateDocstringsExtension
 from api2mdx.mdx_renderer import (
     render_object,
 )
-from api2mdx.api_discovery import _get_module_exports, Directive
+from api2mdx.api_discovery import Directive
 from api2mdx.models import (
     process_object,
 )
@@ -80,11 +78,7 @@ def document_object(obj: Object | Alias, doc_path: str) -> str:
         MDX documentation with enhanced component usage
 
     """
-    # Check if this is a module - if so, render as overview only
-    if isinstance(obj, Module):
-        return render_module_overview(obj, doc_path)
-
-    # For classes, functions, etc., render full documentation
+    # Process all objects the same way - modules get their own dedicated pages
     processed_obj = process_object(obj)
     if processed_obj is None:
         raise ValueError(f"Failed to process object: {obj}")
@@ -136,72 +130,3 @@ def process_directive(directive: Directive, module: Module, doc_path: str) -> st
 
     # Use the document_object dispatcher function
     return document_object(current_obj, doc_path)
-
-
-def render_module_overview(module: Module, doc_path: str) -> str:
-    """Render a module as an overview with export links, not full documentation.
-
-    Args:
-        module: The Griffe module to render as overview
-        doc_path: Path to the document, used for API component links
-
-    Returns:
-        MDX content showing module docstring and export links
-    """
-    content: list[str] = []
-
-    # Module docstring
-    if module.docstring:
-        # Griffe docstring objects have .value, not .description
-        docstring_text = (
-            str(module.docstring.value)
-            if hasattr(module.docstring, "value")
-            else str(module.docstring)
-        )
-        content.append(docstring_text)
-        content.append("")
-
-    # Get meaningful exports (using our filtering logic)
-    exports = _get_module_exports(module)
-
-    if not exports:
-        return "\n".join(content)
-
-    # Show brief info about each export
-    for export_name in exports:
-        if export_name in module.members:
-            member = module.members[export_name]
-
-            # Get brief description from docstring
-            brief_desc = ""
-            if hasattr(member, "docstring") and member.docstring:
-                # Use first line of docstring as brief description
-                docstring_text = (
-                    str(member.docstring.value)
-                    if hasattr(member.docstring, "value")
-                    else str(member.docstring)
-                )
-                brief_desc = docstring_text.split("\n")[0] if docstring_text else ""
-
-            # Determine member type for ApiType component
-            if isinstance(member, Module):
-                member_type = "Module"
-            elif isinstance(member, Class):
-                member_type = "Class"
-            elif isinstance(member, Function):
-                member_type = "Function"
-            elif isinstance(member, Alias):
-                member_type = "Alias"
-            else:
-                member_type = "Object"
-
-            # Add ApiType component with brief description
-            content.append(
-                f'## <ApiType type="{member_type}" path="{doc_path}" symbolName="{export_name}" /> {export_name}'
-            )
-            content.append("")
-            if brief_desc:
-                content.append(brief_desc)
-                content.append("")
-
-    return "\n".join(content)

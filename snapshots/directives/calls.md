@@ -15,3 +15,5 @@
 ::: mirascope_v2_llm.calls.structured_call.StructuredCall  # Class
 
 ::: mirascope_v2_llm.calls.structured_context_call.StructuredContextCall  # Class
+
+::: mirascope_v2_llm.calls.call  # Module

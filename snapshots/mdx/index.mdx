@@ -1,31 +1,943 @@
 ---
 # AUTO-GENERATED API DOCUMENTATION - DO NOT EDIT
-title: index
-description: API documentation for index
+title: mirascope_v2_llm
+description: API documentation for mirascope_v2_llm
 ---
 
-# index
+# mirascope_v2_llm
 
-The `llm` module for writing provider-agnostic LLM Generations.
-
-This module provides a unified interface for interacting with different LLM providers,
-including messages, tools, response formatting, and streaming. It allows you to write
-code that works with multiple LLM providers without changing your application logic.
-
-## <ApiType type="Alias" path="index" symbolName="call" /> call
+## <ApiType type="Module" path="index" symbolName="call" /> call
 
 The Call module for generating responses using LLMs.
+
+## <ApiType type="Attribute" path="index" symbolName="P" /> P
+
+**Type:** <TypeLink type={{"type_str": "ParamSpec('P')", "description": null, "kind": "simple", "doc_identifier": "ParamSpec('P')"}} />
+
+
+## <ApiType type="Class" path="index" symbolName="Call" /> Call
+
+A class for generating responses using LLMs.
+
+**Bases:** 
+<TypeLink type={{"type_str": "BaseCall[P, PromptTemplate]", "description": null, "kind": "generic", "base_type": {"type_str": "BaseCall", "description": null, "kind": "simple", "doc_identifier": "BaseCall"}, "parameters": [{"type_str": "P", "description": null, "kind": "simple", "doc_url": "/docs/mirascope/api/index#p"}, {"type_str": "PromptTemplate", "description": null, "kind": "simple", "doc_identifier": "PromptTemplate"}]}} />
+
+## <ApiType type="Function" path="index" symbolName="call_async" /> call_async
+
+Generates an asynchronous response using the LLM.
+
+<ParametersTable
+  parameters={[
+  {
+    "name": "self",
+    "type_info": {
+      "type_str": "Any",
+      "description": null,
+      "kind": "simple",
+      "doc_identifier": null
+    }
+  },
+  {
+    "name": "args",
+    "type_info": {
+      "type_str": "P.args",
+      "description": null,
+      "kind": "simple",
+      "doc_identifier": "P.args"
+    },
+    "default": "()"
+  },
+  {
+    "name": "kwargs",
+    "type_info": {
+      "type_str": "P.kwargs",
+      "description": null,
+      "kind": "simple",
+      "doc_identifier": "P.kwargs"
+    },
+    "default": "{}"
+  }
+]}
+/>
+
+<ReturnTable
+  returnType={{
+  "type_info": {
+    "type_str": "Response",
+    "description": null,
+    "kind": "simple",
+    "doc_identifier": "Response"
+  }
+}}
+/>
+
+
+## <ApiType type="Function" path="index" symbolName="stream" /> stream
+
+Generates a streaming response using the LLM.
+
+<ParametersTable
+  parameters={[
+  {
+    "name": "self",
+    "type_info": {
+      "type_str": "Any",
+      "description": null,
+      "kind": "simple",
+      "doc_identifier": null
+    }
+  },
+  {
+    "name": "args",
+    "type_info": {
+      "type_str": "P.args",
+      "description": null,
+      "kind": "simple",
+      "doc_identifier": "P.args"
+    },
+    "default": "()"
+  },
+  {
+    "name": "kwargs",
+    "type_info": {
+      "type_str": "P.kwargs",
+      "description": null,
+      "kind": "simple",
+      "doc_identifier": "P.kwargs"
+    },
+    "default": "{}"
+  }
+]}
+/>
+
+<ReturnTable
+  returnType={{
+  "type_info": {
+    "type_str": "Stream",
+    "description": null,
+    "kind": "simple",
+    "doc_identifier": "Stream"
+  }
+}}
+/>
+
+
+## <ApiType type="Function" path="index" symbolName="stream_async" /> stream_async
+
+Generates an asynchronous streaming response using the LLM.
+
+<ParametersTable
+  parameters={[
+  {
+    "name": "self",
+    "type_info": {
+      "type_str": "Any",
+      "description": null,
+      "kind": "simple",
+      "doc_identifier": null
+    }
+  },
+  {
+    "name": "args",
+    "type_info": {
+      "type_str": "P.args",
+      "description": null,
+      "kind": "simple",
+      "doc_identifier": "P.args"
+    },
+    "default": "()"
+  },
+  {
+    "name": "kwargs",
+    "type_info": {
+      "type_str": "P.kwargs",
+      "description": null,
+      "kind": "simple",
+      "doc_identifier": "P.kwargs"
+    },
+    "default": "{}"
+  }
+]}
+/>
+
+<ReturnTable
+  returnType={{
+  "type_info": {
+    "type_str": "AsyncStream",
+    "description": null,
+    "kind": "simple",
+    "doc_identifier": "AsyncStream"
+  }
+}}
+/>
+
+
+
 
 ## <ApiType type="Module" path="index" symbolName="calls" /> calls
 
 The `llm.calls` module.
 
-## <ApiType type="Alias" path="index" symbolName="agent" /> agent
+## <ApiType type="Alias" path="index" symbolName="AsyncCall" /> AsyncCall
+
+A class for generating responses using LLMs asynchronously.
+
+
+**Alias to:** `mirascope_v2_llm.calls.async_call.AsyncCall`
+
+## <ApiType type="Alias" path="index" symbolName="AsyncContextCall" /> AsyncContextCall
+
+A class for generating responses using LLMs asynchronously.
+
+
+**Alias to:** `mirascope_v2_llm.calls.async_context_call.AsyncContextCall`
+
+## <ApiType type="Alias" path="index" symbolName="AsyncStructuredCall" /> AsyncStructuredCall
+
+A class for generating structured responses using LLMs asynchronously.
+
+
+**Alias to:** `mirascope_v2_llm.calls.async_structured_call.AsyncStructuredCall`
+
+## <ApiType type="Alias" path="index" symbolName="AsyncStructuredContextCall" /> AsyncStructuredContextCall
+
+A class for generating structured responses using LLMs asynchronously.
+
+
+**Alias to:** `mirascope_v2_llm.calls.async_structured_context_call.AsyncStructuredContextCall`
+
+## <ApiType type="Alias" path="index" symbolName="Call" /> Call
+
+A class for generating responses using LLMs.
+
+
+**Alias to:** `mirascope_v2_llm.calls.call.Call`
+
+## <ApiType type="Alias" path="index" symbolName="ContextCall" /> ContextCall
+
+A class for generating responses using LLMs.
+
+
+**Alias to:** `mirascope_v2_llm.calls.context_call.ContextCall`
+
+## <ApiType type="Alias" path="index" symbolName="StructuredCall" /> StructuredCall
+
+A class for generating structured responses using LLMs.
+
+
+**Alias to:** `mirascope_v2_llm.calls.structured_call.StructuredCall`
+
+## <ApiType type="Alias" path="index" symbolName="StructuredContextCall" /> StructuredContextCall
+
+A class for generating structured responses using LLMs.
+
+
+**Alias to:** `mirascope_v2_llm.calls.structured_context_call.StructuredContextCall`
+
+## <ApiType type="Module" path="index" symbolName="call" /> call
+
+The Call module for generating responses using LLMs.
+
+## <ApiType type="Attribute" path="index" symbolName="P" /> P
+
+**Type:** <TypeLink type={{"type_str": "ParamSpec('P')", "description": null, "kind": "simple", "doc_identifier": "ParamSpec('P')"}} />
+
+
+## <ApiType type="Class" path="index" symbolName="Call" /> Call
+
+A class for generating responses using LLMs.
+
+**Bases:** 
+<TypeLink type={{"type_str": "BaseCall[P, PromptTemplate]", "description": null, "kind": "generic", "base_type": {"type_str": "BaseCall", "description": null, "kind": "simple", "doc_identifier": "BaseCall"}, "parameters": [{"type_str": "P", "description": null, "kind": "simple", "doc_url": "/docs/mirascope/api/index#p"}, {"type_str": "PromptTemplate", "description": null, "kind": "simple", "doc_identifier": "PromptTemplate"}]}} />
+
+## <ApiType type="Function" path="index" symbolName="call_async" /> call_async
+
+Generates an asynchronous response using the LLM.
+
+<ParametersTable
+  parameters={[
+  {
+    "name": "self",
+    "type_info": {
+      "type_str": "Any",
+      "description": null,
+      "kind": "simple",
+      "doc_identifier": null
+    }
+  },
+  {
+    "name": "args",
+    "type_info": {
+      "type_str": "P.args",
+      "description": null,
+      "kind": "simple",
+      "doc_identifier": "P.args"
+    },
+    "default": "()"
+  },
+  {
+    "name": "kwargs",
+    "type_info": {
+      "type_str": "P.kwargs",
+      "description": null,
+      "kind": "simple",
+      "doc_identifier": "P.kwargs"
+    },
+    "default": "{}"
+  }
+]}
+/>
+
+<ReturnTable
+  returnType={{
+  "type_info": {
+    "type_str": "Response",
+    "description": null,
+    "kind": "simple",
+    "doc_identifier": "Response"
+  }
+}}
+/>
+
+
+## <ApiType type="Function" path="index" symbolName="stream" /> stream
+
+Generates a streaming response using the LLM.
+
+<ParametersTable
+  parameters={[
+  {
+    "name": "self",
+    "type_info": {
+      "type_str": "Any",
+      "description": null,
+      "kind": "simple",
+      "doc_identifier": null
+    }
+  },
+  {
+    "name": "args",
+    "type_info": {
+      "type_str": "P.args",
+      "description": null,
+      "kind": "simple",
+      "doc_identifier": "P.args"
+    },
+    "default": "()"
+  },
+  {
+    "name": "kwargs",
+    "type_info": {
+      "type_str": "P.kwargs",
+      "description": null,
+      "kind": "simple",
+      "doc_identifier": "P.kwargs"
+    },
+    "default": "{}"
+  }
+]}
+/>
+
+<ReturnTable
+  returnType={{
+  "type_info": {
+    "type_str": "Stream",
+    "description": null,
+    "kind": "simple",
+    "doc_identifier": "Stream"
+  }
+}}
+/>
+
+
+## <ApiType type="Function" path="index" symbolName="stream_async" /> stream_async
+
+Generates an asynchronous streaming response using the LLM.
+
+<ParametersTable
+  parameters={[
+  {
+    "name": "self",
+    "type_info": {
+      "type_str": "Any",
+      "description": null,
+      "kind": "simple",
+      "doc_identifier": null
+    }
+  },
+  {
+    "name": "args",
+    "type_info": {
+      "type_str": "P.args",
+      "description": null,
+      "kind": "simple",
+      "doc_identifier": "P.args"
+    },
+    "default": "()"
+  },
+  {
+    "name": "kwargs",
+    "type_info": {
+      "type_str": "P.kwargs",
+      "description": null,
+      "kind": "simple",
+      "doc_identifier": "P.kwargs"
+    },
+    "default": "{}"
+  }
+]}
+/>
+
+<ReturnTable
+  returnType={{
+  "type_info": {
+    "type_str": "AsyncStream",
+    "description": null,
+    "kind": "simple",
+    "doc_identifier": "AsyncStream"
+  }
+}}
+/>
+
+
+
+
+
+## <ApiType type="Module" path="index" symbolName="agent" /> agent
 
 The `Agent` class for LLM agents.
 
-## <ApiType type="Alias" path="index" symbolName="Agent" /> Agent
+## <ApiType type="Attribute" path="index" symbolName="DepsT" /> DepsT
+
+**Type:** <TypeLink type={{"type_str": "TypeVar('DepsT', default=None)", "description": null, "kind": "simple", "doc_identifier": null}} />
+
+
+## <ApiType type="Class" path="index" symbolName="Agent" /> Agent
 
 Agent class for generating responses using LLMs with tools.
+
+**Bases:** 
+<TypeLink type={{"type_str": "BaseAgent[DepsT]", "description": null, "kind": "generic", "base_type": {"type_str": "BaseAgent", "description": null, "kind": "simple", "doc_identifier": "BaseAgent"}, "parameters": [{"type_str": "DepsT", "description": null, "kind": "simple", "doc_url": "/docs/mirascope/api/index#depst"}]}} />
+
+## <ApiType type="Function" path="index" symbolName="run_async" /> run_async
+
+Generates a response by running the agent loop asynchronously.
+
+<ParametersTable
+  parameters={[
+  {
+    "name": "self",
+    "type_info": {
+      "type_str": "Any",
+      "description": null,
+      "kind": "simple",
+      "doc_identifier": null
+    }
+  },
+  {
+    "name": "query",
+    "type_info": {
+      "type_str": "Content | Sequence[Content]",
+      "description": null,
+      "kind": "union",
+      "base_type": {
+        "type_str": "Union",
+        "description": null,
+        "kind": "simple",
+        "doc_url": "https://docs.python.org/3/library/typing.html#typing.Union"
+      },
+      "parameters": [
+        {
+          "type_str": "Content",
+          "description": null,
+          "kind": "simple",
+          "doc_identifier": "Content"
+        },
+        {
+          "type_str": "Sequence[Content]",
+          "description": null,
+          "kind": "generic",
+          "base_type": {
+            "type_str": "Sequence",
+            "description": null,
+            "kind": "simple",
+            "doc_identifier": "Sequence"
+          },
+          "parameters": [
+            {
+              "type_str": "Content",
+              "description": null,
+              "kind": "simple",
+              "doc_identifier": "Content"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "name": "deps",
+    "type_info": {
+      "type_str": "DepsT",
+      "description": null,
+      "kind": "simple",
+      "doc_url": "/docs/mirascope/api/index#depst"
+    },
+    "default": "None"
+  }
+]}
+/>
+
+<ReturnTable
+  returnType={{
+  "type_info": {
+    "type_str": "ContextResponse[DepsT]",
+    "description": null,
+    "kind": "generic",
+    "base_type": {
+      "type_str": "ContextResponse",
+      "description": null,
+      "kind": "simple",
+      "doc_identifier": "ContextResponse"
+    },
+    "parameters": [
+      {
+        "type_str": "DepsT",
+        "description": null,
+        "kind": "simple",
+        "doc_url": "/docs/mirascope/api/index#depst"
+      }
+    ]
+  }
+}}
+/>
+
+
+## <ApiType type="Function" path="index" symbolName="stream" /> stream
+
+Streams the response generated by running the agent loop.
+
+<ParametersTable
+  parameters={[
+  {
+    "name": "self",
+    "type_info": {
+      "type_str": "Any",
+      "description": null,
+      "kind": "simple",
+      "doc_identifier": null
+    }
+  },
+  {
+    "name": "query",
+    "type_info": {
+      "type_str": "Content | Sequence[Content]",
+      "description": null,
+      "kind": "union",
+      "base_type": {
+        "type_str": "Union",
+        "description": null,
+        "kind": "simple",
+        "doc_url": "https://docs.python.org/3/library/typing.html#typing.Union"
+      },
+      "parameters": [
+        {
+          "type_str": "Content",
+          "description": null,
+          "kind": "simple",
+          "doc_identifier": "Content"
+        },
+        {
+          "type_str": "Sequence[Content]",
+          "description": null,
+          "kind": "generic",
+          "base_type": {
+            "type_str": "Sequence",
+            "description": null,
+            "kind": "simple",
+            "doc_identifier": "Sequence"
+          },
+          "parameters": [
+            {
+              "type_str": "Content",
+              "description": null,
+              "kind": "simple",
+              "doc_identifier": "Content"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "name": "deps",
+    "type_info": {
+      "type_str": "DepsT",
+      "description": null,
+      "kind": "simple",
+      "doc_url": "/docs/mirascope/api/index#depst"
+    },
+    "default": "None"
+  }
+]}
+/>
+
+<ReturnTable
+  returnType={{
+  "type_info": {
+    "type_str": "Stream",
+    "description": null,
+    "kind": "simple",
+    "doc_identifier": "Stream"
+  }
+}}
+/>
+
+
+## <ApiType type="Function" path="index" symbolName="stream_async" /> stream_async
+
+Streams the response generated by running the agent loop asynchronously.
+
+<ParametersTable
+  parameters={[
+  {
+    "name": "self",
+    "type_info": {
+      "type_str": "Any",
+      "description": null,
+      "kind": "simple",
+      "doc_identifier": null
+    }
+  },
+  {
+    "name": "query",
+    "type_info": {
+      "type_str": "Content | Sequence[Content]",
+      "description": null,
+      "kind": "union",
+      "base_type": {
+        "type_str": "Union",
+        "description": null,
+        "kind": "simple",
+        "doc_url": "https://docs.python.org/3/library/typing.html#typing.Union"
+      },
+      "parameters": [
+        {
+          "type_str": "Content",
+          "description": null,
+          "kind": "simple",
+          "doc_identifier": "Content"
+        },
+        {
+          "type_str": "Sequence[Content]",
+          "description": null,
+          "kind": "generic",
+          "base_type": {
+            "type_str": "Sequence",
+            "description": null,
+            "kind": "simple",
+            "doc_identifier": "Sequence"
+          },
+          "parameters": [
+            {
+              "type_str": "Content",
+              "description": null,
+              "kind": "simple",
+              "doc_identifier": "Content"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "name": "deps",
+    "type_info": {
+      "type_str": "DepsT",
+      "description": null,
+      "kind": "simple",
+      "doc_url": "/docs/mirascope/api/index#depst"
+    },
+    "default": "None"
+  }
+]}
+/>
+
+<ReturnTable
+  returnType={{
+  "type_info": {
+    "type_str": "AsyncStream",
+    "description": null,
+    "kind": "simple",
+    "doc_identifier": "AsyncStream"
+  }
+}}
+/>
+
+
+
+
+## <ApiType type="Class" path="index" symbolName="Agent" /> Agent
+
+Agent class for generating responses using LLMs with tools.
+
+**Bases:** 
+<TypeLink type={{"type_str": "BaseAgent[DepsT]", "description": null, "kind": "generic", "base_type": {"type_str": "BaseAgent", "description": null, "kind": "simple", "doc_identifier": "BaseAgent"}, "parameters": [{"type_str": "DepsT", "description": null, "kind": "simple", "doc_url": "/docs/mirascope/api/index#depst"}]}} />
+
+## <ApiType type="Function" path="index" symbolName="run_async" /> run_async
+
+Generates a response by running the agent loop asynchronously.
+
+<ParametersTable
+  parameters={[
+  {
+    "name": "self",
+    "type_info": {
+      "type_str": "Any",
+      "description": null,
+      "kind": "simple",
+      "doc_identifier": null
+    }
+  },
+  {
+    "name": "query",
+    "type_info": {
+      "type_str": "Content | Sequence[Content]",
+      "description": null,
+      "kind": "union",
+      "base_type": {
+        "type_str": "Union",
+        "description": null,
+        "kind": "simple",
+        "doc_url": "https://docs.python.org/3/library/typing.html#typing.Union"
+      },
+      "parameters": [
+        {
+          "type_str": "Content",
+          "description": null,
+          "kind": "simple",
+          "doc_identifier": "Content"
+        },
+        {
+          "type_str": "Sequence[Content]",
+          "description": null,
+          "kind": "generic",
+          "base_type": {
+            "type_str": "Sequence",
+            "description": null,
+            "kind": "simple",
+            "doc_identifier": "Sequence"
+          },
+          "parameters": [
+            {
+              "type_str": "Content",
+              "description": null,
+              "kind": "simple",
+              "doc_identifier": "Content"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "name": "deps",
+    "type_info": {
+      "type_str": "DepsT",
+      "description": null,
+      "kind": "simple",
+      "doc_url": "/docs/mirascope/api/index#depst"
+    },
+    "default": "None"
+  }
+]}
+/>
+
+<ReturnTable
+  returnType={{
+  "type_info": {
+    "type_str": "ContextResponse[DepsT]",
+    "description": null,
+    "kind": "generic",
+    "base_type": {
+      "type_str": "ContextResponse",
+      "description": null,
+      "kind": "simple",
+      "doc_identifier": "ContextResponse"
+    },
+    "parameters": [
+      {
+        "type_str": "DepsT",
+        "description": null,
+        "kind": "simple",
+        "doc_url": "/docs/mirascope/api/index#depst"
+      }
+    ]
+  }
+}}
+/>
+
+
+## <ApiType type="Function" path="index" symbolName="stream" /> stream
+
+Streams the response generated by running the agent loop.
+
+<ParametersTable
+  parameters={[
+  {
+    "name": "self",
+    "type_info": {
+      "type_str": "Any",
+      "description": null,
+      "kind": "simple",
+      "doc_identifier": null
+    }
+  },
+  {
+    "name": "query",
+    "type_info": {
+      "type_str": "Content | Sequence[Content]",
+      "description": null,
+      "kind": "union",
+      "base_type": {
+        "type_str": "Union",
+        "description": null,
+        "kind": "simple",
+        "doc_url": "https://docs.python.org/3/library/typing.html#typing.Union"
+      },
+      "parameters": [
+        {
+          "type_str": "Content",
+          "description": null,
+          "kind": "simple",
+          "doc_identifier": "Content"
+        },
+        {
+          "type_str": "Sequence[Content]",
+          "description": null,
+          "kind": "generic",
+          "base_type": {
+            "type_str": "Sequence",
+            "description": null,
+            "kind": "simple",
+            "doc_identifier": "Sequence"
+          },
+          "parameters": [
+            {
+              "type_str": "Content",
+              "description": null,
+              "kind": "simple",
+              "doc_identifier": "Content"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "name": "deps",
+    "type_info": {
+      "type_str": "DepsT",
+      "description": null,
+      "kind": "simple",
+      "doc_url": "/docs/mirascope/api/index#depst"
+    },
+    "default": "None"
+  }
+]}
+/>
+
+<ReturnTable
+  returnType={{
+  "type_info": {
+    "type_str": "Stream",
+    "description": null,
+    "kind": "simple",
+    "doc_identifier": "Stream"
+  }
+}}
+/>
+
+
+## <ApiType type="Function" path="index" symbolName="stream_async" /> stream_async
+
+Streams the response generated by running the agent loop asynchronously.
+
+<ParametersTable
+  parameters={[
+  {
+    "name": "self",
+    "type_info": {
+      "type_str": "Any",
+      "description": null,
+      "kind": "simple",
+      "doc_identifier": null
+    }
+  },
+  {
+    "name": "query",
+    "type_info": {
+      "type_str": "Content | Sequence[Content]",
+      "description": null,
+      "kind": "union",
+      "base_type": {
+        "type_str": "Union",
+        "description": null,
+        "kind": "simple",
+        "doc_url": "https://docs.python.org/3/library/typing.html#typing.Union"
+      },
+      "parameters": [
+        {
+          "type_str": "Content",
+          "description": null,
+          "kind": "simple",
+          "doc_identifier": "Content"
+        },
+        {
+          "type_str": "Sequence[Content]",
+          "description": null,
+          "kind": "generic",
+          "base_type": {
+            "type_str": "Sequence",
+            "description": null,
+            "kind": "simple",
+            "doc_identifier": "Sequence"
+          },
+          "parameters": [
+            {
+              "type_str": "Content",
+              "description": null,
+              "kind": "simple",
+              "doc_identifier": "Content"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "name": "deps",
+    "type_info": {
+      "type_str": "DepsT",
+      "description": null,
+      "kind": "simple",
+      "doc_url": "/docs/mirascope/api/index#depst"
+    },
+    "default": "None"
+  }
+]}
+/>
+
+<ReturnTable
+  returnType={{
+  "type_info": {
+    "type_str": "AsyncStream",
+    "description": null,
+    "kind": "simple",
+    "doc_identifier": "AsyncStream"
+  }
+}}
+/>
+
 
 

@@ -3,20 +3,14 @@
   "label": "API Reference",
   "children": [
     {
-      "slug": "call",
-      "label": "call"
-    },
-    {
       "slug": "calls",
-      "label": "calls"
-    },
-    {
-      "slug": "agent",
-      "label": "Agent"
-    },
-    {
-      "slug": "agent-fn",
-      "label": "agent"
+      "label": "Calls",
+      "children": [
+        {
+          "slug": "call",
+          "label": "call"
+        }
+      ]
     }
   ]
 }

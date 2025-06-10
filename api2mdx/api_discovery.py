@@ -51,7 +51,18 @@ def _extract_all_exports(module: Module) -> list[str] | None:
         List of export names if __all__ is defined, None otherwise
     """
     if "__all__" not in module.members:
-        return None
+        # Fallback to public members (no hacky filtering)
+        fallback_exports = []
+        for name, member in module.members.items():
+            # Skip private members
+            if name.startswith("_"):
+                continue
+
+            # Include classes, functions, and modules
+            if isinstance(member, (Class, Function, Module)):
+                fallback_exports.append(name)
+
+        return fallback_exports
 
     all_member = module.members["__all__"]
 
@@ -87,144 +98,24 @@ def _extract_all_exports(module: Module) -> list[str] | None:
     return None
 
 
-def _get_module_exports(module: Module) -> list[str]:
-    """Get the list of exports from a module.
-
-    Checks for __all__ first, falls back to meaningful public members.
+def _create_directive_from_member(member: Object | Alias) -> Directive:
+    """Create a Directive from a Griffe member object.
 
     Args:
-        module: The module to analyze
+        member: The Griffe object to create a directive for
 
     Returns:
-        List of export names
+        Directive object with appropriate type and path
     """
-    # Try to get __all__ exports first
-    exports = _extract_all_exports(module)
-    if exports is not None:
-        return exports
-
-    # Fallback to public members (no hacky filtering)
-    fallback_exports = []
-    for name, member in module.members.items():
-        # Skip private members
-        if name.startswith("_"):
-            continue
-
-        # Include classes, functions, and modules
-        if isinstance(member, (Class, Function, Module)):
-            fallback_exports.append(name)
-
-    return fallback_exports
-
-
-def _discover_module_directive(module: Module, module_name: str) -> DirectivesPage:
-    """Discover directive for a module by combining all its exports into a single file.
-
-    Args:
-        module: The Module object to process
-        module_name: The name of the module
-
-    Returns:
-        Single ApiDirective with combined module exports
-
-    TODO: This doesn't handle submodules. Should be refactored to operate recursively.
-    """
-    module_exports = _get_module_exports(module)
-
-    # Create lowercase filename
-    filename = module_name.lower()
-    output_path = f"{filename}.mdx"
-
-    # Create ApiDirective and populate directives in a loop
-    api_directive = DirectivesPage([], output_path, module_name)
-
-    for export_name in module_exports:
-        if export_name not in module.members:
-            raise ValueError(
-                f"Export '{export_name}' in __all__ not found in module {module.canonical_path}"
-            )
-
-        export_member = module.members[export_name]
-        if isinstance(export_member, Class):
-            api_directive.directives.append(
-                Directive(export_member.canonical_path, DirectiveType.CLASS)
-            )
-        elif isinstance(export_member, Function):
-            api_directive.directives.append(
-                Directive(export_member.canonical_path, DirectiveType.FUNCTION)
-            )
-        elif hasattr(export_member, "target") and getattr(export_member, "target"):
-            # Handle aliases - use the target's type instead of ALIAS
-            target = getattr(export_member, "target")
-            if isinstance(target, Class):
-                directive_type = DirectiveType.CLASS
-            elif isinstance(target, Function):
-                directive_type = DirectiveType.FUNCTION
-            elif isinstance(target, Module):
-                directive_type = DirectiveType.MODULE
-            else:
-                directive_type = DirectiveType.ALIAS
-            api_directive.directives.append(
-                Directive(target.canonical_path, directive_type)
-            )
-
-    return api_directive
-
-
-def _discover_member_directives(
-    member: Object | Alias, exporting_module_path: str
-) -> list[DirectivesPage]:
-    """Discover directives for a specific module member.
-
-    Args:
-        member: The Griffe object to document
-        exporting_module_path: The path of the module that exports this member
-
-    Returns:
-        List of ApiDirective objects
-    """
-    directives = []
-    member_name = member.name
-    original_name = member_name  # Preserve original casing
-
-    # Use canonical path for directive (what to document)
-    if hasattr(member, "canonical_path"):
-        canonical_path = member.canonical_path
-    else:
-        canonical_path = f"{exporting_module_path}.{member_name}"
-
-    # Create lowercase filename (conflicts will be resolved later)
-    filename = member_name.lower()
-
-    # Use exporting module path for output structure (where to put it)
-    path_parts = exporting_module_path.split(".")
-    if len(path_parts) > 1:  # package.submodule
-        submodule_parts = path_parts[1:]  # Skip package name
-        submodule_path = "/".join(submodule_parts)
-        output_path = f"{submodule_path}/{filename}.mdx"
-    else:
-        # Top-level member
-        output_path = f"{filename}.mdx"
-
     if isinstance(member, Class):
-        directive = Directive(canonical_path, DirectiveType.CLASS)
-        directives.append(DirectivesPage([directive], output_path, original_name))
-
+        return Directive(member.canonical_path, DirectiveType.CLASS)
     elif isinstance(member, Function):
-        directive = Directive(canonical_path, DirectiveType.FUNCTION)
-        directives.append(DirectivesPage([directive], output_path, original_name))
-
+        return Directive(member.canonical_path, DirectiveType.FUNCTION)
     elif isinstance(member, Module):
-        module_directive = _discover_module_directive(member, member_name)
-        directives.append(module_directive)
-
+        return Directive(member.canonical_path, DirectiveType.MODULE)
     elif hasattr(member, "target") and getattr(member, "target"):
-        # Handle aliases by documenting the target
+        # Handle aliases - use the target's type instead of ALIAS
         target = getattr(member, "target")
-        target_path = (
-            target.canonical_path if hasattr(target, "canonical_path") else str(target)
-        )
-        # Use the target's type instead of ALIAS
         if isinstance(target, Class):
             directive_type = DirectiveType.CLASS
         elif isinstance(target, Function):
@@ -233,91 +124,77 @@ def _discover_member_directives(
             directive_type = DirectiveType.MODULE
         else:
             directive_type = DirectiveType.ALIAS
-        directive = Directive(target_path, directive_type)
-        directives.append(DirectivesPage([directive], output_path, original_name))
+        return Directive(target.canonical_path, directive_type)
+    else:
+        raise ValueError(f"Unknown directive type: {member.canonical_path}")
 
-    return directives
+
+def discover_module_pages(module: Module, base_path: str = "") -> list[DirectivesPage]:
+    """Recursively discover pages for a module and its submodules.
+
+    Args:
+        module: The Module object to process
+        base_path: The path prefix for nested modules (e.g., "calls" for submodules)
+
+    Returns:
+        List of DirectivesPage objects for this module and all submodules
+    """
+
+    output_path = f"{base_path or 'index'}.mdx"
+    module_page = DirectivesPage([], output_path, module.name)
+    pages = [module_page]
+
+    # Get all exports from this module
+    export_names = _extract_all_exports(module)
+
+    if export_names is None:
+        raise ValueError(f"Module {module.canonical_path} has no __all__")
+
+    # Process each export
+    for export_name in export_names:
+        if export_name not in module.members:
+            raise ValueError(
+                f"Export '{export_name}' in __all__ not found in module {module.canonical_path}"
+            )
+
+        member = module.members[export_name]
+
+        if isinstance(member, Module):
+            # This is a submodule - give it dedicated page(s) (recursive)
+            submodule_base_path = (
+                f"{base_path}/{export_name}" if base_path else export_name
+            )
+            submodule_pages = discover_module_pages(member, submodule_base_path)
+            pages.extend(submodule_pages)
+
+        # Add a directive to this module's page (including for submodules - will render a link)
+        directive = _create_directive_from_member(member)
+        module_page.directives.append(directive)
+
+    return pages
 
 
 def discover_api_directives(module: Module) -> list[DirectivesPage]:
     """Discover API directives with hierarchical organization.
 
     This creates a structure like:
-    - index.mdx (main module)
-    - submodule/index.mdx (submodule overview)
-    - submodule/Class.mdx (individual classes)
+    - index.mdx (main module with its exports)
+    - submodule.mdx (submodule with its exports)
+    - nested/submodule.mdx (nested submodules)
 
     Args:
         module: The loaded Griffe module to analyze
 
     Returns:
-        List of ApiDirective objects with hierarchical paths
+        List of DirectivesPage objects with hierarchical paths
     """
-    directives = []
-    submodules_seen = set()
-
-    # Main module index
-    module_directive = Directive(module.canonical_path, DirectiveType.MODULE)
-    directives.append(DirectivesPage([module_directive], "index.mdx", "index"))
-
-    # Process the main module's exports (respecting its __all__)
-    member_directives = _discover_main_module_directives(module)
-
-    # Check if we need to add submodule index files
-    for directive_obj in member_directives:
-        if "/" in directive_obj.slug:  # This is in a submodule
-            submodule_path = directive_obj.slug.split("/")[0]
-            if submodule_path not in submodules_seen:
-                # Add submodule index
-                submodule_directive = Directive(
-                    f"{module.canonical_path}.{submodule_path}", DirectiveType.MODULE
-                )
-                submodule_index_path = f"{submodule_path}/index.mdx"
-                directives.append(
-                    DirectivesPage(
-                        [submodule_directive], submodule_index_path, submodule_path
-                    )
-                )
-                submodules_seen.add(submodule_path)
-
-    directives.extend(member_directives)
+    # Use the new recursive discovery function
+    pages = discover_module_pages(module)
 
     # Resolve case-insensitive filename conflicts
-    resolved_directives = _resolve_case_conflicts(directives)
+    resolved_pages = _resolve_case_conflicts(pages)
 
-    return resolved_directives
-
-
-def _discover_main_module_directives(module: Module) -> list[DirectivesPage]:
-    """Discover directives for the main module's __all__ exports.
-
-    This processes only what the main module explicitly exports,
-    creating hierarchical paths based on where the exports come from.
-
-    Args:
-        module: The main module to process
-
-    Returns:
-        List of ApiDirective objects
-    """
-    directives = []
-
-    # Get exports using the consolidated function
-    exports = _extract_all_exports(module)
-    if exports is None:
-        return directives
-
-    for export_name in exports:
-        if export_name in module.members:
-            member = module.members[export_name]
-
-            # Use the existing member directive logic to get hierarchical paths
-            member_directives = _discover_member_directives(
-                member, module.canonical_path
-            )
-            directives.extend(member_directives)
-
-    return directives
+    return resolved_pages
 
 
 def _resolve_case_conflicts(directives: list[DirectivesPage]) -> list[DirectivesPage]:
