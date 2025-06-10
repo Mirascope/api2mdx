@@ -21,13 +21,13 @@ class DirectiveType(Enum):
 class Directive:
     object_path: str
     object_type: DirectiveType
-    
+
     def __str__(self) -> str:
         return f"::: {self.object_path}  # {self.object_type.value}"
 
 
 @dataclass
-class ApiDirective:
+class DirectivesPage:
     """Represents an API directive with its output path and original name.
 
     Attributes:
@@ -117,7 +117,7 @@ def _get_module_exports(module: Module) -> list[str]:
     return fallback_exports
 
 
-def _discover_module_directive(module: Module, module_name: str) -> ApiDirective:
+def _discover_module_directive(module: Module, module_name: str) -> DirectivesPage:
     """Discover directive for a module by combining all its exports into a single file.
 
     Args:
@@ -134,10 +134,10 @@ def _discover_module_directive(module: Module, module_name: str) -> ApiDirective
     # Create lowercase filename
     filename = module_name.lower()
     output_path = f"{filename}.mdx"
-    
+
     # Create ApiDirective and populate directives in a loop
-    api_directive = ApiDirective([], output_path, module_name)
-    
+    api_directive = DirectivesPage([], output_path, module_name)
+
     for export_name in module_exports:
         if export_name not in module.members:
             raise ValueError(
@@ -146,9 +146,13 @@ def _discover_module_directive(module: Module, module_name: str) -> ApiDirective
 
         export_member = module.members[export_name]
         if isinstance(export_member, Class):
-            api_directive.directives.append(Directive(export_member.canonical_path, DirectiveType.CLASS))
+            api_directive.directives.append(
+                Directive(export_member.canonical_path, DirectiveType.CLASS)
+            )
         elif isinstance(export_member, Function):
-            api_directive.directives.append(Directive(export_member.canonical_path, DirectiveType.FUNCTION))
+            api_directive.directives.append(
+                Directive(export_member.canonical_path, DirectiveType.FUNCTION)
+            )
         elif hasattr(export_member, "target") and getattr(export_member, "target"):
             # Handle aliases - use the target's type instead of ALIAS
             target = getattr(export_member, "target")
@@ -160,14 +164,16 @@ def _discover_module_directive(module: Module, module_name: str) -> ApiDirective
                 directive_type = DirectiveType.MODULE
             else:
                 directive_type = DirectiveType.ALIAS
-            api_directive.directives.append(Directive(target.canonical_path, directive_type))
+            api_directive.directives.append(
+                Directive(target.canonical_path, directive_type)
+            )
 
     return api_directive
 
 
 def _discover_member_directives(
     member: Object | Alias, exporting_module_path: str
-) -> list[ApiDirective]:
+) -> list[DirectivesPage]:
     """Discover directives for a specific module member.
 
     Args:
@@ -202,11 +208,11 @@ def _discover_member_directives(
 
     if isinstance(member, Class):
         directive = Directive(canonical_path, DirectiveType.CLASS)
-        directives.append(ApiDirective([directive], output_path, original_name))
-    
+        directives.append(DirectivesPage([directive], output_path, original_name))
+
     elif isinstance(member, Function):
         directive = Directive(canonical_path, DirectiveType.FUNCTION)
-        directives.append(ApiDirective([directive], output_path, original_name))
+        directives.append(DirectivesPage([directive], output_path, original_name))
 
     elif isinstance(member, Module):
         module_directive = _discover_module_directive(member, member_name)
@@ -228,12 +234,12 @@ def _discover_member_directives(
         else:
             directive_type = DirectiveType.ALIAS
         directive = Directive(target_path, directive_type)
-        directives.append(ApiDirective([directive], output_path, original_name))
+        directives.append(DirectivesPage([directive], output_path, original_name))
 
     return directives
 
 
-def discover_api_directives(module: Module) -> list[ApiDirective]:
+def discover_api_directives(module: Module) -> list[DirectivesPage]:
     """Discover API directives with hierarchical organization.
 
     This creates a structure like:
@@ -252,7 +258,7 @@ def discover_api_directives(module: Module) -> list[ApiDirective]:
 
     # Main module index
     module_directive = Directive(module.canonical_path, DirectiveType.MODULE)
-    directives.append(ApiDirective([module_directive], "index.mdx", "index"))
+    directives.append(DirectivesPage([module_directive], "index.mdx", "index"))
 
     # Process the main module's exports (respecting its __all__)
     member_directives = _discover_main_module_directives(module)
@@ -263,10 +269,12 @@ def discover_api_directives(module: Module) -> list[ApiDirective]:
             submodule_path = directive_obj.slug.split("/")[0]
             if submodule_path not in submodules_seen:
                 # Add submodule index
-                submodule_directive = Directive(f"{module.canonical_path}.{submodule_path}", DirectiveType.MODULE)
+                submodule_directive = Directive(
+                    f"{module.canonical_path}.{submodule_path}", DirectiveType.MODULE
+                )
                 submodule_index_path = f"{submodule_path}/index.mdx"
                 directives.append(
-                    ApiDirective(
+                    DirectivesPage(
                         [submodule_directive], submodule_index_path, submodule_path
                     )
                 )
@@ -280,7 +288,7 @@ def discover_api_directives(module: Module) -> list[ApiDirective]:
     return resolved_directives
 
 
-def _discover_main_module_directives(module: Module) -> list[ApiDirective]:
+def _discover_main_module_directives(module: Module) -> list[DirectivesPage]:
     """Discover directives for the main module's __all__ exports.
 
     This processes only what the main module explicitly exports,
@@ -312,7 +320,7 @@ def _discover_main_module_directives(module: Module) -> list[ApiDirective]:
     return directives
 
 
-def _resolve_case_conflicts(directives: list[ApiDirective]) -> list[ApiDirective]:
+def _resolve_case_conflicts(directives: list[DirectivesPage]) -> list[DirectivesPage]:
     """Resolve case-insensitive filename conflicts by adding -fn suffix.
 
     When there are conflicts (e.g., "agent.mdx" from both "Agent" and "agent"), we:
@@ -327,22 +335,22 @@ def _resolve_case_conflicts(directives: list[ApiDirective]) -> list[ApiDirective
         List of ApiDirective objects with conflicts resolved
     """
     # Group by lowercase slug to find conflicts
-    path_groups: dict[str, list[ApiDirective]] = {}
+    path_groups: dict[str, list[DirectivesPage]] = {}
     for directive_obj in directives:
         lower_slug = directive_obj.slug.lower()
         if lower_slug not in path_groups:
             path_groups[lower_slug] = []
         path_groups[lower_slug].append(directive_obj)
 
-    resolved: list[ApiDirective] = []
+    resolved: list[DirectivesPage] = []
     for lower_slug, group in path_groups.items():
         if len(group) == 1:
             # No conflict
             resolved.extend(group)
         else:
             # We have a conflict - resolve it
-            capitalized_items: list[ApiDirective] = []
-            lowercase_items: list[ApiDirective] = []
+            capitalized_items: list[DirectivesPage] = []
+            lowercase_items: list[DirectivesPage] = []
 
             for directive_obj in group:
                 # Check the original name, not the lowercase slug
@@ -365,7 +373,9 @@ def _resolve_case_conflicts(directives: list[ApiDirective]) -> list[ApiDirective
                 base_slug = directive_obj.slug.replace(".mdx", "")
                 new_slug = f"{base_slug}-fn.mdx"
                 resolved.append(
-                    ApiDirective(directive_obj.directives, new_slug, directive_obj.name)
+                    DirectivesPage(
+                        directive_obj.directives, new_slug, directive_obj.name
+                    )
                 )
 
     return resolved

@@ -13,7 +13,7 @@ from pathlib import Path
 from typing import Any
 
 from api2mdx.admonition_converter import convert_admonitions
-from api2mdx.api_discovery import ApiDirective, discover_api_directives
+from api2mdx.api_discovery import DirectivesPage, discover_api_directives
 from api2mdx.griffe_integration import (
     get_loader,
     process_directive,
@@ -57,7 +57,7 @@ class DocumentationGenerator:
         self.docs_path = docs_path
         self.output_path = output_path
         self.module: Any | None = None
-        self.api_directives: list[ApiDirective] | None = None
+        self.api_directives: list[DirectivesPage] | None = None
 
     def setup(self) -> "DocumentationGenerator":
         """Set up the generator by loading module and discovering API structure.
@@ -102,7 +102,7 @@ class DocumentationGenerator:
         # Generate metadata
         self._generate_meta_file()
 
-    def generate_directive(self, api_directive: ApiDirective) -> None:
+    def generate_directive(self, api_directive: DirectivesPage) -> None:
         """Generate documentation for a specific directive.
 
         Args:
@@ -242,7 +242,7 @@ class DocumentationGenerator:
             if str(self.source_path) in sys.path:
                 sys.path.remove(str(self.source_path))
 
-    def _process_directive(self, api_directive: ApiDirective) -> None:
+    def _process_directive(self, api_directive: DirectivesPage) -> None:
         """Process directives and generate the corresponding MDX file.
 
         Args:
