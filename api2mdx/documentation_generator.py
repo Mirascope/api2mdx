@@ -130,30 +130,6 @@ class DocumentationGenerator:
             # Re-raise the exception to maintain the original behavior
             raise
 
-    def generate_file(self, file_path: Path) -> None:
-        """Generate documentation for a specific file.
-
-        Args:
-            file_path: Path to the source file relative to the docs_path
-
-        """
-        if not self.module:
-            raise RuntimeError("Setup must be called before generating documentation")
-
-        try:
-            src_path = self.source_path / self.docs_path / file_path
-            target_path = self.output_path / file_path.with_suffix(".mdx")
-
-            # Ensure target directory exists
-            target_path.parent.mkdir(exist_ok=True, parents=True)
-
-            # Process file
-            self._process_file(src_path, target_path)
-        except Exception as e:
-            print(f"ERROR: Failed to process file {file_path}: {e}")
-            # Re-raise the exception to maintain the original behavior
-            raise
-
     def generate_selected(self, pattern: str, skip_meta: bool = True) -> None:
         """Generate documentation only for directives matching the pattern.
 
@@ -170,7 +146,10 @@ class DocumentationGenerator:
 
         for api_directive in self.api_directives:
             # Check if any directive or output path matches pattern
-            directive_matches = any(fnmatch.fnmatch(directive, pattern) for directive in api_directive.directives)
+            directive_matches = any(
+                fnmatch.fnmatch(directive.object_path, pattern)
+                for directive in api_directive.directives
+            )
             if (
                 directive_matches
                 or fnmatch.fnmatch(api_directive.slug, pattern)
@@ -202,7 +181,9 @@ class DocumentationGenerator:
         directive_output_path.mkdir(parents=True, exist_ok=True)
 
         for api_directive in self.api_directives:
-            directive_content = f"# {api_directive.name}\n\n" + "\n\n".join(api_directive.directives)
+            directive_content = f"# {api_directive.name}\n\n" + "\n\n".join(
+                str(directive) for directive in api_directive.directives
+            )
 
             # Write to .md file in directive output directory
             directive_file_path = directive_output_path / api_directive.slug.replace(
@@ -266,75 +247,6 @@ class DocumentationGenerator:
             if str(self.source_path) in sys.path:
                 sys.path.remove(str(self.source_path))
 
-    def _process_file(self, src_path: Path, target_path: Path) -> None:
-        """Process a source file and generate the corresponding MDX file.
-
-        Args:
-            src_path: Path to the source markdown file
-            target_path: Path to the target MDX file
-
-        """
-        if not self.module:
-            raise RuntimeError("Module must be loaded before processing files")
-
-        # Read the source file
-        with open(src_path) as f:
-            content = f.read()
-
-        # Convert any MkDocs admonitions to MDX callout components
-        content = convert_admonitions(content)
-
-        # Extract title from the first heading or use the filename
-        title_match = re.search(r"^#\s+(.+)$", content, re.MULTILINE)
-        if title_match:
-            title = title_match.group(1)
-        else:
-            title = src_path.stem.replace("_", " ").title()
-
-        # Write the target file with frontmatter and processed content
-        with open(target_path, "w") as f:
-            f.write("---\n")
-            # Add auto-generation notice as a comment in the frontmatter
-            f.write("# AUTO-GENERATED API DOCUMENTATION - DO NOT EDIT\n")
-            f.write(f"title: {title}\n")
-            f.write(f"description: API documentation for {title}\n")
-            f.write("---\n\n")
-            f.write(f"# {title}\n\n")
-
-            # Get the relative file path for the API component
-            relative_path = target_path.relative_to(self.output_path)
-            doc_path = str(relative_path.with_suffix(""))  # Remove .mdx extension
-
-            # Process the content line by line
-            lines = content.split("\n")
-            skip_next_title = (
-                True  # Skip the first title line since we've already written it
-            )
-
-            for line in lines:
-                line_stripped = line.strip()
-
-                # Skip empty lines
-                if not line_stripped:
-                    continue
-
-                # Check if this is a directive line
-                if line_stripped.startswith(":::"):
-                    # Process directive
-                    doc_content = process_directive_with_error_handling(
-                        line_stripped, self.module, doc_path
-                    )
-                    f.write(doc_content)
-                    f.write("\n\n")
-                elif skip_next_title and line_stripped.startswith("# "):
-                    # Skip the first title line
-                    skip_next_title = False
-                    continue
-                else:
-                    # Write normal content line
-                    f.write(line)
-                    f.write("\n")
-
     def _process_directive(self, api_directive: ApiDirective) -> None:
         """Process directives and generate the corresponding MDX file.
 
@@ -347,7 +259,7 @@ class DocumentationGenerator:
 
         # Get target path from the directive's slug
         target_path = self.output_path / api_directive.slug
-        
+
         # Extract title from directive name
         title = api_directive.name
 
@@ -367,12 +279,11 @@ class DocumentationGenerator:
 
             # Process each directive
             for directive in api_directive.directives:
-                if directive.strip():  # Skip empty directives
-                    doc_content = process_directive_with_error_handling(
-                        directive.strip(), self.module, doc_path
-                    )
-                    f.write(doc_content)
-                    f.write("\n\n")
+                doc_content = process_directive_with_error_handling(
+                    directive, self.module, doc_path
+                )
+                f.write(doc_content)
+                f.write("\n\n")
 
     def _create_index_file(self) -> None:
         """Create the index.mdx file in the target directory."""

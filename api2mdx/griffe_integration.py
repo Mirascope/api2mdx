@@ -13,7 +13,6 @@ The code is organized in the following sections:
 - Directive Processing: Handling API directives and error cases
 """
 
-import re
 from pathlib import Path
 
 from griffe import (
@@ -31,7 +30,7 @@ from api2mdx.doclinks import UpdateDocstringsExtension
 from api2mdx.mdx_renderer import (
     render_object,
 )
-from api2mdx.api_discovery import _get_module_exports
+from api2mdx.api_discovery import _get_module_exports, Directive
 from api2mdx.models import (
     process_object,
 )
@@ -109,7 +108,7 @@ Please check that all required dependencies are installed.
 
 
 def process_directive_with_error_handling(
-    directive: str, module: Module, doc_path: str
+    directive: Directive, module: Module, doc_path: str
 ) -> str:
     """Process an API directive with error handling for missing dependencies.
 
@@ -118,7 +117,7 @@ def process_directive_with_error_handling(
     even when dependencies are missing or other issues are encountered.
 
     Args:
-        directive: The directive string (e.g., "::: mirascope.core.anthropic.call")
+        directive: The Directive object containing object path and type
         module: The pre-loaded Griffe module
         doc_path: Optional path to the document, used for API component links
 
@@ -129,8 +128,7 @@ def process_directive_with_error_handling(
     try:
         return process_directive(directive, module, doc_path)
     except Exception as e:
-        object_path = directive.replace("::: ", "")
-        return generate_error_placeholder(object_path, e)
+        return generate_error_placeholder(directive.object_path, e)
 
 
 def document_object(obj: Object | Alias, doc_path: str) -> str:
@@ -156,11 +154,11 @@ def document_object(obj: Object | Alias, doc_path: str) -> str:
     return render_object(processed_obj, doc_path)
 
 
-def process_directive(directive: str, module: Module, doc_path: str) -> str:
+def process_directive(directive: Directive, module: Module, doc_path: str) -> str:
     """Process an API directive and generate documentation.
 
     Args:
-        directive: The directive string (e.g., "::: mirascope.core.anthropic.call")
+        directive: The Directive object containing object path and type
         module: The pre-loaded Griffe module
         doc_path: Optional path to the document, used for API component links
 
@@ -168,12 +166,7 @@ def process_directive(directive: str, module: Module, doc_path: str) -> str:
         The generated documentation content
 
     """
-    # Extract the module/class/function name from the directive
-    match = re.search(r"::: ([a-zA-Z0-9_.]+)(?:\s+(.+))?", directive)
-    if not match:
-        raise ValueError("Invalid directive format. Expected '::: module_name'.")
-
-    object_path = match.group(1)
+    object_path = directive.object_path
 
     # Split the path to navigate to the object
     path_parts = object_path.split(".")

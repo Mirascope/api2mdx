@@ -1,3 +1,3 @@
 # Agent
 
-::: mirascope_v2_llm.agents.agent.Agent
+::: mirascope_v2_llm.agents.agent.Agent  # Alias

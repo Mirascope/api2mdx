@@ -6,7 +6,24 @@ by the existing documentation pipeline.
 """
 
 from dataclasses import dataclass
+from enum import Enum
 from griffe import Alias, Class, Function, Module, Object
+
+
+class DirectiveType(Enum):
+    CLASS = "Class"
+    FUNCTION = "Function"
+    MODULE = "Module"
+    ALIAS = "Alias"
+
+
+@dataclass
+class Directive:
+    object_path: str
+    object_type: DirectiveType
+    
+    def __str__(self) -> str:
+        return f"::: {self.object_path}  # {self.object_type.value}"
 
 
 @dataclass
@@ -14,12 +31,12 @@ class ApiDirective:
     """Represents an API directive with its output path and original name.
 
     Attributes:
-        directives: List of API directive strings (e.g., [":::package.module.Class", ":::package.module.Function"])
+        directives: List of Directive objects for this documentation file
         slug: The lowercase output path/slug (e.g., "agent.mdx" or "agent-fn.mdx")
         name: The original name with proper casing (e.g., "Agent" or "agent")
     """
 
-    directives: list[str]
+    directives: list[Directive]
     slug: str
     name: str
 
@@ -128,12 +145,22 @@ def _discover_module_directive(module: Module, module_name: str) -> ApiDirective
             )
 
         export_member = module.members[export_name]
-        if isinstance(export_member, (Class, Function)):
-            api_directive.directives.append(f"::: {export_member.canonical_path}")
+        if isinstance(export_member, Class):
+            api_directive.directives.append(Directive(export_member.canonical_path, DirectiveType.CLASS))
+        elif isinstance(export_member, Function):
+            api_directive.directives.append(Directive(export_member.canonical_path, DirectiveType.FUNCTION))
         elif hasattr(export_member, "target") and getattr(export_member, "target"):
-            # Handle aliases
+            # Handle aliases - use the target's type instead of ALIAS
             target = getattr(export_member, "target")
-            api_directive.directives.append(f"::: {target.canonical_path}")
+            if isinstance(target, Class):
+                directive_type = DirectiveType.CLASS
+            elif isinstance(target, Function):
+                directive_type = DirectiveType.FUNCTION
+            elif isinstance(target, Module):
+                directive_type = DirectiveType.MODULE
+            else:
+                directive_type = DirectiveType.ALIAS
+            api_directive.directives.append(Directive(target.canonical_path, directive_type))
 
     return api_directive
 
@@ -173,8 +200,12 @@ def _discover_member_directives(
         # Top-level member
         output_path = f"{filename}.mdx"
 
-    if isinstance(member, (Class, Function)):
-        directive = f"::: {canonical_path}"
+    if isinstance(member, Class):
+        directive = Directive(canonical_path, DirectiveType.CLASS)
+        directives.append(ApiDirective([directive], output_path, original_name))
+    
+    elif isinstance(member, Function):
+        directive = Directive(canonical_path, DirectiveType.FUNCTION)
         directives.append(ApiDirective([directive], output_path, original_name))
 
     elif isinstance(member, Module):
@@ -187,7 +218,16 @@ def _discover_member_directives(
         target_path = (
             target.canonical_path if hasattr(target, "canonical_path") else str(target)
         )
-        directive = f"::: {target_path}"
+        # Use the target's type instead of ALIAS
+        if isinstance(target, Class):
+            directive_type = DirectiveType.CLASS
+        elif isinstance(target, Function):
+            directive_type = DirectiveType.FUNCTION
+        elif isinstance(target, Module):
+            directive_type = DirectiveType.MODULE
+        else:
+            directive_type = DirectiveType.ALIAS
+        directive = Directive(target_path, directive_type)
         directives.append(ApiDirective([directive], output_path, original_name))
 
     return directives
@@ -211,7 +251,7 @@ def discover_api_directives(module: Module) -> list[ApiDirective]:
     submodules_seen = set()
 
     # Main module index
-    module_directive = f"::: {module.canonical_path}"
+    module_directive = Directive(module.canonical_path, DirectiveType.MODULE)
     directives.append(ApiDirective([module_directive], "index.mdx", "index"))
 
     # Process the main module's exports (respecting its __all__)
@@ -223,7 +263,7 @@ def discover_api_directives(module: Module) -> list[ApiDirective]:
             submodule_path = directive_obj.slug.split("/")[0]
             if submodule_path not in submodules_seen:
                 # Add submodule index
-                submodule_directive = f"::: {module.canonical_path}.{submodule_path}"
+                submodule_directive = Directive(f"{module.canonical_path}.{submodule_path}", DirectiveType.MODULE)
                 submodule_index_path = f"{submodule_path}/index.mdx"
                 directives.append(
                     ApiDirective(

@@ -1,3 +1,3 @@
 # index
 
-::: mirascope_v2_llm
+::: mirascope_v2_llm  # Module
