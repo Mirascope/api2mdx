@@ -5,10 +5,11 @@ including messages, tools, response formatting, and streaming. It allows you to 
 code that works with multiple LLM providers without changing your application logic.
 """
 
+from . import calls
 from .agents import Agent, agent
 from .calls import (
     call,
 )
 
 
-__all__ = ["call", "agent", "Agent"]
+__all__ = ["call", "calls", "agent", "Agent"]

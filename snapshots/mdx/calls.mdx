@@ -1,0 +1,165 @@
+---
+# AUTO-GENERATED API DOCUMENTATION - DO NOT EDIT
+title: StructuredContextCall
+description: API documentation for StructuredContextCall
+---
+
+# StructuredContextCall
+
+## <ApiType type="Class" path="calls" symbolName="AsyncCall" /> AsyncCall
+
+A class for generating responses using LLMs asynchronously.
+
+**Bases:** 
+<TypeLink type={{"type_str": "BaseCall[P, AsyncPromptTemplate]", "description": null, "kind": "generic", "base_type": {"type_str": "BaseCall", "description": null, "kind": "simple", "doc_identifier": "BaseCall"}, "parameters": [{"type_str": "P", "description": null, "kind": "simple", "doc_identifier": "P"}, {"type_str": "AsyncPromptTemplate", "description": null, "kind": "simple", "doc_identifier": "AsyncPromptTemplate"}]}} />
+
+## <ApiType type="Function" path="calls" symbolName="call_async" /> call_async
+
+Generates an asynchronous response using the LLM.
+
+<ParametersTable
+  parameters={[
+  {
+    "name": "self",
+    "type_info": {
+      "type_str": "Any",
+      "description": null,
+      "kind": "simple",
+      "doc_identifier": null
+    }
+  },
+  {
+    "name": "args",
+    "type_info": {
+      "type_str": "P.args",
+      "description": null,
+      "kind": "simple",
+      "doc_identifier": "P.args"
+    },
+    "default": "()"
+  },
+  {
+    "name": "kwargs",
+    "type_info": {
+      "type_str": "P.kwargs",
+      "description": null,
+      "kind": "simple",
+      "doc_identifier": "P.kwargs"
+    },
+    "default": "{}"
+  }
+]}
+/>
+
+<ReturnTable
+  returnType={{
+  "type_info": {
+    "type_str": "Response",
+    "description": null,
+    "kind": "simple",
+    "doc_identifier": "Response"
+  }
+}}
+/>
+
+
+## <ApiType type="Function" path="calls" symbolName="stream" /> stream
+
+Generates a streaming response using the LLM asynchronously.
+
+<ParametersTable
+  parameters={[
+  {
+    "name": "self",
+    "type_info": {
+      "type_str": "Any",
+      "description": null,
+      "kind": "simple",
+      "doc_identifier": null
+    }
+  },
+  {
+    "name": "args",
+    "type_info": {
+      "type_str": "P.args",
+      "description": null,
+      "kind": "simple",
+      "doc_identifier": "P.args"
+    },
+    "default": "()"
+  },
+  {
+    "name": "kwargs",
+    "type_info": {
+      "type_str": "P.kwargs",
+      "description": null,
+      "kind": "simple",
+      "doc_identifier": "P.kwargs"
+    },
+    "default": "{}"
+  }
+]}
+/>
+
+<ReturnTable
+  returnType={{
+  "type_info": {
+    "type_str": "AsyncStream",
+    "description": null,
+    "kind": "simple",
+    "doc_identifier": "AsyncStream"
+  }
+}}
+/>
+
+
+## <ApiType type="Function" path="calls" symbolName="stream_async" /> stream_async
+
+Generates an asynchronous streaming response using the LLM.
+
+<ParametersTable
+  parameters={[
+  {
+    "name": "self",
+    "type_info": {
+      "type_str": "Any",
+      "description": null,
+      "kind": "simple",
+      "doc_identifier": null
+    }
+  },
+  {
+    "name": "args",
+    "type_info": {
+      "type_str": "P.args",
+      "description": null,
+      "kind": "simple",
+      "doc_identifier": "P.args"
+    },
+    "default": "()"
+  },
+  {
+    "name": "kwargs",
+    "type_info": {
+      "type_str": "P.kwargs",
+      "description": null,
+      "kind": "simple",
+      "doc_identifier": "P.kwargs"
+    },
+    "default": "{}"
+  }
+]}
+/>
+
+<ReturnTable
+  returnType={{
+  "type_info": {
+    "type_str": "AsyncStream",
+    "description": null,
+    "kind": "simple",
+    "doc_identifier": "AsyncStream"
+  }
+}}
+/>
+
+

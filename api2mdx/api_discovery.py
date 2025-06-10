@@ -37,7 +37,7 @@ def _extract_all_exports(module: Module) -> list[str] | None:
         return None
 
     all_member = module.members["__all__"]
-    
+
     # Use getattr to safely access the value attribute
     value = getattr(all_member, "value", None)
     if value is None:
@@ -61,6 +61,7 @@ def _extract_all_exports(module: Module) -> list[str] | None:
     # If it's a string representation, try to safely evaluate it
     elif isinstance(value, str):
         import ast
+
         try:
             return ast.literal_eval(value)
         except (ValueError, SyntaxError):
@@ -97,6 +98,45 @@ def _get_module_exports(module: Module) -> list[str]:
             fallback_exports.append(name)
 
     return fallback_exports
+
+
+def _discover_module_directive(module: Module, module_name: str) -> ApiDirective:
+    """Discover directive for a module by combining all its exports into a single file.
+
+    Args:
+        module: The Module object to process
+        module_name: The name of the module
+
+    Returns:
+        Single ApiDirective with combined module exports
+
+    TODO: This doesn't handle submodules. Should be refactored to operate recursively.
+    """
+    module_exports = _get_module_exports(module)
+
+    # Create combined directive with all exports from this module
+    module_directives = []
+    for export_name in module_exports:
+        if export_name not in module.members:
+            raise ValueError(
+                f"Export '{export_name}' in __all__ not found in module {module.canonical_path}"
+            )
+
+        export_member = module.members[export_name]
+        if isinstance(export_member, (Class, Function)):
+            module_directives.append(f"::: {export_member.canonical_path}")
+        elif hasattr(export_member, "target") and getattr(export_member, "target"):
+            # Handle aliases
+            target = getattr(export_member, "target")
+            module_directives.append(f"::: {target.canonical_path}")
+
+    # Create lowercase filename
+    filename = module_name.lower()
+    output_path = f"{filename}.mdx"
+
+    # Combine all directives into a single directive string
+    combined_directive = "\n\n".join(module_directives)
+    return ApiDirective(combined_directive, output_path, module_name)
 
 
 def _discover_member_directives(
@@ -137,6 +177,10 @@ def _discover_member_directives(
     if isinstance(member, (Class, Function)):
         directive = f"::: {canonical_path}"
         directives.append(ApiDirective(directive, output_path, original_name))
+
+    elif isinstance(member, Module):
+        module_directive = _discover_module_directive(member, member_name)
+        directives.append(module_directive)
 
     elif hasattr(member, "target") and getattr(member, "target"):
         # Handle aliases by documenting the target

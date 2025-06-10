@@ -7,6 +7,10 @@
       "label": "call"
     },
     {
+      "slug": "calls",
+      "label": "calls"
+    },
+    {
       "slug": "agent",
       "label": "Agent"
     },

@@ -201,12 +201,7 @@ class DocumentationGenerator:
         directive_output_path.mkdir(parents=True, exist_ok=True)
 
         for api_directive in self.api_directives:
-            # Create directive content
-            directive_content = f"# Directive: {api_directive.directive}\n\n"
-            directive_content += f"**Output Path**: {api_directive.slug}\n\n"
-            directive_content += (
-                f"**Directive String**: `{api_directive.directive}`\n\n"
-            )
+            directive_content = f"# {api_directive.name}\n\n{api_directive.directive}"
 
             # Write to .md file in directive output directory
             directive_file_path = directive_output_path / api_directive.slug.replace(
