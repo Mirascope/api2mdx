@@ -237,11 +237,8 @@ class DocumentationGenerator:
 
             # Try to preload common external dependencies to improve alias resolution
             common_dependencies = [
-                "pydantic",
                 "collections.abc",
                 "typing",
-                "opentelemetry",
-                "opentelemetry.trace",
                 "openai",
                 "mistralai",
                 "functools",
