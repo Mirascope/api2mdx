@@ -1,6 +1,3 @@
-# Directive: ::: mirascope_v2_llm.agents.agent.Agent
+# Agent
 
-**Output Path**: agent.mdx
-
-**Directive String**: `::: mirascope_v2_llm.agents.agent.Agent`
-
+::: mirascope_v2_llm.agents.agent.Agent

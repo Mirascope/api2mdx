@@ -1,6 +1,3 @@
-# Directive: ::: mirascope_v2_llm
+# index
 
-**Output Path**: index.mdx
-
-**Directive String**: `::: mirascope_v2_llm`
-
+::: mirascope_v2_llm
