@@ -16,7 +16,7 @@ from api2mdx.admonition_converter import convert_admonitions
 from api2mdx.api_discovery import ApiDirective, discover_api_directives
 from api2mdx.griffe_integration import (
     get_loader,
-    process_directive_with_error_handling,
+    process_directive,
 )
 from api2mdx.meta import (
     generate_meta_file_content,
@@ -28,13 +28,11 @@ class DocumentationGenerator:
     """Handles the generation of API documentation from source repositories.
 
     This class encapsulates the entire documentation generation process, including:
-    - Cloning or updating the source repository
     - Loading the module with Griffe
     - Processing API documentation files
     - Generating formatted MDX output
 
     Attributes:
-        config: Configuration for the documentation source
         project_root: Root directory of the project
         repo_path: Path to the cloned repository
         module: Loaded Griffe module
@@ -276,9 +274,7 @@ class DocumentationGenerator:
 
             # Process each directive
             for directive in api_directive.directives:
-                doc_content = process_directive_with_error_handling(
-                    directive, self.module, doc_path
-                )
+                doc_content = process_directive(directive, self.module, doc_path)
                 f.write(doc_content)
                 f.write("\n\n")
 
@@ -314,7 +310,6 @@ class DocumentationGenerator:
                 "API directives must be discovered before generating metadata"
             )
 
-        # Generate the metadata with weight 0.25 (API reference sections have lower weight)
         api_section = generate_meta_from_directives(self.api_directives, weight=None)
         content = generate_meta_file_content(api_section)
 

@@ -69,68 +69,6 @@ def get_loader(
     return loader
 
 
-def generate_error_placeholder(object_path: str, error: Exception) -> str:
-    """Generate placeholder documentation for errors.
-
-    Args:
-        object_path: The path of the object that failed to process
-        error: The exception that was raised
-
-    Returns:
-        Placeholder documentation with error details
-
-    """
-    if isinstance(error, KeyError):
-        # Handle missing dependency issues (like opentelemetry not being available)
-        missing_dep = str(error).strip("'")
-        print(
-            f"WARNING: Could not resolve dependency when processing {object_path}: {error}"
-        )
-
-        return f"""
-## Missing Dependency Warning
-
-Documentation for `{object_path}` could not be fully generated because of a missing dependency: `{missing_dep}`.
-
-This is expected and safe to ignore for documentation generation purposes.
-"""
-    else:
-        # Add general error handling to make API docs generation more robust
-        print(f"WARNING: Error processing directive {object_path}: {error}")
-
-        return f"""
-## Error Processing Documentation
-
-An error occurred while generating documentation for `{object_path}`: {error!s}
-
-Please check that all required dependencies are installed.
-"""
-
-
-def process_directive_with_error_handling(
-    directive: Directive, module: Module, doc_path: str
-) -> str:
-    """Process an API directive with error handling for missing dependencies.
-
-    This wrapper catches errors during documentation generation, reports them,
-    and provides placeholder documentation, allowing the process to continue
-    even when dependencies are missing or other issues are encountered.
-
-    Args:
-        directive: The Directive object containing object path and type
-        module: The pre-loaded Griffe module
-        doc_path: Optional path to the document, used for API component links
-
-    Returns:
-        The generated documentation content or error placeholder
-
-    """
-    try:
-        return process_directive(directive, module, doc_path)
-    except Exception as e:
-        return generate_error_placeholder(directive.object_path, e)
-
-
 def document_object(obj: Object | Alias, doc_path: str) -> str:
     """Generate documentation for any supported Griffe object type.
 
