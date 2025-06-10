@@ -5,7 +5,6 @@ documentation from source repositories by extracting docstrings and processing
 API directives using Griffe.
 """
 
-import fnmatch
 import shutil
 import subprocess
 import sys
@@ -16,7 +15,7 @@ from api2mdx.admonition_converter import convert_admonitions
 from api2mdx.api_discovery import DirectivesPage, discover_api_directives
 from api2mdx.griffe_integration import (
     get_loader,
-    process_directive,
+    render_directive,
 )
 from api2mdx.meta import (
     generate_meta_file_content,
@@ -59,12 +58,11 @@ class DocumentationGenerator:
         self.module: Any | None = None
         self.api_directives: list[DirectivesPage] | None = None
 
-    def setup(self) -> "DocumentationGenerator":
-        """Set up the generator by loading module and discovering API structure.
+    def generate_all(self, directive_output_path: Path | None = None) -> None:
+        """Generate all documentation files.
 
-        Returns:
-            Self for method chaining
-
+        Args:
+            directive_output_path: Optional path to output intermediate directive files
         """
         # Load the module
         self.module = self._load_module()
@@ -74,17 +72,6 @@ class DocumentationGenerator:
             raise RuntimeError("Module must be loaded before discovering directives")
         self.api_directives = discover_api_directives(self.module)
         print(f"Discovered {len(self.api_directives)} API directives")
-
-        return self
-
-    def generate_all(self, directive_output_path: Path | None = None) -> None:
-        """Generate all documentation files.
-
-        Args:
-            directive_output_path: Optional path to output intermediate directive files
-        """
-        if not self.api_directives:
-            raise RuntimeError("Setup must be called before generating documentation")
 
         # Output directive snapshots if requested
         if directive_output_path:
@@ -119,47 +106,11 @@ class DocumentationGenerator:
             target_path.parent.mkdir(exist_ok=True, parents=True)
 
             # Process directive
-            self._process_directive(api_directive)
+            self._write_directives_page(api_directive)
         except Exception as e:
             print(f"ERROR: Failed to process directive {api_directive.directives}: {e}")
             # Re-raise the exception to maintain the original behavior
             raise
-
-    def generate_selected(self, pattern: str, skip_meta: bool = True) -> None:
-        """Generate documentation only for directives matching the pattern.
-
-        Args:
-            pattern: Pattern to match against directive or output paths
-            skip_meta: Whether to skip metadata generation (default: True)
-
-        """
-        if not self.api_directives:
-            raise RuntimeError("Setup must be called before generating documentation")
-
-        found = False
-        self.output_path.mkdir(parents=True, exist_ok=True)
-
-        for api_directive in self.api_directives:
-            # Check if any directive or output path matches pattern
-            directive_matches = any(
-                fnmatch.fnmatch(directive.object_path, pattern)
-                for directive in api_directive.directives
-            )
-            if (
-                directive_matches
-                or fnmatch.fnmatch(api_directive.slug, pattern)
-                or fnmatch.fnmatch(api_directive.slug.replace(".mdx", ""), pattern)
-            ):
-                print(f"Generating: {api_directive.directives} -> {api_directive.slug}")
-                self.generate_directive(api_directive)
-                found = True
-
-        if not found:
-            print(f"No directives matched pattern: {pattern}")
-        elif not skip_meta:
-            # Regenerate metadata only if skip_meta is False
-            print("Regenerating metadata file...")
-            self._generate_meta_file()
 
     def output_directive_snapshots(self, directive_output_path: Path) -> None:
         """Output directives as intermediate .md files for debugging/inspection.
@@ -242,7 +193,7 @@ class DocumentationGenerator:
             if str(self.source_path) in sys.path:
                 sys.path.remove(str(self.source_path))
 
-    def _process_directive(self, api_directive: DirectivesPage) -> None:
+    def _write_directives_page(self, directives_page: DirectivesPage) -> None:
         """Process directives and generate the corresponding MDX file.
 
         Args:
@@ -253,10 +204,10 @@ class DocumentationGenerator:
             raise RuntimeError("Module must be loaded before processing directives")
 
         # Get target path from the directive's slug
-        target_path = self.output_path / api_directive.slug
+        target_path = self.output_path / directives_page.slug
 
         # Extract title from directive name
-        title = api_directive.name
+        title = directives_page.name
 
         # Get the relative file path for the API component
         relative_path = target_path.relative_to(self.output_path)
@@ -273,35 +224,10 @@ class DocumentationGenerator:
             f.write(f"# {title}\n\n")
 
             # Process each directive
-            for directive in api_directive.directives:
-                doc_content = process_directive(directive, self.module, doc_path)
+            for directive in directives_page.directives:
+                doc_content = render_directive(directive, self.module, doc_path)
                 f.write(doc_content)
                 f.write("\n\n")
-
-    def _create_index_file(self) -> None:
-        """Create the index.mdx file in the target directory."""
-        index_path = self.output_path / "index.mdx"
-        product_name = self.package.title()
-
-        with open(index_path, "w") as f:
-            f.write("---\n")
-            # Add auto-generation notice as a comment in the frontmatter
-            f.write("# AUTO-GENERATED API DOCUMENTATION - DO NOT EDIT\n")
-            f.write(f"title: {product_name} API Reference\n")
-            f.write(f"description: API documentation for {product_name}\n")
-            f.write("---\n\n")
-            f.write(f"# {product_name} API Reference\n\n")
-
-            # Break long lines for the welcome text
-            welcome_text = (
-                f"Welcome to the {product_name} API reference documentation. "
-                "This section provides detailed information about the classes, "
-                f"methods, and interfaces that make up the {product_name} library."
-            )
-            f.write(f"{welcome_text}\n\n")
-            f.write(
-                "Use the sidebar to navigate through the different API components.\n"
-            )
 
     def _generate_meta_file(self) -> None:
         """Generate metadata file and format it with prettier."""

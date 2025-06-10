@@ -86,7 +86,7 @@ def document_object(obj: Object | Alias, doc_path: str) -> str:
     return render_object(processed_obj, doc_path)
 
 
-def process_directive(directive: Directive, module: Module, doc_path: str) -> str:
+def render_directive(directive: Directive, module: Module, doc_path: str) -> str:
     """Process an API directive and generate documentation.
 
     Args:
