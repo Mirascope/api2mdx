@@ -5,9 +5,35 @@ from a loaded Griffe module, generating directive strings that can be processed
 by the existing documentation pipeline.
 """
 
+import re
 from dataclasses import dataclass
 from enum import Enum
+from typing import NewType
 from griffe import Alias, Class, Function, Module, Object
+
+
+# Type aliases for better type safety
+ObjectPath = NewType("ObjectPath", str)
+"""Canonical path to a Python object (e.g., 'mirascope_v2_llm.calls.decorator.call')"""
+
+
+class Slug(str):
+    """A filesystem-safe slug matching [a-z0-9-_]* pattern."""
+
+    _pattern = re.compile(r"^[a-z0-9-_]+$")
+
+    def __new__(cls, value: str) -> "Slug":
+        if not cls._pattern.match(value):
+            raise ValueError(f"Invalid slug '{value}': must match [a-z0-9-_]*")
+        return super().__new__(cls, value)
+
+    @classmethod
+    def from_name(cls, name: str) -> "Slug":
+        """Create a slug from a name by converting to lowercase and replacing invalid chars."""
+        slug = name.lower().replace(".", "-").replace("_", "-")
+        # Remove any remaining invalid characters
+        slug = re.sub(r"[^a-z0-9-_]", "", slug)
+        return cls(slug)
 
 
 class DirectiveType(Enum):
@@ -19,7 +45,7 @@ class DirectiveType(Enum):
 
 @dataclass
 class Directive:
-    object_path: str
+    object_path: ObjectPath
     object_type: DirectiveType
 
     def __str__(self) -> str:
@@ -43,46 +69,46 @@ class DirectivesPage:
 
 class ApiDocumentation:
     """Container for all API documentation with global symbol resolution.
-    
+
     This class wraps a list of DirectivesPage objects and provides:
     - Global symbol registry for conflict resolution
     - Canonical vs alias assignment
     - Symbol-level slug resolution
     """
-    
+
     def __init__(self, pages: list[DirectivesPage]):
         self.pages = pages
         self._symbol_registry = self._build_symbol_registry()
-    
-    def _build_symbol_registry(self) -> dict[str, str]:
+
+    def _build_symbol_registry(self) -> dict[ObjectPath, str]:
         """Build a registry mapping canonical paths to canonical slugs.
-        
+
         Returns:
-            Dictionary mapping canonical_path -> canonical_slug
+            Dictionary mapping ObjectPath -> canonical_slug
         """
         # TODO: Implement symbol registry logic
         registry = {}
         for page in self.pages:
             for directive in page.directives:
                 # For now, use simple mapping - will enhance with conflict resolution
-                registry[directive.object_path] = directive.object_path
+                registry[directive.object_path] = str(directive.object_path)
         return registry
-    
-    def get_canonical_slug(self, canonical_path: str) -> str:
+
+    def get_canonical_slug(self, canonical_path: ObjectPath) -> str:
         """Get the canonical slug for a given object path.
-        
+
         Args:
             canonical_path: The canonical object path (e.g., "mirascope_v2_llm.calls.decorator.call")
-        
+
         Returns:
             The canonical slug to use for this symbol
         """
-        return self._symbol_registry.get(canonical_path, canonical_path)
-    
+        return self._symbol_registry.get(canonical_path, str(canonical_path))
+
     def __iter__(self):
         """Allow iteration over pages."""
         return iter(self.pages)
-    
+
     def __len__(self):
         """Return number of pages."""
         return len(self.pages)
@@ -243,11 +269,11 @@ def _create_directive_from_member(member: Object | Alias) -> Directive:
         Directive object with appropriate type and path
     """
     if isinstance(member, Class):
-        return Directive(member.canonical_path, DirectiveType.CLASS)
+        return Directive(ObjectPath(member.canonical_path), DirectiveType.CLASS)
     elif isinstance(member, Function):
-        return Directive(member.canonical_path, DirectiveType.FUNCTION)
+        return Directive(ObjectPath(member.canonical_path), DirectiveType.FUNCTION)
     elif isinstance(member, Module):
-        return Directive(member.canonical_path, DirectiveType.MODULE)
+        return Directive(ObjectPath(member.canonical_path), DirectiveType.MODULE)
     elif hasattr(member, "target") and getattr(member, "target"):
         # Handle aliases - use the target's type instead of ALIAS
         target = getattr(member, "target")
@@ -259,7 +285,7 @@ def _create_directive_from_member(member: Object | Alias) -> Directive:
             directive_type = DirectiveType.MODULE
         else:
             directive_type = DirectiveType.ALIAS
-        return Directive(target.canonical_path, directive_type)
+        return Directive(ObjectPath(target.canonical_path), directive_type)
     else:
         raise ValueError(f"Unknown directive type: {member.canonical_path}")
 
@@ -386,7 +412,9 @@ def _resolve_case_conflicts(directives: list[DirectivesPage]) -> list[Directives
                 new_slug = f"{base_slug}-fn.mdx"
                 resolved.append(
                     DirectivesPage(
-                        directive_obj.directives, new_slug, directive_obj.name
+                        directive_obj.directives,
+                        Slug.from_name(new_slug),
+                        directive_obj.name,
                     )
                 )
 
