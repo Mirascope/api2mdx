@@ -12,7 +12,7 @@ from pathlib import Path
 from typing import Any
 
 from api2mdx.admonition_converter import convert_admonitions
-from api2mdx.api_discovery import DirectivesPage, discover_api_directives
+from api2mdx.api_discovery import ApiDocumentation, DirectivesPage, discover_api_directives
 from api2mdx.griffe_integration import (
     get_loader,
     render_directive,
@@ -56,7 +56,7 @@ class DocumentationGenerator:
         self.docs_path = docs_path
         self.output_path = output_path
         self.module: Any | None = None
-        self.api_directives: list[DirectivesPage] | None = None
+        self.api_documentation: ApiDocumentation | None = None
 
     def generate_all(self, directive_output_path: Path | None = None) -> None:
         """Generate all documentation files.
@@ -70,8 +70,8 @@ class DocumentationGenerator:
         # Discover API directives from module structure
         if self.module is None:
             raise RuntimeError("Module must be loaded before discovering directives")
-        self.api_directives = discover_api_directives(self.module)
-        print(f"Discovered {len(self.api_directives)} API directives")
+        self.api_documentation = discover_api_directives(self.module)
+        print(f"Discovered {len(self.api_documentation)} API directives")
 
         # Output directive snapshots if requested
         if directive_output_path:
@@ -83,7 +83,7 @@ class DocumentationGenerator:
         self.output_path.mkdir(parents=True, exist_ok=True)
 
         # Generate files from discovered directives
-        for api_directive in self.api_directives:
+        for api_directive in self.api_documentation:
             self.generate_directive(api_directive)
 
         # Generate metadata
@@ -118,7 +118,7 @@ class DocumentationGenerator:
         Args:
             directive_output_path: Path where directive files should be written
         """
-        if not self.api_directives:
+        if not self.api_documentation:
             raise RuntimeError("API directives must be discovered before output")
 
         # Clear and create directive output directory
@@ -126,7 +126,7 @@ class DocumentationGenerator:
             shutil.rmtree(directive_output_path)
         directive_output_path.mkdir(parents=True, exist_ok=True)
 
-        for api_directive in self.api_directives:
+        for api_directive in self.api_documentation:
             directive_content = f"# {api_directive.name}\n\n" + "\n\n".join(
                 str(directive) for directive in api_directive.directives
             )
@@ -141,7 +141,7 @@ class DocumentationGenerator:
                 f.write(directive_content)
 
         print(
-            f"Generated {len(self.api_directives)} directive files in {directive_output_path}"
+            f"Generated {len(self.api_documentation)} directive files in {directive_output_path}"
         )
 
     def _load_module(self) -> Any:
@@ -231,12 +231,12 @@ class DocumentationGenerator:
 
     def _generate_meta_file(self) -> None:
         """Generate metadata file and format it with prettier."""
-        if not self.api_directives:
+        if not self.api_documentation:
             raise RuntimeError(
                 "API directives must be discovered before generating metadata"
             )
 
-        api_section = generate_meta_from_directives(self.api_directives, weight=None)
+        api_section = generate_meta_from_directives(self.api_documentation.pages, weight=None)
         content = generate_meta_file_content(api_section)
 
         # Write to file

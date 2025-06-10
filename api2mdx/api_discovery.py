@@ -41,6 +41,53 @@ class DirectivesPage:
     name: str
 
 
+class ApiDocumentation:
+    """Container for all API documentation with global symbol resolution.
+    
+    This class wraps a list of DirectivesPage objects and provides:
+    - Global symbol registry for conflict resolution
+    - Canonical vs alias assignment
+    - Symbol-level slug resolution
+    """
+    
+    def __init__(self, pages: list[DirectivesPage]):
+        self.pages = pages
+        self._symbol_registry = self._build_symbol_registry()
+    
+    def _build_symbol_registry(self) -> dict[str, str]:
+        """Build a registry mapping canonical paths to canonical slugs.
+        
+        Returns:
+            Dictionary mapping canonical_path -> canonical_slug
+        """
+        # TODO: Implement symbol registry logic
+        registry = {}
+        for page in self.pages:
+            for directive in page.directives:
+                # For now, use simple mapping - will enhance with conflict resolution
+                registry[directive.object_path] = directive.object_path
+        return registry
+    
+    def get_canonical_slug(self, canonical_path: str) -> str:
+        """Get the canonical slug for a given object path.
+        
+        Args:
+            canonical_path: The canonical object path (e.g., "mirascope_v2_llm.calls.decorator.call")
+        
+        Returns:
+            The canonical slug to use for this symbol
+        """
+        return self._symbol_registry.get(canonical_path, canonical_path)
+    
+    def __iter__(self):
+        """Allow iteration over pages."""
+        return iter(self.pages)
+    
+    def __len__(self):
+        """Return number of pages."""
+        return len(self.pages)
+
+
 def _resolve_member(module: Module, name: str) -> Object | Alias:
     """Resolve a member name, prioritizing imports over submodules for name conflicts."""
     # Try custom import resolution first
@@ -262,7 +309,7 @@ def discover_module_pages(module: Module, base_path: str = "") -> list[Directive
     return pages
 
 
-def discover_api_directives(module: Module) -> list[DirectivesPage]:
+def discover_api_directives(module: Module) -> ApiDocumentation:
     """Discover API directives with hierarchical organization.
 
     This creates a structure like:
@@ -274,7 +321,7 @@ def discover_api_directives(module: Module) -> list[DirectivesPage]:
         module: The loaded Griffe module to analyze
 
     Returns:
-        List of DirectivesPage objects with hierarchical paths
+        ApiDocumentation object containing all pages with symbol registry
     """
     # Use the new recursive discovery function
     pages = discover_module_pages(module)
@@ -282,7 +329,7 @@ def discover_api_directives(module: Module) -> list[DirectivesPage]:
     # Resolve case-insensitive filename conflicts
     resolved_pages = _resolve_case_conflicts(pages)
 
-    return resolved_pages
+    return ApiDocumentation(resolved_pages)
 
 
 def _resolve_case_conflicts(directives: list[DirectivesPage]) -> list[DirectivesPage]:
