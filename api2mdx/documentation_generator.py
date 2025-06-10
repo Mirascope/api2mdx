@@ -6,7 +6,6 @@ API directives using Griffe.
 """
 
 import fnmatch
-import re
 import shutil
 import subprocess
 import sys
@@ -15,7 +14,6 @@ from typing import Any
 
 from api2mdx.admonition_converter import convert_admonitions
 from api2mdx.api_discovery import ApiDirective, discover_api_directives
-from api2mdx.config import ApiSourceConfig
 from api2mdx.griffe_integration import (
     get_loader,
     process_directive_with_error_handling,
@@ -24,7 +22,6 @@ from api2mdx.meta import (
     generate_meta_file_content,
     generate_meta_from_directives,
 )
-from api2mdx.structure import organize_api_files
 
 
 class DocumentationGenerator:
