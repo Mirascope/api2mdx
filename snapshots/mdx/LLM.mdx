@@ -6,7 +6,7 @@ description: API documentation for LLM
 
 # LLM
 
-## <ApiType type="Class" path="LLM" symbolName="LLM" /> LLM
+## <ApiType type="Class" path="llm" symbolName="LLM" /> LLM
 
 The base interface for LLM models.
 
@@ -18,7 +18,7 @@ Implementations of this class for specific providers should extend it and
 implement the abstract methods for calls and streaming.
 
 **Bases:** 
-<TypeLink type={{"type_str": "Generic[MessageT, ParamsT, ClientT]", "description": null, "kind": "generic", "base_type": {"type_str": "Generic", "description": null, "kind": "simple", "doc_url": "https://docs.python.org/3/library/typing.html#typing.Generic"}, "parameters": [{"type_str": "MessageT", "description": null, "kind": "simple", "doc_url": "/docs/mirascope/api/Message#message"}, {"type_str": "ParamsT", "description": null, "kind": "simple", "doc_url": "/docs/mirascope/api/Params#params"}, {"type_str": "ClientT", "description": null, "kind": "simple", "doc_url": "/docs/mirascope/api/Client#client"}]}} />, <TypeLink type={{"type_str": "ABC", "description": null, "kind": "simple", "doc_identifier": "ABC"}} />
+<TypeLink type={{"type_str": "Generic[MessageT, ParamsT, ClientT]", "description": null, "kind": "generic", "base_type": {"type_str": "Generic", "description": null, "kind": "simple", "doc_url": "https://docs.python.org/3/library/typing.html#typing.Generic"}, "parameters": [{"type_str": "MessageT", "description": null, "kind": "simple", "doc_url": "/docs/mirascope/api/message#message"}, {"type_str": "ParamsT", "description": null, "kind": "simple", "doc_url": "/docs/mirascope/api/params#params"}, {"type_str": "ClientT", "description": null, "kind": "simple", "doc_url": "/docs/mirascope/api/client#client"}]}} />, <TypeLink type={{"type_str": "ABC", "description": null, "kind": "simple", "doc_identifier": "ABC"}} />
 
 <AttributesTable
   attributes={[
@@ -48,7 +48,7 @@ implement the abstract methods for calls and streaming.
       "type_str": "ParamsT",
       "description": null,
       "kind": "simple",
-      "doc_url": "/docs/mirascope/api/Params#params"
+      "doc_url": "/docs/mirascope/api/params#params"
     },
     "description": "The default parameters for the model (temperature, max_tokens, etc.)."
   },
@@ -58,14 +58,14 @@ implement the abstract methods for calls and streaming.
       "type_str": "ClientT",
       "description": null,
       "kind": "simple",
-      "doc_url": "/docs/mirascope/api/Client#client"
+      "doc_url": "/docs/mirascope/api/client#client"
     },
     "description": "The client object used to interact with the model API."
   }
 ]}
 />
 
-## <ApiType type="Function" path="LLM" symbolName="call" /> call
+## <ApiType type="Function" path="llm" symbolName="call" /> call
 
 Generate a response using the model.
 
@@ -97,7 +97,7 @@ Generate a response using the model.
           "type_str": "MessageT",
           "description": null,
           "kind": "simple",
-          "doc_url": "/docs/mirascope/api/Message#message"
+          "doc_url": "/docs/mirascope/api/message#message"
         }
       ]
     }
@@ -130,7 +130,7 @@ Generate a response using the model.
               "type_str": "ToolDef",
               "description": null,
               "kind": "simple",
-              "doc_url": "/docs/mirascope/api/ToolDef#tooldef"
+              "doc_url": "/docs/mirascope/api/tooldef#tooldef"
             }
           ]
         },
@@ -160,7 +160,7 @@ Generate a response using the model.
                   "type_str": "ToolDef",
                   "description": null,
                   "kind": "simple",
-                  "doc_url": "/docs/mirascope/api/ToolDef#tooldef"
+                  "doc_url": "/docs/mirascope/api/tooldef#tooldef"
                 },
                 {
                   "type_str": "ContextToolDef[..., Any, DepsT]",
@@ -266,7 +266,7 @@ Generate a response using the model.
           "type_str": "ParamsT",
           "description": null,
           "kind": "simple",
-          "doc_url": "/docs/mirascope/api/Params#params"
+          "doc_url": "/docs/mirascope/api/params#params"
         },
         {
           "type_str": "None",
@@ -350,7 +350,7 @@ Generate a response using the model.
 />
 
 
-## <ApiType type="Function" path="LLM" symbolName="call_async" /> call_async
+## <ApiType type="Function" path="llm" symbolName="call_async" /> call_async
 
 Generate a response asynchronously using the model.
 
@@ -382,7 +382,7 @@ Generate a response asynchronously using the model.
           "type_str": "MessageT",
           "description": null,
           "kind": "simple",
-          "doc_url": "/docs/mirascope/api/Message#message"
+          "doc_url": "/docs/mirascope/api/message#message"
         }
       ]
     }
@@ -415,7 +415,7 @@ Generate a response asynchronously using the model.
               "type_str": "ToolDef",
               "description": null,
               "kind": "simple",
-              "doc_url": "/docs/mirascope/api/ToolDef#tooldef"
+              "doc_url": "/docs/mirascope/api/tooldef#tooldef"
             }
           ]
         },
@@ -445,7 +445,7 @@ Generate a response asynchronously using the model.
                   "type_str": "ToolDef",
                   "description": null,
                   "kind": "simple",
-                  "doc_url": "/docs/mirascope/api/ToolDef#tooldef"
+                  "doc_url": "/docs/mirascope/api/tooldef#tooldef"
                 },
                 {
                   "type_str": "ContextToolDef[..., Any, DepsT]",
@@ -551,7 +551,7 @@ Generate a response asynchronously using the model.
           "type_str": "ParamsT",
           "description": null,
           "kind": "simple",
-          "doc_url": "/docs/mirascope/api/Params#params"
+          "doc_url": "/docs/mirascope/api/params#params"
         },
         {
           "type_str": "None",
@@ -635,7 +635,7 @@ Generate a response asynchronously using the model.
 />
 
 
-## <ApiType type="Function" path="LLM" symbolName="stream" /> stream
+## <ApiType type="Function" path="llm" symbolName="stream" /> stream
 
 Stream a response using the model.
 
@@ -667,7 +667,7 @@ Stream a response using the model.
           "type_str": "MessageT",
           "description": null,
           "kind": "simple",
-          "doc_url": "/docs/mirascope/api/Message#message"
+          "doc_url": "/docs/mirascope/api/message#message"
         }
       ]
     }
@@ -700,7 +700,7 @@ Stream a response using the model.
               "type_str": "ToolDef",
               "description": null,
               "kind": "simple",
-              "doc_url": "/docs/mirascope/api/ToolDef#tooldef"
+              "doc_url": "/docs/mirascope/api/tooldef#tooldef"
             }
           ]
         },
@@ -730,7 +730,7 @@ Stream a response using the model.
                   "type_str": "ToolDef",
                   "description": null,
                   "kind": "simple",
-                  "doc_url": "/docs/mirascope/api/ToolDef#tooldef"
+                  "doc_url": "/docs/mirascope/api/tooldef#tooldef"
                 },
                 {
                   "type_str": "ContextToolDef[..., Any, DepsT]",
@@ -836,7 +836,7 @@ Stream a response using the model.
           "type_str": "ParamsT",
           "description": null,
           "kind": "simple",
-          "doc_url": "/docs/mirascope/api/Params#params"
+          "doc_url": "/docs/mirascope/api/params#params"
         },
         {
           "type_str": "None",
@@ -939,7 +939,7 @@ Stream a response using the model.
 />
 
 
-## <ApiType type="Function" path="LLM" symbolName="stream_async" /> stream_async
+## <ApiType type="Function" path="llm" symbolName="stream_async" /> stream_async
 
 Stream a response asynchronously using the model.
 
@@ -971,7 +971,7 @@ Stream a response asynchronously using the model.
           "type_str": "MessageT",
           "description": null,
           "kind": "simple",
-          "doc_url": "/docs/mirascope/api/Message#message"
+          "doc_url": "/docs/mirascope/api/message#message"
         }
       ]
     }
@@ -1004,7 +1004,7 @@ Stream a response asynchronously using the model.
               "type_str": "ToolDef",
               "description": null,
               "kind": "simple",
-              "doc_url": "/docs/mirascope/api/ToolDef#tooldef"
+              "doc_url": "/docs/mirascope/api/tooldef#tooldef"
             }
           ]
         },
@@ -1034,7 +1034,7 @@ Stream a response asynchronously using the model.
                   "type_str": "ToolDef",
                   "description": null,
                   "kind": "simple",
-                  "doc_url": "/docs/mirascope/api/ToolDef#tooldef"
+                  "doc_url": "/docs/mirascope/api/tooldef#tooldef"
                 },
                 {
                   "type_str": "ContextToolDef[..., Any, DepsT]",
@@ -1140,7 +1140,7 @@ Stream a response asynchronously using the model.
           "type_str": "ParamsT",
           "description": null,
           "kind": "simple",
-          "doc_url": "/docs/mirascope/api/Params#params"
+          "doc_url": "/docs/mirascope/api/params#params"
         },
         {
           "type_str": "None",
@@ -1182,7 +1182,7 @@ Stream a response asynchronously using the model.
           "type_str": "AsyncStructuredStream",
           "description": null,
           "kind": "simple",
-          "doc_url": "/docs/mirascope/api/AsyncStructuredStream#asyncstructuredstream"
+          "doc_url": "/docs/mirascope/api/asyncstructuredstream#asyncstructuredstream"
         },
         "parameters": [
           {

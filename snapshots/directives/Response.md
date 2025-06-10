@@ -1,6 +1,6 @@
 # Directive: ::: mirascope_v2_llm.responses.response.Response
 
-**Output Path**: Response.mdx
+**Output Path**: response.mdx
 
 **Directive String**: `::: mirascope_v2_llm.responses.response.Response`
 

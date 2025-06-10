@@ -1,0 +1,138 @@
+{
+  "slug": "api",
+  "label": "API Reference",
+  "children": [
+    {
+      "slug": "llm",
+      "label": "LLM"
+    },
+    {
+      "slug": "agent",
+      "label": "Agent"
+    },
+    {
+      "slug": "agent-fn",
+      "label": "agent"
+    },
+    {
+      "slug": "asyncagent",
+      "label": "AsyncAgent"
+    },
+    {
+      "slug": "asynccall",
+      "label": "AsyncCall"
+    },
+    {
+      "slug": "asyncstream",
+      "label": "AsyncStream"
+    },
+    {
+      "slug": "asyncstructuredagent",
+      "label": "AsyncStructuredAgent"
+    },
+    {
+      "slug": "asyncstructuredcall",
+      "label": "AsyncStructuredCall"
+    },
+    {
+      "slug": "asyncstructuredstream",
+      "label": "AsyncStructuredStream"
+    },
+    {
+      "slug": "call",
+      "label": "Call"
+    },
+    {
+      "slug": "call-fn",
+      "label": "call"
+    },
+    {
+      "slug": "client",
+      "label": "Client"
+    },
+    {
+      "slug": "content",
+      "label": "Content"
+    },
+    {
+      "slug": "context",
+      "label": "Context"
+    },
+    {
+      "slug": "dynamicconfig",
+      "label": "DynamicConfig"
+    },
+    {
+      "slug": "message",
+      "label": "Message"
+    },
+    {
+      "slug": "params",
+      "label": "Params"
+    },
+    {
+      "slug": "response",
+      "label": "Response"
+    },
+    {
+      "slug": "responseformat",
+      "label": "ResponseFormat"
+    },
+    {
+      "slug": "stream",
+      "label": "Stream"
+    },
+    {
+      "slug": "streamchunk",
+      "label": "StreamChunk"
+    },
+    {
+      "slug": "structuredagent",
+      "label": "StructuredAgent"
+    },
+    {
+      "slug": "structuredcall",
+      "label": "StructuredCall"
+    },
+    {
+      "slug": "structuredstream",
+      "label": "StructuredStream"
+    },
+    {
+      "slug": "tool",
+      "label": "Tool"
+    },
+    {
+      "slug": "tool-fn",
+      "label": "tool"
+    },
+    {
+      "slug": "tooldef",
+      "label": "ToolDef"
+    },
+    {
+      "slug": "assistant",
+      "label": "assistant"
+    },
+    {
+      "slug": "model",
+      "label": "model"
+    },
+    {
+      "slug": "prompt_template",
+      "label": "prompt_template"
+    },
+    {
+      "slug": "response_format",
+      "label": "response_format"
+    },
+    {
+      "slug": "system",
+      "label": "system"
+    },
+    {
+      "slug": "user",
+      "label": "user"
+    }
+  ]
+}

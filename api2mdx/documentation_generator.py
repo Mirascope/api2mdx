@@ -14,7 +14,7 @@ from pathlib import Path
 from typing import Any
 
 from api2mdx.admonition_converter import convert_admonitions
-from api2mdx.api_discovery import discover_hierarchical_directives
+from api2mdx.api_discovery import ApiDirective, discover_api_directives
 from api2mdx.config import ApiSourceConfig
 from api2mdx.griffe_integration import (
     get_loader,
@@ -45,7 +45,9 @@ class DocumentationGenerator:
 
     """
 
-    def __init__(self, source_path: Path, package: str, docs_path: str, output_path: Path) -> None:
+    def __init__(
+        self, source_path: Path, package: str, docs_path: str, output_path: Path
+    ) -> None:
         """Initialize the DocumentationGenerator.
 
         Args:
@@ -60,7 +62,7 @@ class DocumentationGenerator:
         self.docs_path = docs_path
         self.output_path = output_path
         self.module: Any | None = None
-        self.api_directives: list[tuple[str, str]] | None = None
+        self.api_directives: list[ApiDirective] | None = None
 
     def setup(self) -> "DocumentationGenerator":
         """Set up the generator by loading module and discovering API structure.
@@ -75,14 +77,14 @@ class DocumentationGenerator:
         # Discover API directives from module structure
         if self.module is None:
             raise RuntimeError("Module must be loaded before discovering directives")
-        self.api_directives = discover_hierarchical_directives(self.module)
+        self.api_directives = discover_api_directives(self.module)
         print(f"Discovered {len(self.api_directives)} API directives")
 
         return self
 
     def generate_all(self, directive_output_path: Path | None = None) -> None:
         """Generate all documentation files.
-        
+
         Args:
             directive_output_path: Optional path to output intermediate directive files
         """
@@ -99,33 +101,32 @@ class DocumentationGenerator:
         self.output_path.mkdir(parents=True, exist_ok=True)
 
         # Generate files from discovered directives
-        for directive, output_path in self.api_directives:
-            self.generate_directive(directive, output_path)
+        for api_directive in self.api_directives:
+            self.generate_directive(api_directive)
 
         # Generate metadata
         self._generate_meta_file()
 
-    def generate_directive(self, directive: str, output_path: str) -> None:
+    def generate_directive(self, api_directive: ApiDirective) -> None:
         """Generate documentation for a specific directive.
 
         Args:
-            directive: The API directive (e.g., ":::package.module.Class")
-            output_path: Relative path for the output file (e.g., "module/Class.mdx")
+            api_directive: The ApiDirective object containing directive string and output path
 
         """
         if not self.module:
             raise RuntimeError("Setup must be called before generating documentation")
 
         try:
-            target_path = self.output_path / output_path
+            target_path = self.output_path / api_directive.slug
 
             # Ensure target directory exists
             target_path.parent.mkdir(exist_ok=True, parents=True)
 
             # Process directive
-            self._process_directive(directive, target_path)
+            self._process_directive(api_directive.directive, target_path)
         except Exception as e:
-            print(f"ERROR: Failed to process directive {directive}: {e}")
+            print(f"ERROR: Failed to process directive {api_directive.directive}: {e}")
             # Re-raise the exception to maintain the original behavior
             raise
 
@@ -167,15 +168,15 @@ class DocumentationGenerator:
         found = False
         self.output_path.mkdir(parents=True, exist_ok=True)
 
-        for directive, output_path in self.api_directives:
+        for api_directive in self.api_directives:
             # Check if directive or output path matches pattern
             if (
-                fnmatch.fnmatch(directive, pattern)
-                or fnmatch.fnmatch(output_path, pattern)
-                or fnmatch.fnmatch(output_path.replace(".mdx", ""), pattern)
+                fnmatch.fnmatch(api_directive.directive, pattern)
+                or fnmatch.fnmatch(api_directive.slug, pattern)
+                or fnmatch.fnmatch(api_directive.slug.replace(".mdx", ""), pattern)
             ):
-                print(f"Generating: {directive} -> {output_path}")
-                self.generate_directive(directive, output_path)
+                print(f"Generating: {api_directive.directive} -> {api_directive.slug}")
+                self.generate_directive(api_directive)
                 found = True
 
         if not found:
@@ -187,32 +188,38 @@ class DocumentationGenerator:
 
     def output_directive_snapshots(self, directive_output_path: Path) -> None:
         """Output directives as intermediate .md files for debugging/inspection.
-        
+
         Args:
             directive_output_path: Path where directive files should be written
         """
         if not self.api_directives:
             raise RuntimeError("API directives must be discovered before output")
-        
+
         # Clear and create directive output directory
         if directive_output_path.exists():
             shutil.rmtree(directive_output_path)
         directive_output_path.mkdir(parents=True, exist_ok=True)
-        
-        for directive, output_path in self.api_directives:
+
+        for api_directive in self.api_directives:
             # Create directive content
-            directive_content = f"# Directive: {directive}\n\n"
-            directive_content += f"**Output Path**: {output_path}\n\n"
-            directive_content += f"**Directive String**: `{directive}`\n\n"
-            
+            directive_content = f"# Directive: {api_directive.directive}\n\n"
+            directive_content += f"**Output Path**: {api_directive.slug}\n\n"
+            directive_content += (
+                f"**Directive String**: `{api_directive.directive}`\n\n"
+            )
+
             # Write to .md file in directive output directory
-            directive_file_path = directive_output_path / output_path.replace('.mdx', '.md')
+            directive_file_path = directive_output_path / api_directive.slug.replace(
+                ".mdx", ".md"
+            )
             directive_file_path.parent.mkdir(parents=True, exist_ok=True)
-            
-            with open(directive_file_path, 'w') as f:
+
+            with open(directive_file_path, "w") as f:
                 f.write(directive_content)
-        
-        print(f"Generated {len(self.api_directives)} directive files in {directive_output_path}")
+
+        print(
+            f"Generated {len(self.api_directives)} directive files in {directive_output_path}"
+        )
 
     def _load_module(self) -> Any:
         """Load the module using Griffe.
@@ -401,17 +408,16 @@ class DocumentationGenerator:
     def _generate_meta_file(self) -> None:
         """Generate metadata file and format it with prettier."""
         if not self.api_directives:
-            raise RuntimeError("API directives must be discovered before generating metadata")
+            raise RuntimeError(
+                "API directives must be discovered before generating metadata"
+            )
 
         # Generate the metadata with weight 0.25 (API reference sections have lower weight)
-        api_section = generate_meta_from_directives(
-            self.api_directives,
-            weight=0.25,  # API reference has lower weight in search results
-        )
-        content = generate_meta_file_content(api_section, "apiMeta")
+        api_section = generate_meta_from_directives(self.api_directives, weight=None)
+        content = generate_meta_file_content(api_section)
 
         # Write to file
-        meta_path = self.output_path / "_meta.ts"
+        meta_path = self.output_path / "_meta.json"
         with open(meta_path, "w") as f:
             f.write(content)
         print(f"Generated API meta file at {meta_path}")

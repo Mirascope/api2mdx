@@ -4,9 +4,12 @@ This module provides Python classes that mirror the TypeScript interfaces used i
 `src/lib/content/spec.ts` file for structuring documentation metadata.
 """
 
+import json
 import re
 from pathlib import Path
-from typing import Any
+from typing import Any, Optional
+
+from api2mdx.api_discovery import ApiDirective
 
 # Constants
 SINGLE_NESTING_LEVEL = 2  # Path with format "parent/child" has 2 parts
@@ -127,49 +130,28 @@ class SectionSpec:
         return json_str
 
 
-def generate_meta_file_content(section: SectionSpec, export_name: str) -> str:
-    """Generate a complete TypeScript meta file content.
+def generate_meta_file_content(section: SectionSpec) -> str:
+    """Generate JSON meta file content.
 
     Args:
-        section: The SectionSpec object to convert to TypeScript
-        export_name: The name to use for the exported variable
+        section: The SectionSpec object to convert to JSON
 
     Returns:
-        A string containing the complete TypeScript file content
+        A string containing the JSON file content
 
     """
-    content = []
-
-    # Add header
-    content.append("/**")
-    content.append(" * AUTO-GENERATED API DOCUMENTATION - DO NOT EDIT")
-    content.append(" */")
-    content.append("")
-
-    # Add imports
-    content.append('import type { SectionSpec } from "@/src/lib/content/spec";')
-    content.append("")
-
-    # Add the export declaration
-    content.append(
-        f"export const {export_name}: SectionSpec = {section.to_typescript()};"
-    )
-    content.append("")
-
-    # Add default export
-    content.append(f"export default {export_name};")
-
-    return "\n".join(content)
+    # Convert to dict and output as formatted JSON
+    return json.dumps(section.to_dict(), indent=2)
 
 
 def generate_meta_from_directives(
-    directives: list[tuple[str, str]],
-    weight: float = 0.25,  # Default weight for API sections
+    directives: list[ApiDirective],
+    weight: Optional[float],  # Default weight for API sections
 ) -> SectionSpec:
     """Generate a SectionSpec from API directives.
 
     Args:
-        directives: List of (directive, output_path) tuples
+        directives: List of ApiDirective objects
         weight: Search weight for this section (default: 0.25)
 
     Returns:
@@ -184,13 +166,13 @@ def generate_meta_from_directives(
     # Build a tree structure from the directives
     path_tree: dict[str, Any] = {}
     
-    for directive, output_path in directives:
+    for api_directive in directives:
         # Skip the main index file for now
-        if output_path == "index.mdx":
+        if api_directive.slug == "index.mdx":
             continue
             
-        # Convert output_path to path parts
-        path_parts = output_path.replace(".mdx", "").split("/")
+        # Convert slug to path parts
+        path_parts = api_directive.slug.replace(".mdx", "").split("/")
         
         # Navigate/create the tree structure
         current_level = path_tree
@@ -199,8 +181,8 @@ def generate_meta_from_directives(
                 current_level[part] = {"_files": [], "_children": {}}
             
             if i == len(path_parts) - 1:
-                # This is a file
-                current_level[part]["_files"].append((directive, output_path))
+                # This is a file - store the ApiDirective
+                current_level[part]["_files"].append(api_directive)
             else:
                 # This is a directory
                 current_level = current_level[part]["_children"]
@@ -216,12 +198,12 @@ def generate_meta_from_directives(
     )
 
 
-def _tree_to_docspecs(tree: dict[str, Any], weight: float) -> list[DocSpec]:
+def _tree_to_docspecs(tree: dict[str, Any], weight: Optional[float]) -> list[DocSpec]:
     """Convert a path tree to DocSpec objects.
     
     Args:
         tree: Tree structure from generate_meta_from_directives
-        weight: Weight to apply to items
+        weight: Weight to apply to items (optional)
         
     Returns:
         List of DocSpec objects
@@ -242,10 +224,12 @@ def _tree_to_docspecs(tree: dict[str, Any], weight: float) -> list[DocSpec]:
                 weight=weight
             ))
         elif files:
-            # This is a file
+            # This is a file - there should be exactly one file per name
+            assert len(files) == 1, f"Expected exactly one file for {name}, got {len(files)}"
+            api_directive = files[0]
             specs.append(DocSpec(
                 slug=name,
-                label=titleify(name),
+                label=api_directive.name,
                 weight=weight
             ))
     

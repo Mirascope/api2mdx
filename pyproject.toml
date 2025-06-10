@@ -1,6 +1,6 @@
 [project]
 name = "api2mdx"
-version = "0.1.0"
+version = "0.2.0"
 description = "Generate MDX API documentation from Python source code"
 readme = "README.md"
 requires-python = ">=3.10"
@@ -12,7 +12,6 @@ keywords = ["documentation", "api", "mdx", "python"]
 classifiers = [
     "Development Status :: 3 - Alpha",
     "Intended Audience :: Developers",
-    "License :: OSI Approved :: MIT License",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
@@ -29,7 +28,7 @@ dependencies = [
 ]
 
 [tool.setuptools]
-packages = ["api2mdx"]
+packages = ["api2mdx", "api2mdx.scripts"]
 
 
 [project.scripts]

@@ -1,6 +1,6 @@
 # Directive: ::: mirascope_v2_llm.responses.stream.Stream
 
-**Output Path**: Stream.mdx
+**Output Path**: stream.mdx
 
 **Directive String**: `::: mirascope_v2_llm.responses.stream.Stream`
 

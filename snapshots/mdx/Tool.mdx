@@ -1,151 +1,69 @@
 ---
 # AUTO-GENERATED API DOCUMENTATION - DO NOT EDIT
-title: tool
-description: API documentation for tool
+title: Tool
+description: API documentation for Tool
 ---
 
-# tool
+# Tool
 
-## <ApiType type="Function" path="tool" symbolName="tool" /> tool
+## <ApiType type="Class" path="tool" symbolName="Tool" /> Tool
 
-Decorator that turns a function into a tool definition.
+Tool instance with arguments provided by an LLM.
 
-This decorator creates a `ToolDef` that can be used with `llm.call`.
-The function's name, docstring, and type hints are used to generate the
-tool's metadata.
+When an LLM uses a tool during a call, a Tool instance is created with the specific
+arguments provided by the LLM.
 
-Example:
+**Bases:** 
+<TypeLink type={{"type_str": "BaseTool[P, R]", "description": null, "kind": "generic", "base_type": {"type_str": "BaseTool", "description": null, "kind": "simple", "doc_identifier": "BaseTool"}, "parameters": [{"type_str": "P", "description": null, "kind": "simple", "doc_identifier": "P"}, {"type_str": "R", "description": null, "kind": "simple", "doc_identifier": "R"}]}} />
 
-    ```python
-    from mirascope import llm
+<AttributesTable
+  attributes={[
+  {
+    "name": "tool_def",
+    "type_info": {
+      "type_str": "ToolDef[P, R]",
+      "description": null,
+      "kind": "generic",
+      "base_type": {
+        "type_str": "ToolDef",
+        "description": null,
+        "kind": "simple",
+        "doc_url": "/docs/mirascope/api/tooldef#tooldef"
+      },
+      "parameters": [
+        {
+          "type_str": "P",
+          "description": null,
+          "kind": "simple",
+          "doc_identifier": "P"
+        },
+        {
+          "type_str": "R",
+          "description": null,
+          "kind": "simple",
+          "doc_identifier": "R"
+        }
+      ]
+    },
+    "description": "The ToolDef that defines the tool being called."
+  }
+]}
+/>
 
-    @llm.tool()
-    def available_books() -> list[str]:
-        """Returns the list of available books."""
-        return ["The Name of the Wind"]
-    ```
+## <ApiType type="Function" path="tool" symbolName="call" /> call
+
+Execute the tool with the arguments provided by the LLM.
 
 <ParametersTable
   parameters={[
   {
-    "name": "__fn",
+    "name": "self",
     "type_info": {
-      "type_str": "Callable[P, R] | None",
-      "description": null,
-      "kind": "union",
-      "base_type": {
-        "type_str": "Union",
-        "description": null,
-        "kind": "simple",
-        "doc_url": "https://docs.python.org/3/library/typing.html#typing.Union"
-      },
-      "parameters": [
-        {
-          "type_str": "Callable[P, R]",
-          "description": null,
-          "kind": "callable",
-          "base_type": {
-            "type_str": "Callable",
-            "description": null,
-            "kind": "simple",
-            "doc_url": "https://docs.python.org/3/library/typing.html#typing.Callable"
-          },
-          "parameters": [
-            {
-              "type_str": "P",
-              "description": null,
-              "kind": "simple",
-              "doc_identifier": "P"
-            },
-            {
-              "type_str": "R",
-              "description": null,
-              "kind": "simple",
-              "doc_identifier": "R"
-            }
-          ]
-        },
-        {
-          "type_str": "None",
-          "description": null,
-          "kind": "simple",
-          "doc_url": "https://docs.python.org/3/library/constants.html#None"
-        }
-      ]
-    },
-    "default": "None"
-  },
-  {
-    "name": "deps_type",
-    "type_info": {
-      "type_str": "type[DepsT] | type[None] | None",
-      "description": null,
-      "kind": "union",
-      "base_type": {
-        "type_str": "Union",
-        "description": null,
-        "kind": "simple",
-        "doc_url": "https://docs.python.org/3/library/typing.html#typing.Union"
-      },
-      "parameters": [
-        {
-          "type_str": "type[DepsT]",
-          "description": null,
-          "kind": "generic",
-          "base_type": {
-            "type_str": "type",
-            "description": null,
-            "kind": "simple",
-            "doc_url": "https://docs.python.org/3/library/functions.html#type"
-          },
-          "parameters": [
-            {
-              "type_str": "DepsT",
-              "description": null,
-              "kind": "simple",
-              "doc_identifier": "DepsT"
-            }
-          ]
-        },
-        {
-          "type_str": "type[None]",
-          "description": null,
-          "kind": "generic",
-          "base_type": {
-            "type_str": "type",
-            "description": null,
-            "kind": "simple",
-            "doc_url": "https://docs.python.org/3/library/functions.html#type"
-          },
-          "parameters": [
-            {
-              "type_str": "None",
-              "description": null,
-              "kind": "simple",
-              "doc_url": "https://docs.python.org/3/library/constants.html#None"
-            }
-          ]
-        },
-        {
-          "type_str": "None",
-          "description": null,
-          "kind": "simple",
-          "doc_url": "https://docs.python.org/3/library/constants.html#None"
-        }
-      ]
-    },
-    "default": "None"
-  },
-  {
-    "name": "strict",
-    "type_info": {
-      "type_str": "bool",
+      "type_str": "Any",
       "description": null,
       "kind": "simple",
-      "doc_url": "https://docs.python.org/3/library/functions.html#bool"
-    },
-    "default": "False",
-    "description": "Whether the tool should use strict mode when supported by the model."
+      "doc_identifier": null
+    }
   }
 ]}
 />
@@ -153,69 +71,26 @@ Example:
 <ReturnTable
   returnType={{
   "type_info": {
-    "type_str": "ToolDef[P, R] | ToolDecorator | ContextToolDecorator[DepsT]",
+    "type_str": "ToolOutput[R]",
     "description": null,
-    "kind": "union",
+    "kind": "generic",
     "base_type": {
-      "type_str": "Union",
+      "type_str": "ToolOutput",
       "description": null,
       "kind": "simple",
-      "doc_url": "https://docs.python.org/3/library/typing.html#typing.Union"
+      "doc_identifier": "ToolOutput"
     },
     "parameters": [
       {
-        "type_str": "ToolDef[P, R]",
-        "description": null,
-        "kind": "generic",
-        "base_type": {
-          "type_str": "ToolDef",
-          "description": null,
-          "kind": "simple",
-          "doc_url": "/docs/mirascope/api/ToolDef#tooldef"
-        },
-        "parameters": [
-          {
-            "type_str": "P",
-            "description": null,
-            "kind": "simple",
-            "doc_identifier": "P"
-          },
-          {
-            "type_str": "R",
-            "description": null,
-            "kind": "simple",
-            "doc_identifier": "R"
-          }
-        ]
-      },
-      {
-        "type_str": "ToolDecorator",
+        "type_str": "R",
         "description": null,
         "kind": "simple",
-        "doc_identifier": "ToolDecorator"
-      },
-      {
-        "type_str": "ContextToolDecorator[DepsT]",
-        "description": null,
-        "kind": "generic",
-        "base_type": {
-          "type_str": "ContextToolDecorator",
-          "description": null,
-          "kind": "simple",
-          "doc_identifier": "ContextToolDecorator"
-        },
-        "parameters": [
-          {
-            "type_str": "DepsT",
-            "description": null,
-            "kind": "simple",
-            "doc_identifier": "DepsT"
-          }
-        ]
+        "doc_identifier": "R"
       }
     ]
   },
-  "description": "A decorator function that converts the function into a ToolDef."
+  "description": "The `ToolOutput` result of executing the tool with the provided arguments."
 }}
 />
+
 
