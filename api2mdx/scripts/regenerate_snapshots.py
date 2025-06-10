@@ -24,28 +24,36 @@ def run_command(cmd: list[str], description: str) -> bool:
 def main() -> int:
     """Regenerate all snapshots."""
     print("🚀 Regenerating all api2mdx snapshots...")
-    
+
     # Get the project root
     script_dir = Path(__file__).parent
     project_root = script_dir.parent.parent
-    
+
     commands = [
-        # Regenerate mirascope v2 llm example  
+        # Regenerate mirascope v2 llm example
         (
-            ["python", "-m", "api2mdx.main",
-             "--source-path", "./snapshots",
-             "--package", "mirascope_v2_llm", 
-             "--output", "./snapshots/mdx",
-             "--output-directives", "./snapshots/directives"],
-            "Regenerating mirascope_v2_llm snapshot"
+            [
+                "python",
+                "-m",
+                "api2mdx.main",
+                "--source-path",
+                "./snapshots",
+                "--package",
+                "mirascope_v2_llm",
+                "--output",
+                "./snapshots/mdx",
+                "--output-directives",
+                "./snapshots/directives",
+            ],
+            "Regenerating mirascope_v2_llm snapshot",
         ),
     ]
-    
+
     success_count = 0
     for cmd, description in commands:
         if run_command(cmd, description):
             success_count += 1
-    
+
     total = len(commands)
     if success_count == total:
         print(f"\n🎉 All {total} snapshots regenerated successfully!")

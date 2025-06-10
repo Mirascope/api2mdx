@@ -147,7 +147,7 @@ def document_object(obj: Object | Alias, doc_path: str) -> str:
     # Check if this is a module - if so, render as overview only
     if isinstance(obj, Module):
         return render_module_overview(obj, doc_path)
-    
+
     # For classes, functions, etc., render full documentation
     processed_obj = process_object(obj)
     if processed_obj is None:
@@ -180,20 +180,20 @@ def process_directive(directive: str, module: Module, doc_path: str) -> str:
 
     # Start with the loaded module
     current_obj: Object | Alias = module
-    
+
     # If the directive path exactly matches the loaded module path, return the module itself
     if object_path == module.canonical_path:
         pass  # current_obj is already the target module
     else:
         # Navigate through the object path, skipping parts that match the module path
         module_parts = module.canonical_path.split(".")
-        
+
         # Find the starting index - skip parts that match the loaded module path
         start_index = 0
         if len(path_parts) >= len(module_parts):
-            if path_parts[:len(module_parts)] == module_parts:
+            if path_parts[: len(module_parts)] == module_parts:
                 start_index = len(module_parts)
-        
+
         # Navigate from the starting index
         for i, part in enumerate(path_parts[start_index:], start_index):
             if hasattr(current_obj, "members") and part in current_obj.members:
@@ -209,41 +209,49 @@ def process_directive(directive: str, module: Module, doc_path: str) -> str:
 
 def render_module_overview(module: Module, doc_path: str) -> str:
     """Render a module as an overview with export links, not full documentation.
-    
+
     Args:
         module: The Griffe module to render as overview
         doc_path: Path to the document, used for API component links
-        
+
     Returns:
         MDX content showing module docstring and export links
     """
     content: list[str] = []
-    
+
     # Module docstring
     if module.docstring:
         # Griffe docstring objects have .value, not .description
-        docstring_text = str(module.docstring.value) if hasattr(module.docstring, 'value') else str(module.docstring)
+        docstring_text = (
+            str(module.docstring.value)
+            if hasattr(module.docstring, "value")
+            else str(module.docstring)
+        )
         content.append(docstring_text)
         content.append("")
-    
+
     # Get meaningful exports (using our filtering logic)
     exports = _get_module_exports(module)
-    
+
     if not exports:
         return "\n".join(content)
-    
+
     # Show brief info about each export
     for export_name in exports:
         if export_name in module.members:
             member = module.members[export_name]
-            
+
             # Get brief description from docstring
             brief_desc = ""
-            if hasattr(member, 'docstring') and member.docstring:
+            if hasattr(member, "docstring") and member.docstring:
                 # Use first line of docstring as brief description
-                docstring_text = str(member.docstring.value) if hasattr(member.docstring, 'value') else str(member.docstring)
-                brief_desc = docstring_text.split('\n')[0] if docstring_text else ""
-            
+                docstring_text = (
+                    str(member.docstring.value)
+                    if hasattr(member.docstring, "value")
+                    else str(member.docstring)
+                )
+                brief_desc = docstring_text.split("\n")[0] if docstring_text else ""
+
             # Determine member type for ApiType component
             if isinstance(member, Module):
                 member_type = "Module"
@@ -255,12 +263,14 @@ def render_module_overview(module: Module, doc_path: str) -> str:
                 member_type = "Alias"
             else:
                 member_type = "Object"
-            
+
             # Add ApiType component with brief description
-            content.append(f'## <ApiType type="{member_type}" path="{doc_path}" symbolName="{export_name}" /> {export_name}')
+            content.append(
+                f'## <ApiType type="{member_type}" path="{doc_path}" symbolName="{export_name}" /> {export_name}'
+            )
             content.append("")
             if brief_desc:
                 content.append(brief_desc)
                 content.append("")
-    
+
     return "\n".join(content)

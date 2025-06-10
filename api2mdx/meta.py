@@ -165,31 +165,31 @@ def generate_meta_from_directives(
 
     # Build a tree structure from the directives
     path_tree: dict[str, Any] = {}
-    
+
     for api_directive in directives:
         # Skip the main index file for now
         if api_directive.slug == "index.mdx":
             continue
-            
+
         # Convert slug to path parts
         path_parts = api_directive.slug.replace(".mdx", "").split("/")
-        
+
         # Navigate/create the tree structure
         current_level = path_tree
         for i, part in enumerate(path_parts):
             if part not in current_level:
                 current_level[part] = {"_files": [], "_children": {}}
-            
+
             if i == len(path_parts) - 1:
                 # This is a file - store the ApiDirective
                 current_level[part]["_files"].append(api_directive)
             else:
                 # This is a directory
                 current_level = current_level[part]["_children"]
-    
+
     # Convert tree to DocSpec objects
     children = _tree_to_docspecs(path_tree, weight)
-    
+
     return SectionSpec(
         slug=section_slug,
         label=section_label,
@@ -200,39 +200,36 @@ def generate_meta_from_directives(
 
 def _tree_to_docspecs(tree: dict[str, Any], weight: Optional[float]) -> list[DocSpec]:
     """Convert a path tree to DocSpec objects.
-    
+
     Args:
         tree: Tree structure from generate_meta_from_directives
         weight: Weight to apply to items (optional)
-        
+
     Returns:
         List of DocSpec objects
     """
     specs = []
-    
+
     for name, node in tree.items():
         files = node.get("_files", [])
         children_tree = node.get("_children", {})
-        
+
         if children_tree:
             # This is a directory with children
             children = _tree_to_docspecs(children_tree, weight)
-            specs.append(DocSpec(
-                slug=name,
-                label=titleify(name),
-                children=children,
-                weight=weight
-            ))
+            specs.append(
+                DocSpec(
+                    slug=name, label=titleify(name), children=children, weight=weight
+                )
+            )
         elif files:
             # This is a file - there should be exactly one file per name
-            assert len(files) == 1, f"Expected exactly one file for {name}, got {len(files)}"
+            assert len(files) == 1, (
+                f"Expected exactly one file for {name}, got {len(files)}"
+            )
             api_directive = files[0]
-            specs.append(DocSpec(
-                slug=name,
-                label=api_directive.name,
-                weight=weight
-            ))
-    
+            specs.append(DocSpec(slug=name, label=api_directive.name, weight=weight))
+
     return specs
 
 
