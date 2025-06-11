@@ -85,33 +85,55 @@ class RawDirectivesPage:
 
 
 @dataclass
-class Directive:
-    """Enriched directive with computed slug and canonical docs path."""
+class ApiObject:
+    """Canonical representation of an API object with all computed properties."""
     
-    raw_directive: RawDirective
-    slug: Slug
+    object_path: ObjectPath
+    object_type: DirectiveType
+    canonical_slug: Slug
     canonical_docs_path: str
+    symbol_name: str
+
+
+@dataclass
+class Directive:
+    """Directive that references an API object."""
+    
+    api_object: ApiObject
     
     @property
     def object_path(self) -> ObjectPath:
-        """Get the object path from the underlying raw directive."""
-        return self.raw_directive.object_path
+        """Get the object path from the API object."""
+        return self.api_object.object_path
     
     @property
     def object_type(self) -> DirectiveType:
-        """Get the object type from the underlying raw directive."""
-        return self.raw_directive.object_type
+        """Get the object type from the API object."""
+        return self.api_object.object_type
     
     def symbol_name(self) -> str:
-        """Extract the symbol name from the object path."""
-        return self.raw_directive.symbol_name()
+        """Get the symbol name from the API object."""
+        return self.api_object.symbol_name
     
     def __str__(self) -> str:
         return f"::: {self.object_path}  # {self.object_type.value}"
     
-    def render(self) -> str:
-        """Render directive as JSX-like component for debugging."""
-        return f'<Directive\n  path="{self.object_path}"\n  symbolName="{self.symbol_name()}"\n  slug="{self.slug}"\n  canonicalPath="{self.canonical_docs_path}"\n/>'
+    def render(self, current_docs_path: str) -> str:
+        """Render directive as JSX-like component for debugging.
+        
+        Args:
+            current_docs_path: The docs path of the current page (e.g., "calls" or "index")
+            
+        Returns:
+            Either a simple path reference or full ApiObject depending on whether
+            this is the canonical location for the object.
+        """
+        if self.api_object.canonical_docs_path == current_docs_path:
+            # This is the canonical location - render full ApiObject
+            return f'<ApiObject\n  path="{self.api_object.object_path}"\n  symbolName="{self.api_object.symbol_name}"\n  slug="{self.api_object.canonical_slug}"\n  canonicalPath="{self.api_object.canonical_docs_path}"\n/>'
+        else:
+            # This is just a reference - render simple path
+            return f'<Directive path="{self.api_object.object_path}" />'
 
 
 @dataclass
@@ -161,22 +183,18 @@ class ApiDocumentation:
             file_paths.add(page.file_path)
 
         self.raw_pages = raw_pages
-        self._symbol_registry = self._build_symbol_registry()
-        self._canonical_docs_registry = self._build_canonical_docs_registry()
+        self._api_objects_registry = self._build_api_objects_registry()
         self.pages = self._build_enriched_pages()
 
-    def _build_symbol_registry(self) -> dict[ObjectPath, str]:
-        """Build a registry mapping canonical paths to canonical slugs.
+    def _build_api_objects_registry(self) -> dict[ObjectPath, ApiObject]:
+        """Build a registry of all API objects with their canonical properties.
 
-        Uses conflict resolution to ensure unique slugs:
-        1. Try the symbol name as slug
-        2. If taken, try symbol_name + "_" + type_suffix
-        3. If still taken, append _1, _2, etc.
+        Uses conflict resolution to ensure unique slugs and first encounter for canonical docs path.
 
         Returns:
-            Dictionary mapping ObjectPath -> canonical_slug
+            Dictionary mapping ObjectPath -> ApiObject
         """
-        registry: dict[ObjectPath, str] = {}
+        registry: dict[ObjectPath, ApiObject] = {}
         used_slugs: dict[str, ObjectPath] = {}
 
         # Type suffix mappings for disambiguation
@@ -188,58 +206,51 @@ class ApiDocumentation:
         }
 
         for page in self.raw_pages:
+            # Get docs path without .mdx extension for canonical docs path
+            docs_path = page.file_path.replace(".mdx", "")
+            
             for directive in page.directives:
+                # Skip if we already have this object (first encounter wins for canonical docs path)
+                if directive.object_path in registry:
+                    continue
+
                 # Get the symbol name
                 symbol_name = directive.symbol_name()
                 # Convert camelCase/PascalCase to kebab-case for readability
                 base_slug = self._camel_to_kebab(symbol_name)
 
-                # Try the base slug first
-                if base_slug not in used_slugs:
-                    registry[directive.object_path] = base_slug
-                    used_slugs[base_slug] = directive.object_path
-                    continue
+                # Find unique slug using conflict resolution
+                final_slug_str = base_slug
+                if base_slug in used_slugs:
+                    # Try with type suffix
+                    type_suffix = type_suffixes.get(directive.object_type, "unknown")
+                    typed_slug = f"{base_slug}_{type_suffix}"
 
-                # Try with type suffix
-                type_suffix = type_suffixes.get(directive.object_type, "unknown")
-                typed_slug = f"{base_slug}_{type_suffix}"
+                    if typed_slug not in used_slugs:
+                        final_slug_str = typed_slug
+                    else:
+                        # Try with numbered suffix
+                        counter = 1
+                        while True:
+                            numbered_slug = f"{typed_slug}_{counter}"
+                            if numbered_slug not in used_slugs:
+                                final_slug_str = numbered_slug
+                                break
+                            counter += 1
 
-                if typed_slug not in used_slugs:
-                    registry[directive.object_path] = typed_slug
-                    used_slugs[typed_slug] = directive.object_path
-                    continue
+                # Create the ApiObject
+                api_object = ApiObject(
+                    object_path=directive.object_path,
+                    object_type=directive.object_type,
+                    canonical_slug=Slug(final_slug_str),
+                    canonical_docs_path=docs_path,
+                    symbol_name=symbol_name
+                )
 
-                # Try with numbered suffix
-                counter = 1
-                while True:
-                    numbered_slug = f"{typed_slug}_{counter}"
-                    if numbered_slug not in used_slugs:
-                        registry[directive.object_path] = numbered_slug
-                        used_slugs[numbered_slug] = directive.object_path
-                        break
-                    counter += 1
+                # Register it
+                registry[directive.object_path] = api_object
+                used_slugs[final_slug_str] = directive.object_path
 
-        return registry
-
-    def _build_canonical_docs_registry(self) -> dict[ObjectPath, str]:
-        """Build a registry mapping object paths to their canonical docs locations.
-        
-        Uses first encounter as canonical location for cross-references.
-        
-        Returns:
-            Dictionary mapping ObjectPath -> canonical_docs_path (e.g., "calls/decorator")
-        """
-        registry: dict[ObjectPath, str] = {}
-        
-        for page in self.raw_pages:
-            # Get docs path without .mdx extension
-            docs_path = page.file_path.replace(".mdx", "")
-            
-            for directive in page.directives:
-                # Only record first encounter as canonical
-                if directive.object_path not in registry:
-                    registry[directive.object_path] = docs_path
-        
         return registry
 
     def _camel_to_kebab(self, name: str) -> str:
@@ -248,28 +259,22 @@ class ApiDocumentation:
         result = re.sub(r"(?<!^)(?=[A-Z])", "-", name)
         return result.lower()
 
-    def get_canonical_slug(self, canonical_path: ObjectPath) -> Slug:
-        """Get the canonical slug for a given object path.
+    def get_api_object(self, object_path: ObjectPath) -> ApiObject:
+        """Get the API object for a given object path.
 
         Args:
-            canonical_path: The canonical object path (e.g., "mirascope_v2_llm.calls.decorator.call")
+            object_path: The canonical object path (e.g., "mirascope_v2_llm.calls.decorator.call")
 
         Returns:
-            The canonical slug to use for this symbol
+            The ApiObject for this path
+
+        Raises:
+            ValueError: If no ApiObject is found for the given path
         """
-        slug_str = self._symbol_registry.get(canonical_path, str(canonical_path))
-        return Slug(slug_str)
-
-    def get_canonical_docs_path(self, canonical_path: ObjectPath) -> str:
-        """Get the canonical docs path for a given object path.
-
-        Args:
-            canonical_path: The canonical object path (e.g., "mirascope_v2_llm.calls.decorator.call")
-
-        Returns:
-            The canonical docs path where this symbol should be linked (e.g., "calls/decorator" or "index")
-        """
-        return self._canonical_docs_registry.get(canonical_path, "index")
+        api_object = self._api_objects_registry.get(object_path)
+        if api_object is None:
+            raise ValueError(f"No API object found for path: {object_path}")
+        return api_object
 
     def _build_enriched_pages(self) -> list[DirectivesPage]:
         """Build enriched pages with computed slugs.
@@ -283,18 +288,11 @@ class ApiDocumentation:
             enriched_directives = []
             
             for raw_directive in raw_page.directives:
-                # Get the computed slug for this directive
-                slug = self.get_canonical_slug(raw_directive.object_path)
-                
-                # Get the canonical docs path for this directive
-                canonical_docs_path = self.get_canonical_docs_path(raw_directive.object_path)
+                # Get the API object for this directive
+                api_object = self.get_api_object(raw_directive.object_path)
                 
                 # Create enriched directive
-                enriched_directive = Directive(
-                    raw_directive=raw_directive,
-                    slug=slug,
-                    canonical_docs_path=canonical_docs_path
-                )
+                enriched_directive = Directive(api_object=api_object)
                 enriched_directives.append(enriched_directive)
             
             # Create enriched page

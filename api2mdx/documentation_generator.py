@@ -127,8 +127,10 @@ class DocumentationGenerator:
         directive_output_path.mkdir(parents=True, exist_ok=True)
 
         for api_directive in self.api_documentation:
+            # Get docs path for this directive page (without .mdx extension)
+            docs_path = api_directive.file_path.replace(".mdx", "")
             directive_content = f"# {api_directive.name}\n\n" + "\n\n".join(
-                directive.render()
+                directive.render(docs_path)
                 for directive in api_directive.directives
             )
 
@@ -226,7 +228,13 @@ class DocumentationGenerator:
 
             # Process each directive
             for directive in directives_page.directives:
-                doc_content = render_directive(directive.raw_directive, self.module, doc_path)
+                # Create a RawDirective from the ApiObject for rendering
+                from api2mdx.api_discovery import RawDirective
+                raw_directive = RawDirective(
+                    object_path=directive.api_object.object_path,
+                    object_type=directive.api_object.object_type
+                )
+                doc_content = render_directive(raw_directive, self.module, doc_path)
                 f.write(doc_content)
                 f.write("\n\n")
 
