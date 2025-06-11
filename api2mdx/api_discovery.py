@@ -50,6 +50,10 @@ class Directive:
 
     def __str__(self) -> str:
         return f"::: {self.object_path}  # {self.object_type.value}"
+    
+    def format_with_slug(self, slug: str) -> str:
+        """Format directive with slug for debugging/inspection."""
+        return f"::: {self.object_path}  # {self.object_type.value} -> {slug}"
 
 
 @dataclass
@@ -99,18 +103,66 @@ class ApiDocumentation:
     def _build_symbol_registry(self) -> dict[ObjectPath, str]:
         """Build a registry mapping canonical paths to canonical slugs.
 
+        Uses conflict resolution to ensure unique slugs:
+        1. Try the symbol name as slug  
+        2. If taken, try symbol_name + "_" + type_suffix
+        3. If still taken, append _1, _2, etc.
+
         Returns:
             Dictionary mapping ObjectPath -> canonical_slug
         """
-        # TODO: Implement symbol registry logic
-        registry = {}
+        registry: dict[ObjectPath, str] = {}
+        used_slugs: dict[str, ObjectPath] = {}
+        
+        # Type suffix mappings for disambiguation
+        type_suffixes = {
+            DirectiveType.FUNCTION: "fn",
+            DirectiveType.CLASS: "cls", 
+            DirectiveType.MODULE: "mod",
+            DirectiveType.ALIAS: "alias"
+        }
+        
         for page in self.pages:
             for directive in page.directives:
-                # For now, use simple mapping - will enhance with conflict resolution
-                registry[directive.object_path] = str(directive.object_path)
+                # Get the symbol name (last part of path)
+                symbol_name = directive.object_path.split(".")[-1]
+                # Convert camelCase/PascalCase to kebab-case for readability
+                base_slug = self._camel_to_kebab(symbol_name)
+                
+                # Try the base slug first
+                if base_slug not in used_slugs:
+                    registry[directive.object_path] = base_slug
+                    used_slugs[base_slug] = directive.object_path
+                    continue
+                
+                # Try with type suffix
+                type_suffix = type_suffixes.get(directive.object_type, "unknown")
+                typed_slug = f"{base_slug}_{type_suffix}"
+                
+                if typed_slug not in used_slugs:
+                    registry[directive.object_path] = typed_slug
+                    used_slugs[typed_slug] = directive.object_path
+                    continue
+                
+                # Try with numbered suffix
+                counter = 1
+                while True:
+                    numbered_slug = f"{typed_slug}_{counter}"
+                    if numbered_slug not in used_slugs:
+                        registry[directive.object_path] = numbered_slug
+                        used_slugs[numbered_slug] = directive.object_path
+                        break
+                    counter += 1
+        
         return registry
 
-    def get_canonical_slug(self, canonical_path: ObjectPath) -> str:
+    def _camel_to_kebab(self, name: str) -> str:
+        """Convert camelCase/PascalCase to kebab-case."""
+        # Insert hyphens before uppercase letters (except at start)
+        result = re.sub(r'(?<!^)(?=[A-Z])', '-', name)
+        return result.lower()
+
+    def get_canonical_slug(self, canonical_path: ObjectPath) -> Slug:
         """Get the canonical slug for a given object path.
 
         Args:
@@ -119,7 +171,8 @@ class ApiDocumentation:
         Returns:
             The canonical slug to use for this symbol
         """
-        return self._symbol_registry.get(canonical_path, str(canonical_path))
+        slug_str = self._symbol_registry.get(canonical_path, str(canonical_path))
+        return Slug(slug_str)
 
     def __iter__(self):
         """Allow iteration over pages."""

@@ -128,7 +128,8 @@ class DocumentationGenerator:
 
         for api_directive in self.api_documentation:
             directive_content = f"# {api_directive.name}\n\n" + "\n\n".join(
-                str(directive) for directive in api_directive.directives
+                directive.format_with_slug(self.api_documentation.get_canonical_slug(directive.object_path))
+                for directive in api_directive.directives
             )
 
             # Write to .md file in directive output directory
