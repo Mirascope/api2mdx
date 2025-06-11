@@ -9,16 +9,27 @@
   canonicalPath="index"
 />
 
+<Directive path="mirascope_v2_llm.agents.decorator.agent" />
+
+<Directive path="mirascope_v2_llm.agents.agent.Agent" />
+
 <ApiObject
-  path="mirascope_v2_llm.agents.decorator.agent"
-  symbolName="agent"
-  slug="agent"
+  path="mirascope_v2_llm.agents"
+  symbolName="agents"
+  slug="agents"
   canonicalPath="index"
 />
 
 <ApiObject
-  path="mirascope_v2_llm.agents.agent.Agent"
-  symbolName="Agent"
-  slug="agent_cls"
+  path="mirascope_v2_llm.responses"
+  symbolName="responses"
+  slug="responses"
+  canonicalPath="index"
+/>
+
+<ApiObject
+  path="mirascope_v2_llm.content"
+  symbolName="content"
+  slug="content"
   canonicalPath="index"
 />

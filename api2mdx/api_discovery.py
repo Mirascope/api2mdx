@@ -9,7 +9,7 @@ import re
 from dataclasses import dataclass
 from enum import Enum
 from typing import NewType
-from griffe import Alias, Class, Function, Module, Object
+from griffe import Alias, Attribute, Class, Function, Module, Object
 
 
 # Type aliases for better type safety
@@ -41,6 +41,7 @@ class DirectiveType(Enum):
     FUNCTION = "Function"
     MODULE = "Module"
     ALIAS = "Alias"
+    ATTRIBUTE = "Attribute"
 
 
 @dataclass
@@ -204,6 +205,7 @@ class ApiDocumentation:
             DirectiveType.CLASS: "cls",
             DirectiveType.MODULE: "mod",
             DirectiveType.ALIAS: "alias",
+            DirectiveType.ATTRIBUTE: "attr",
         }
 
         for page in self.raw_pages:
@@ -515,8 +517,8 @@ def _extract_all_exports(module: Module) -> list[str] | None:
             if name.startswith("_"):
                 continue
 
-            # Include classes, functions, and modules
-            if isinstance(member, (Class, Function, Module)):
+            # Include classes, functions, modules, and attributes
+            if isinstance(member, (Class, Function, Module, Attribute)):
                 fallback_exports.append(name)
 
         return fallback_exports
@@ -570,6 +572,8 @@ def _create_directive_from_member(member: Object | Alias) -> RawDirective:
         return RawDirective(ObjectPath(member.canonical_path), DirectiveType.FUNCTION)
     elif isinstance(member, Module):
         return RawDirective(ObjectPath(member.canonical_path), DirectiveType.MODULE)
+    elif isinstance(member, Attribute):
+        return RawDirective(ObjectPath(member.canonical_path), DirectiveType.ATTRIBUTE)
     elif hasattr(member, "target") and getattr(member, "target"):
         # Handle aliases - use the target's type instead of ALIAS
         target = getattr(member, "target")
@@ -579,11 +583,16 @@ def _create_directive_from_member(member: Object | Alias) -> RawDirective:
             directive_type = DirectiveType.FUNCTION
         elif isinstance(target, Module):
             directive_type = DirectiveType.MODULE
+        elif isinstance(target, Attribute):
+            directive_type = DirectiveType.ATTRIBUTE
         else:
             directive_type = DirectiveType.ALIAS
         return RawDirective(ObjectPath(target.canonical_path), directive_type)
     else:
-        raise ValueError(f"Unknown directive type: {member.canonical_path}")
+        # Debug output to see what type we're dealing with
+        member_type = type(member).__name__
+        member_class = member.__class__
+        raise ValueError(f"Unknown directive type: {member.canonical_path} (type: {member_type}, class: {member_class})")
 
 
 def discover_module_pages(
