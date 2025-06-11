@@ -1,19 +1,46 @@
 # calls
 
-::: mirascope_v2_llm.calls.async_call.AsyncCall  # Class -> async-call
+<Directive
+  path="mirascope_v2_llm.calls.async_call.AsyncCall"
+  slug="async-call"
+/>
 
-::: mirascope_v2_llm.calls.async_context_call.AsyncContextCall  # Class -> async-context-call
+<Directive
+  path="mirascope_v2_llm.calls.async_context_call.AsyncContextCall"
+  slug="async-context-call"
+/>
 
-::: mirascope_v2_llm.calls.async_structured_call.AsyncStructuredCall  # Class -> async-structured-call
+<Directive
+  path="mirascope_v2_llm.calls.async_structured_call.AsyncStructuredCall"
+  slug="async-structured-call"
+/>
 
-::: mirascope_v2_llm.calls.async_structured_context_call.AsyncStructuredContextCall  # Class -> async-structured-context-call
+<Directive
+  path="mirascope_v2_llm.calls.async_structured_context_call.AsyncStructuredContextCall"
+  slug="async-structured-context-call"
+/>
 
-::: mirascope_v2_llm.calls.call.Call  # Class -> call_cls
+<Directive
+  path="mirascope_v2_llm.calls.call.Call"
+  slug="call_cls"
+/>
 
-::: mirascope_v2_llm.calls.context_call.ContextCall  # Class -> context-call
+<Directive
+  path="mirascope_v2_llm.calls.context_call.ContextCall"
+  slug="context-call"
+/>
 
-::: mirascope_v2_llm.calls.structured_call.StructuredCall  # Class -> structured-call
+<Directive
+  path="mirascope_v2_llm.calls.structured_call.StructuredCall"
+  slug="structured-call"
+/>
 
-::: mirascope_v2_llm.calls.structured_context_call.StructuredContextCall  # Class -> structured-context-call
+<Directive
+  path="mirascope_v2_llm.calls.structured_context_call.StructuredContextCall"
+  slug="structured-context-call"
+/>
 
-::: mirascope_v2_llm.calls.decorator.call  # Function -> call_fn
+<Directive
+  path="mirascope_v2_llm.calls.decorator.call"
+  slug="call_fn"
+/>

@@ -51,9 +51,13 @@ class RawDirective:
     def __str__(self) -> str:
         return f"::: {self.object_path}  # {self.object_type.value}"
 
-    def format_with_slug(self, slug: str) -> str:
-        """Format directive with slug for debugging/inspection."""
-        return f"::: {self.object_path}  # {self.object_type.value} -> {slug}"
+    def symbol_name(self) -> str:
+        """Extract the symbol name from the object path.
+        
+        Returns:
+            The last component of the object path (e.g., "call" from "mirascope_v2_llm.calls.decorator.call")
+        """
+        return self.object_path.split(".")[-1]
 
 
 @dataclass
@@ -80,6 +84,63 @@ class RawDirectivesPage:
         return f"{self.slug}.mdx"
 
 
+@dataclass
+class Directive:
+    """Enriched directive with computed slug."""
+    
+    raw_directive: RawDirective
+    slug: Slug
+    
+    @property
+    def object_path(self) -> ObjectPath:
+        """Get the object path from the underlying raw directive."""
+        return self.raw_directive.object_path
+    
+    @property
+    def object_type(self) -> DirectiveType:
+        """Get the object type from the underlying raw directive."""
+        return self.raw_directive.object_type
+    
+    def symbol_name(self) -> str:
+        """Extract the symbol name from the object path."""
+        return self.raw_directive.symbol_name()
+    
+    def __str__(self) -> str:
+        return f"::: {self.object_path}  # {self.object_type.value}"
+    
+    def render(self) -> str:
+        """Render directive as JSX-like component for debugging."""
+        return f'<Directive\n  path="{self.object_path}"\n  slug="{self.slug}"\n/>'
+
+
+@dataclass
+class DirectivesPage:
+    """Enriched directives page with computed file path and enriched directives."""
+    
+    raw_page: RawDirectivesPage
+    directives: list[Directive]
+    
+    @property
+    def directory(self) -> str:
+        """Get the directory from the underlying raw page."""
+        return self.raw_page.directory
+    
+    @property
+    def slug(self) -> Slug:
+        """Get the slug from the underlying raw page."""
+        return self.raw_page.slug
+    
+    @property
+    def name(self) -> str:
+        """Get the name from the underlying raw page."""
+        return self.raw_page.name
+    
+    @property
+    def file_path(self) -> str:
+        """Get the full file path with .mdx extension."""
+        return self.raw_page.file_path
+
+
 class ApiDocumentation:
     """Container for all API documentation with global symbol resolution.
 
@@ -89,16 +150,17 @@ class ApiDocumentation:
     - Symbol-level slug resolution
     """
 
-    def __init__(self, pages: list[RawDirectivesPage]):
+    def __init__(self, raw_pages: list[RawDirectivesPage]):
         # Validate unique file paths
         file_paths = set()
-        for page in pages:
+        for page in raw_pages:
             if page.file_path in file_paths:
                 raise ValueError(f"Duplicate file path: {page.file_path}")
             file_paths.add(page.file_path)
 
-        self.pages = pages
+        self.raw_pages = raw_pages
         self._symbol_registry = self._build_symbol_registry()
+        self.pages = self._build_enriched_pages()
 
     def _build_symbol_registry(self) -> dict[ObjectPath, str]:
         """Build a registry mapping canonical paths to canonical slugs.
@@ -122,10 +184,10 @@ class ApiDocumentation:
             DirectiveType.ALIAS: "alias",
         }
 
-        for page in self.pages:
+        for page in self.raw_pages:
             for directive in page.directives:
-                # Get the symbol name (last part of path)
-                symbol_name = directive.object_path.split(".")[-1]
+                # Get the symbol name
+                symbol_name = directive.symbol_name()
                 # Convert camelCase/PascalCase to kebab-case for readability
                 base_slug = self._camel_to_kebab(symbol_name)
 
@@ -173,6 +235,37 @@ class ApiDocumentation:
         """
         slug_str = self._symbol_registry.get(canonical_path, str(canonical_path))
         return Slug(slug_str)
+
+    def _build_enriched_pages(self) -> list[DirectivesPage]:
+        """Build enriched pages with computed slugs.
+        
+        Returns:
+            List of enriched DirectivesPage objects
+        """
+        enriched_pages = []
+        
+        for raw_page in self.raw_pages:
+            enriched_directives = []
+            
+            for raw_directive in raw_page.directives:
+                # Get the computed slug for this directive
+                slug = self.get_canonical_slug(raw_directive.object_path)
+                
+                # Create enriched directive
+                enriched_directive = Directive(
+                    raw_directive=raw_directive,
+                    slug=slug
+                )
+                enriched_directives.append(enriched_directive)
+            
+            # Create enriched page
+            enriched_page = DirectivesPage(
+                raw_page=raw_page,
+                directives=enriched_directives
+            )
+            enriched_pages.append(enriched_page)
+        
+        return enriched_pages
 
     def __iter__(self):
         """Allow iteration over pages."""

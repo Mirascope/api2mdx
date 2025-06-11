@@ -12,7 +12,7 @@ from pathlib import Path
 from typing import Any
 
 from api2mdx.admonition_converter import convert_admonitions
-from api2mdx.api_discovery import ApiDocumentation, RawDirectivesPage
+from api2mdx.api_discovery import ApiDocumentation, DirectivesPage
 from api2mdx.griffe_integration import (
     get_loader,
     render_directive,
@@ -89,7 +89,7 @@ class DocumentationGenerator:
         # Generate metadata
         self._generate_meta_file()
 
-    def generate_directive(self, api_directive: RawDirectivesPage) -> None:
+    def generate_directive(self, api_directive: DirectivesPage) -> None:
         """Generate documentation for a specific directive.
 
         Args:
@@ -128,9 +128,7 @@ class DocumentationGenerator:
 
         for api_directive in self.api_documentation:
             directive_content = f"# {api_directive.name}\n\n" + "\n\n".join(
-                directive.format_with_slug(
-                    self.api_documentation.get_canonical_slug(directive.object_path)
-                )
+                directive.render()
                 for directive in api_directive.directives
             )
 
@@ -196,7 +194,7 @@ class DocumentationGenerator:
             if str(self.source_path) in sys.path:
                 sys.path.remove(str(self.source_path))
 
-    def _write_directives_page(self, directives_page: RawDirectivesPage) -> None:
+    def _write_directives_page(self, directives_page: DirectivesPage) -> None:
         """Process directives and generate the corresponding MDX file.
 
         Args:
@@ -228,7 +226,7 @@ class DocumentationGenerator:
 
             # Process each directive
             for directive in directives_page.directives:
-                doc_content = render_directive(directive, self.module, doc_path)
+                doc_content = render_directive(directive.raw_directive, self.module, doc_path)
                 f.write(doc_content)
                 f.write("\n\n")
 

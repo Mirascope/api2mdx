@@ -1,9 +1,21 @@
 # mirascope_v2_llm
 
-::: mirascope_v2_llm.calls.decorator.call  # Function -> call_fn
+<Directive
+  path="mirascope_v2_llm.calls.decorator.call"
+  slug="call_fn"
+/>
 
-::: mirascope_v2_llm.calls  # Module -> calls
+<Directive
+  path="mirascope_v2_llm.calls"
+  slug="calls"
+/>
 
-::: mirascope_v2_llm.agents.decorator.agent  # Function -> agent
+<Directive
+  path="mirascope_v2_llm.agents.decorator.agent"
+  slug="agent"
+/>
 
-::: mirascope_v2_llm.agents.agent.Agent  # Class -> agent_cls
+<Directive
+  path="mirascope_v2_llm.agents.agent.Agent"
+  slug="agent_cls"
+/>
