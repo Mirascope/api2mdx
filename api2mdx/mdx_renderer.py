@@ -16,6 +16,7 @@ from api2mdx.models import (
     ProcessedObject,
 )
 from api2mdx.type_model import EnumEncoder, ParameterInfo
+from api2mdx.mdx_components import ApiType, ApiTypeKind
 
 
 def render_object(processed_obj: ProcessedObject, doc_path: str) -> str:
@@ -75,9 +76,8 @@ def render_module(processed_module: ProcessedModule, doc_path: str) -> str:
     module_name = processed_module.module_path.split(".")[-1]
 
     # Add heading with embedded ApiType component
-    content.append(
-        f'## <ApiType type="Module" path="{doc_path}" symbolName="{module_name}" /> {module_name}\n'
-    )
+    api_type = ApiType(ApiTypeKind.MODULE, doc_path, module_name)
+    content.append(f'## {api_type.render()} {module_name}\n')
 
     # Add docstring if available
     if processed_module.docstring:
@@ -106,9 +106,8 @@ def render_function(processed_func: ProcessedFunction, doc_path: str) -> str:
     content: list[str] = []
 
     # Add heading with embedded ApiType component
-    content.append(
-        f'## <ApiType type="Function" path="{doc_path}" symbolName="{processed_func.name}" /> {processed_func.name}\n'
-    )
+    api_type = ApiType(ApiTypeKind.FUNCTION, doc_path, processed_func.name)
+    content.append(f'## {api_type.render()} {processed_func.name}\n')
 
     # Add docstring if available
     if processed_func.docstring:
@@ -140,9 +139,8 @@ def render_class(processed_class: ProcessedClass, doc_path: str) -> str:
     content: list[str] = []
 
     # Add heading with embedded ApiType component
-    content.append(
-        f'## <ApiType type="Class" path="{doc_path}" symbolName="{processed_class.name}" /> {processed_class.name}\n'
-    )
+    api_type = ApiType(ApiTypeKind.CLASS, doc_path, processed_class.name)
+    content.append(f'## {api_type.render()} {processed_class.name}\n')
 
     # Add docstring if available
     if processed_class.docstring:
@@ -192,9 +190,8 @@ def render_attribute(processed_attr: ProcessedAttribute, doc_path: str) -> str:
     content: list[str] = []
 
     # Add heading with embedded ApiType component
-    content.append(
-        f'## <ApiType type="Attribute" path="{doc_path}" symbolName="{processed_attr.name}" /> {processed_attr.name}\n'
-    )
+    api_type = ApiType(ApiTypeKind.ATTRIBUTE, doc_path, processed_attr.name)
+    content.append(f'## {api_type.render()} {processed_attr.name}\n')
 
     # Add type information
     type_str = json.dumps(processed_attr.type_info.to_dict(), cls=EnumEncoder)
@@ -222,9 +219,8 @@ def render_alias(processed_alias: ProcessedAlias, doc_path: str) -> str:
     content: list[str] = []
 
     # Add heading with embedded ApiType component
-    content.append(
-        f'## <ApiType type="Alias" path="{doc_path}" symbolName="{processed_alias.name}" /> {processed_alias.name}\n'
-    )
+    api_type = ApiType(ApiTypeKind.ALIAS, doc_path, processed_alias.name)
+    content.append(f'## {api_type.render()} {processed_alias.name}\n')
     # Add docstring if available
     if processed_alias.docstring:
         content.append(processed_alias.docstring.strip())
