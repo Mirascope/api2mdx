@@ -1,11 +1,6 @@
 # mirascope_v2_llm
 
-<ApiObject
-  path="mirascope_v2_llm.calls.decorator.call"
-  symbolName="call"
-  slug="call"
-  canonicalPath="index"
-/>
+<Directive path="mirascope_v2_llm.calls.decorator.call" />
 
 <ApiObject
   path="mirascope_v2_llm.calls"

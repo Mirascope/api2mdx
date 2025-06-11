@@ -210,8 +210,14 @@ class ApiDocumentation:
             docs_path = page.file_path.replace(".mdx", "")
             
             for directive in page.directives:
-                # Skip if we already have this object (first encounter wins for canonical docs path)
+                # Check if we already have this object
                 if directive.object_path in registry:
+                    # Update canonical docs path if this one is deeper (more specific)
+                    existing_api_object = registry[directive.object_path]
+                    current_depth = 0 if docs_path == "index" else 1 + docs_path.count("/")
+                    existing_depth = 0 if existing_api_object.canonical_docs_path == "index" else 1 + existing_api_object.canonical_docs_path.count("/")
+                    if current_depth > existing_depth:
+                        existing_api_object.canonical_docs_path = docs_path
                     continue
 
                 # Get the symbol name
