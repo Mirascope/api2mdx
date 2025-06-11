@@ -184,6 +184,7 @@ class ApiDocumentation:
 
         self.raw_pages = raw_pages
         self._api_objects_registry = self._build_api_objects_registry()
+        self._build_symbol_registry()
         self.pages = self._build_enriched_pages()
 
     def _build_api_objects_registry(self) -> dict[ObjectPath, ApiObject]:
@@ -259,6 +260,34 @@ class ApiDocumentation:
 
         return registry
 
+    def _build_symbol_registry(self) -> None:
+        """Build a registry mapping symbol names to their canonical API objects.
+        
+        Stores unique symbols in self._symbol_registry and conflicts in self._orphaned_objects.
+        """
+        symbol_registry: dict[str, ApiObject] = {}
+        symbol_conflicts: dict[str, list[ApiObject]] = {}
+        
+        # Collect all symbols and track conflicts
+        for api_object in self._api_objects_registry.values():
+            symbol_name = api_object.symbol_name
+            
+            if symbol_name in symbol_registry:
+                # This is a conflict - move to conflicts tracking
+                if symbol_name not in symbol_conflicts:
+                    # First time seeing this conflict - move the original to conflicts too
+                    symbol_conflicts[symbol_name] = [symbol_registry[symbol_name]]
+                    del symbol_registry[symbol_name]
+                
+                symbol_conflicts[symbol_name].append(api_object)
+            elif symbol_name not in symbol_conflicts:
+                # No conflict yet, add to registry
+                symbol_registry[symbol_name] = api_object
+        
+        # Store results on instance
+        self._symbol_registry = symbol_registry
+        self._overloaded_symbols = symbol_conflicts
+
     def _camel_to_kebab(self, name: str) -> str:
         """Convert camelCase/PascalCase to kebab-case."""
         # Insert hyphens before uppercase letters (except at start)
@@ -309,6 +338,48 @@ class ApiDocumentation:
             enriched_pages.append(enriched_page)
         
         return enriched_pages
+
+    def generate_symbols_debug(self) -> str:
+        """Generate debug output showing all unique symbols in the registry.
+        
+        Returns:
+            Markdown content for _symbols.md file
+        """
+        lines = ["# Symbol Registry", ""]
+        
+        for symbol_name in sorted(self._symbol_registry.keys()):
+            api_object = self._symbol_registry[symbol_name]
+            canonical_file_path = f"{api_object.canonical_docs_path}.mdx"
+            lines.append(f'<SymbolRef name="{symbol_name}" path="{canonical_file_path}" />')
+            lines.append("")
+        
+        return "\n".join(lines)
+
+    def generate_overloaded_debug(self) -> str | None:
+        """Generate debug output showing all overloaded symbols (conflicts).
+        
+        Returns:
+            Markdown content for _overloaded.md file, or None if no overloaded symbols
+        """
+        if not self._overloaded_symbols:
+            return None
+            
+        lines = ["# Overloaded Symbols", ""]
+        lines.append("These symbols appear in multiple objects and cannot be uniquely resolved:")
+        lines.append("")
+        
+        for symbol_name in sorted(self._overloaded_symbols.keys()):
+            conflicting_objects = self._overloaded_symbols[symbol_name]
+            lines.append(f"## {symbol_name}")
+            lines.append("")
+            
+            for api_object in conflicting_objects:
+                canonical_file_path = f"{api_object.canonical_docs_path}.mdx"
+                lines.append(f'<SymbolRef name="{symbol_name}" path="{canonical_file_path}" objectPath="{api_object.object_path}" />')
+            
+            lines.append("")
+        
+        return "\n".join(lines)
 
     def __iter__(self):
         """Allow iteration over pages."""

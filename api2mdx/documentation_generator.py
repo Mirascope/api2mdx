@@ -143,6 +143,19 @@ class DocumentationGenerator:
             with open(directive_file_path, "w") as f:
                 f.write(directive_content)
 
+        # Generate debug files for symbol registry
+        symbols_debug = self.api_documentation.generate_symbols_debug()
+        symbols_file_path = directive_output_path / "_symbols.md"
+        with open(symbols_file_path, "w") as f:
+            f.write(symbols_debug)
+
+        # Generate debug file for overloaded symbols if any exist
+        overloaded_debug = self.api_documentation.generate_overloaded_debug()
+        if overloaded_debug:
+            overloaded_file_path = directive_output_path / "_overloaded.md"
+            with open(overloaded_file_path, "w") as f:
+                f.write(overloaded_debug)
+
         print(
             f"Generated {len(self.api_documentation)} directive files in {directive_output_path}"
         )
