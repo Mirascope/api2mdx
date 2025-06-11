@@ -44,7 +44,7 @@ class DirectiveType(Enum):
 
 
 @dataclass
-class Directive:
+class RawDirective:
     object_path: ObjectPath
     object_type: DirectiveType
 
@@ -57,7 +57,7 @@ class Directive:
 
 
 @dataclass
-class DirectivesPage:
+class RawDirectivesPage:
     """Represents an API directive with its output path and original name.
 
     Attributes:
@@ -67,7 +67,7 @@ class DirectivesPage:
         name: The original name with proper casing (e.g., "Agent" or "agent")
     """
 
-    directives: list[Directive]
+    directives: list[RawDirective]
     directory: str
     slug: Slug
     name: str
@@ -89,7 +89,7 @@ class ApiDocumentation:
     - Symbol-level slug resolution
     """
 
-    def __init__(self, pages: list[DirectivesPage]):
+    def __init__(self, pages: list[RawDirectivesPage]):
         # Validate unique file paths
         file_paths = set()
         for page in pages:
@@ -348,7 +348,7 @@ def _extract_all_exports(module: Module) -> list[str] | None:
     return None
 
 
-def _create_directive_from_member(member: Object | Alias) -> Directive:
+def _create_directive_from_member(member: Object | Alias) -> RawDirective:
     """Create a Directive from a Griffe member object.
 
     Args:
@@ -358,11 +358,11 @@ def _create_directive_from_member(member: Object | Alias) -> Directive:
         Directive object with appropriate type and path
     """
     if isinstance(member, Class):
-        return Directive(ObjectPath(member.canonical_path), DirectiveType.CLASS)
+        return RawDirective(ObjectPath(member.canonical_path), DirectiveType.CLASS)
     elif isinstance(member, Function):
-        return Directive(ObjectPath(member.canonical_path), DirectiveType.FUNCTION)
+        return RawDirective(ObjectPath(member.canonical_path), DirectiveType.FUNCTION)
     elif isinstance(member, Module):
-        return Directive(ObjectPath(member.canonical_path), DirectiveType.MODULE)
+        return RawDirective(ObjectPath(member.canonical_path), DirectiveType.MODULE)
     elif hasattr(member, "target") and getattr(member, "target"):
         # Handle aliases - use the target's type instead of ALIAS
         target = getattr(member, "target")
@@ -374,12 +374,14 @@ def _create_directive_from_member(member: Object | Alias) -> Directive:
             directive_type = DirectiveType.MODULE
         else:
             directive_type = DirectiveType.ALIAS
-        return Directive(ObjectPath(target.canonical_path), directive_type)
+        return RawDirective(ObjectPath(target.canonical_path), directive_type)
     else:
         raise ValueError(f"Unknown directive type: {member.canonical_path}")
 
 
-def discover_module_pages(module: Module, base_path: str = "") -> list[DirectivesPage]:
+def discover_module_pages(
+    module: Module, base_path: str = ""
+) -> list[RawDirectivesPage]:
     """Recursively discover pages for a module and its submodules.
 
     Args:
@@ -398,7 +400,9 @@ def discover_module_pages(module: Module, base_path: str = "") -> list[Directive
         directory = ""
         slug_name = "index"
 
-    module_page = DirectivesPage([], directory, Slug.from_name(slug_name), module.name)
+    module_page = RawDirectivesPage(
+        [], directory, Slug.from_name(slug_name), module.name
+    )
     pages = [module_page]
 
     # Get all exports from this module

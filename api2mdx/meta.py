@@ -9,7 +9,7 @@ import re
 from pathlib import Path
 from typing import Any, Optional
 
-from api2mdx.api_discovery import DirectivesPage
+from api2mdx.api_discovery import RawDirectivesPage
 
 # Constants
 SINGLE_NESTING_LEVEL = 2  # Path with format "parent/child" has 2 parts
@@ -145,7 +145,7 @@ def generate_meta_file_content(section: SectionSpec) -> str:
 
 
 def generate_meta_from_directives(
-    directives: list[DirectivesPage],
+    directives: list[RawDirectivesPage],
     weight: Optional[float],  # Default weight for API sections
 ) -> SectionSpec:
     """Generate a SectionSpec from API directives.

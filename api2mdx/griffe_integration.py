@@ -28,7 +28,7 @@ from api2mdx.doclinks import UpdateDocstringsExtension
 from api2mdx.mdx_renderer import (
     render_object,
 )
-from api2mdx.api_discovery import Directive
+from api2mdx.api_discovery import RawDirective
 from api2mdx.models import (
     process_object,
 )
@@ -86,7 +86,7 @@ def document_object(obj: Object | Alias, doc_path: str) -> str:
     return render_object(processed_obj, doc_path)
 
 
-def render_directive(directive: Directive, module: Module, doc_path: str) -> str:
+def render_directive(directive: RawDirective, module: Module, doc_path: str) -> str:
     """Process an API directive and generate documentation.
 
     Args:
