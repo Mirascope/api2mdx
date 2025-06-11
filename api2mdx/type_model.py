@@ -68,6 +68,8 @@ class SimpleType(BaseTypeInfo):
     kind: TypeKind = field(default=TypeKind.SIMPLE)
     # Documentation identifier for this type, used for post-processing to URLs
     doc_identifier: str | None = None
+    # Canonical URL for this type, resolved from ApiDocumentation registry
+    url: str | None = None
 
 
 @dataclass
@@ -80,6 +82,8 @@ class GenericType(BaseTypeInfo):
     base_type: SimpleType = field(default_factory=lambda: SimpleType(type_str=""))
     # Type parameters (can be any TypeInfo)
     parameters: list["TypeInfo"] = field(default_factory=list)
+    # Canonical URL for this type, resolved from ApiDocumentation registry
+    url: str | None = None
 
 
 # Define the TypeInfo union type

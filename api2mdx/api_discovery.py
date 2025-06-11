@@ -12,6 +12,10 @@ from typing import NewType
 from griffe import Alias, Attribute, Class, Function, Module, Object
 
 
+# Default API documentation root path
+DEFAULT_API_ROOT = "/docs/api"
+
+
 # Type aliases for better type safety
 ObjectPath = NewType("ObjectPath", str)
 """Canonical path to a Python object (e.g., 'mirascope_v2_llm.calls.decorator.call')"""
@@ -175,7 +179,7 @@ class ApiDocumentation:
     - Canonical docs path mapping for cross-references
     """
 
-    def __init__(self, raw_pages: list[RawDirectivesPage]):
+    def __init__(self, raw_pages: list[RawDirectivesPage], api_root: str = DEFAULT_API_ROOT):
         # Validate unique file paths
         file_paths = set()
         for page in raw_pages:
@@ -184,6 +188,7 @@ class ApiDocumentation:
             file_paths.add(page.file_path)
 
         self.raw_pages = raw_pages
+        self.api_root = api_root
         self._api_objects_registry = self._build_api_objects_registry()
         self._build_symbol_registry()
         self.pages = self._build_enriched_pages()
@@ -392,7 +397,7 @@ class ApiDocumentation:
         return len(self.pages)
 
     @classmethod
-    def from_module(cls, module: Module) -> "ApiDocumentation":
+    def from_module(cls, module: Module, api_root: str = DEFAULT_API_ROOT) -> "ApiDocumentation":
         """Discover API directives with hierarchical organization.
 
         This creates a structure like:
@@ -402,6 +407,7 @@ class ApiDocumentation:
 
         Args:
             module: The loaded Griffe module to analyze
+            api_root: The root path for API documentation URLs
 
         Returns:
             ApiDocumentation object containing all pages with symbol registry
@@ -409,7 +415,7 @@ class ApiDocumentation:
         # Use the new recursive discovery function
         pages = discover_module_pages(module)
 
-        return cls(pages)
+        return cls(pages, api_root)
 
 
 def _resolve_member(module: Module, name: str) -> Object | Alias:

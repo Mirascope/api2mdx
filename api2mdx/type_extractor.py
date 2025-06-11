@@ -19,6 +19,7 @@ from griffe import (
     Object,
 )
 
+from .api_discovery import ApiDocumentation
 from .parser import parse_type_string
 from .type_model import ParameterInfo, ReturnInfo, SimpleType, TypeInfo
 
@@ -31,6 +32,23 @@ logger = logging.getLogger(__name__)
 
 # Generic helper for type safety
 T = TypeVar("T", bound=DocstringSection)
+
+
+def resolve_symbol_url(symbol_name: str, api_docs: ApiDocumentation) -> str | None:
+    """Resolve a symbol name to its canonical documentation URL.
+    
+    Args:
+        symbol_name: The symbol name to resolve (e.g., "Response", "AsyncCall")
+        api_docs: The ApiDocumentation registry containing symbol mappings
+        
+    Returns:
+        Canonical URL if symbol is found in registry, None otherwise
+    """
+    if symbol_name in api_docs._symbol_registry:
+        api_object = api_docs._symbol_registry[symbol_name]
+        return f"{api_docs.api_root}/{api_object.canonical_docs_path}#{api_object.canonical_slug}"
+    
+    return None
 
 
 def find_docstring_section(
