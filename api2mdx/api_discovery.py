@@ -111,7 +111,7 @@ class Directive:
     
     def render(self) -> str:
         """Render directive as JSX-like component for debugging."""
-        return f'<Directive\n  path="{self.object_path}"\n  slug="{self.slug}"\n  canonicalPath="{self.canonical_docs_path}"\n/>'
+        return f'<Directive\n  path="{self.object_path}"\n  symbolName="{self.symbol_name()}"\n  slug="{self.slug}"\n  canonicalPath="{self.canonical_docs_path}"\n/>'
 
 
 @dataclass
