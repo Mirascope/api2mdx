@@ -86,10 +86,11 @@ class RawDirectivesPage:
 
 @dataclass
 class Directive:
-    """Enriched directive with computed slug."""
+    """Enriched directive with computed slug and canonical docs path."""
     
     raw_directive: RawDirective
     slug: Slug
+    canonical_docs_path: str
     
     @property
     def object_path(self) -> ObjectPath:
@@ -110,7 +111,7 @@ class Directive:
     
     def render(self) -> str:
         """Render directive as JSX-like component for debugging."""
-        return f'<Directive\n  path="{self.object_path}"\n  slug="{self.slug}"\n/>'
+        return f'<Directive\n  path="{self.object_path}"\n  slug="{self.slug}"\n  canonicalPath="{self.canonical_docs_path}"\n/>'
 
 
 @dataclass
@@ -148,6 +149,7 @@ class ApiDocumentation:
     - Global symbol registry for conflict resolution
     - Canonical vs alias assignment
     - Symbol-level slug resolution
+    - Canonical docs path mapping for cross-references
     """
 
     def __init__(self, raw_pages: list[RawDirectivesPage]):
@@ -160,6 +162,7 @@ class ApiDocumentation:
 
         self.raw_pages = raw_pages
         self._symbol_registry = self._build_symbol_registry()
+        self._canonical_docs_registry = self._build_canonical_docs_registry()
         self.pages = self._build_enriched_pages()
 
     def _build_symbol_registry(self) -> dict[ObjectPath, str]:
@@ -218,6 +221,27 @@ class ApiDocumentation:
 
         return registry
 
+    def _build_canonical_docs_registry(self) -> dict[ObjectPath, str]:
+        """Build a registry mapping object paths to their canonical docs locations.
+        
+        Uses first encounter as canonical location for cross-references.
+        
+        Returns:
+            Dictionary mapping ObjectPath -> canonical_docs_path (e.g., "calls/decorator")
+        """
+        registry: dict[ObjectPath, str] = {}
+        
+        for page in self.raw_pages:
+            # Get docs path without .mdx extension
+            docs_path = page.file_path.replace(".mdx", "")
+            
+            for directive in page.directives:
+                # Only record first encounter as canonical
+                if directive.object_path not in registry:
+                    registry[directive.object_path] = docs_path
+        
+        return registry
+
     def _camel_to_kebab(self, name: str) -> str:
         """Convert camelCase/PascalCase to kebab-case."""
         # Insert hyphens before uppercase letters (except at start)
@@ -236,6 +260,17 @@ class ApiDocumentation:
         slug_str = self._symbol_registry.get(canonical_path, str(canonical_path))
         return Slug(slug_str)
 
+    def get_canonical_docs_path(self, canonical_path: ObjectPath) -> str:
+        """Get the canonical docs path for a given object path.
+
+        Args:
+            canonical_path: The canonical object path (e.g., "mirascope_v2_llm.calls.decorator.call")
+
+        Returns:
+            The canonical docs path where this symbol should be linked (e.g., "calls/decorator" or "index")
+        """
+        return self._canonical_docs_registry.get(canonical_path, "index")
+
     def _build_enriched_pages(self) -> list[DirectivesPage]:
         """Build enriched pages with computed slugs.
         
@@ -251,10 +286,14 @@ class ApiDocumentation:
                 # Get the computed slug for this directive
                 slug = self.get_canonical_slug(raw_directive.object_path)
                 
+                # Get the canonical docs path for this directive
+                canonical_docs_path = self.get_canonical_docs_path(raw_directive.object_path)
+                
                 # Create enriched directive
                 enriched_directive = Directive(
                     raw_directive=raw_directive,
-                    slug=slug
+                    slug=slug,
+                    canonical_docs_path=canonical_docs_path
                 )
                 enriched_directives.append(enriched_directive)
             

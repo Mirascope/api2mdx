@@ -3,19 +3,23 @@
 <Directive
   path="mirascope_v2_llm.calls.decorator.call"
   slug="call_fn"
+  canonicalPath="index"
 />
 
 <Directive
   path="mirascope_v2_llm.calls"
   slug="calls"
+  canonicalPath="index"
 />
 
 <Directive
   path="mirascope_v2_llm.agents.decorator.agent"
   slug="agent"
+  canonicalPath="index"
 />
 
 <Directive
   path="mirascope_v2_llm.agents.agent.Agent"
   slug="agent_cls"
+  canonicalPath="index"
 />
