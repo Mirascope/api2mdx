@@ -50,7 +50,7 @@ class Directive:
 
     def __str__(self) -> str:
         return f"::: {self.object_path}  # {self.object_type.value}"
-    
+
     def format_with_slug(self, slug: str) -> str:
         """Format directive with slug for debugging/inspection."""
         return f"::: {self.object_path}  # {self.object_type.value} -> {slug}"
@@ -71,7 +71,7 @@ class DirectivesPage:
     directory: str
     slug: Slug
     name: str
-    
+
     @property
     def file_path(self) -> str:
         """Get the full file path with .mdx extension."""
@@ -96,7 +96,7 @@ class ApiDocumentation:
             if page.file_path in file_paths:
                 raise ValueError(f"Duplicate file path: {page.file_path}")
             file_paths.add(page.file_path)
-        
+
         self.pages = pages
         self._symbol_registry = self._build_symbol_registry()
 
@@ -104,7 +104,7 @@ class ApiDocumentation:
         """Build a registry mapping canonical paths to canonical slugs.
 
         Uses conflict resolution to ensure unique slugs:
-        1. Try the symbol name as slug  
+        1. Try the symbol name as slug
         2. If taken, try symbol_name + "_" + type_suffix
         3. If still taken, append _1, _2, etc.
 
@@ -113,37 +113,37 @@ class ApiDocumentation:
         """
         registry: dict[ObjectPath, str] = {}
         used_slugs: dict[str, ObjectPath] = {}
-        
+
         # Type suffix mappings for disambiguation
         type_suffixes = {
             DirectiveType.FUNCTION: "fn",
-            DirectiveType.CLASS: "cls", 
+            DirectiveType.CLASS: "cls",
             DirectiveType.MODULE: "mod",
-            DirectiveType.ALIAS: "alias"
+            DirectiveType.ALIAS: "alias",
         }
-        
+
         for page in self.pages:
             for directive in page.directives:
                 # Get the symbol name (last part of path)
                 symbol_name = directive.object_path.split(".")[-1]
                 # Convert camelCase/PascalCase to kebab-case for readability
                 base_slug = self._camel_to_kebab(symbol_name)
-                
+
                 # Try the base slug first
                 if base_slug not in used_slugs:
                     registry[directive.object_path] = base_slug
                     used_slugs[base_slug] = directive.object_path
                     continue
-                
+
                 # Try with type suffix
                 type_suffix = type_suffixes.get(directive.object_type, "unknown")
                 typed_slug = f"{base_slug}_{type_suffix}"
-                
+
                 if typed_slug not in used_slugs:
                     registry[directive.object_path] = typed_slug
                     used_slugs[typed_slug] = directive.object_path
                     continue
-                
+
                 # Try with numbered suffix
                 counter = 1
                 while True:
@@ -153,13 +153,13 @@ class ApiDocumentation:
                         used_slugs[numbered_slug] = directive.object_path
                         break
                     counter += 1
-        
+
         return registry
 
     def _camel_to_kebab(self, name: str) -> str:
         """Convert camelCase/PascalCase to kebab-case."""
         # Insert hyphens before uppercase letters (except at start)
-        result = re.sub(r'(?<!^)(?=[A-Z])', '-', name)
+        result = re.sub(r"(?<!^)(?=[A-Z])", "-", name)
         return result.lower()
 
     def get_canonical_slug(self, canonical_path: ObjectPath) -> Slug:
@@ -181,7 +181,7 @@ class ApiDocumentation:
     def __len__(self):
         """Return number of pages."""
         return len(self.pages)
-    
+
     @classmethod
     def from_module(cls, module: Module) -> "ApiDocumentation":
         """Discover API directives with hierarchical organization.
@@ -397,7 +397,7 @@ def discover_module_pages(module: Module, base_path: str = "") -> list[Directive
     else:
         directory = ""
         slug_name = "index"
-    
+
     module_page = DirectivesPage([], directory, Slug.from_name(slug_name), module.name)
     pages = [module_page]
 
@@ -429,7 +429,3 @@ def discover_module_pages(module: Module, base_path: str = "") -> list[Directive
         module_page.directives.append(directive)
 
     return pages
-
-
-
-

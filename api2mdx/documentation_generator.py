@@ -128,13 +128,15 @@ class DocumentationGenerator:
 
         for api_directive in self.api_documentation:
             directive_content = f"# {api_directive.name}\n\n" + "\n\n".join(
-                directive.format_with_slug(self.api_documentation.get_canonical_slug(directive.object_path))
+                directive.format_with_slug(
+                    self.api_documentation.get_canonical_slug(directive.object_path)
+                )
                 for directive in api_directive.directives
             )
 
             # Write to .md file in directive output directory
-            directive_file_path = directive_output_path / api_directive.file_path.replace(
-                ".mdx", ".md"
+            directive_file_path = (
+                directive_output_path / api_directive.file_path.replace(".mdx", ".md")
             )
             directive_file_path.parent.mkdir(parents=True, exist_ok=True)
 
@@ -237,7 +239,9 @@ class DocumentationGenerator:
                 "API directives must be discovered before generating metadata"
             )
 
-        api_section = generate_meta_from_directives(self.api_documentation.pages, weight=None)
+        api_section = generate_meta_from_directives(
+            self.api_documentation.pages, weight=None
+        )
         content = generate_meta_file_content(api_section)
 
         # Write to file
