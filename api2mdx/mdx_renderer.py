@@ -5,8 +5,6 @@ for documentation websites. It focuses purely on the rendering aspect, working
 with pre-processed data models rather than directly with Griffe objects.
 """
 
-import json
-
 from api2mdx.models import (
     ProcessedAlias,
     ProcessedAttribute,
@@ -15,8 +13,14 @@ from api2mdx.models import (
     ProcessedModule,
     ProcessedObject,
 )
-from api2mdx.type_model import EnumEncoder, ParameterInfo
-from api2mdx.mdx_components import ApiType, ApiTypeKind
+from api2mdx.mdx_components import (
+    ApiType,
+    ApiTypeKind,
+    TypeLink,
+    ParametersTable,
+    ReturnTable,
+    AttributesTable,
+)
 
 
 def render_object(processed_obj: ProcessedObject, doc_path: str) -> str:
@@ -77,7 +81,7 @@ def render_module(processed_module: ProcessedModule, doc_path: str) -> str:
 
     # Add heading with embedded ApiType component
     api_type = ApiType(ApiTypeKind.MODULE, doc_path, module_name)
-    content.append(f'## {api_type.render()} {module_name}\n')
+    content.append(f"## {api_type.render()} {module_name}\n")
 
     # Add docstring if available
     if processed_module.docstring:
@@ -107,7 +111,7 @@ def render_function(processed_func: ProcessedFunction, doc_path: str) -> str:
 
     # Add heading with embedded ApiType component
     api_type = ApiType(ApiTypeKind.FUNCTION, doc_path, processed_func.name)
-    content.append(f'## {api_type.render()} {processed_func.name}\n')
+    content.append(f"## {api_type.render()} {processed_func.name}\n")
 
     # Add docstring if available
     if processed_func.docstring:
@@ -116,11 +120,13 @@ def render_function(processed_func: ProcessedFunction, doc_path: str) -> str:
 
     # Add parameters table if available
     if processed_func.parameters:
-        content.extend(format_parameters_table(processed_func.parameters))
+        params_table = ParametersTable(processed_func.parameters)
+        content.append(params_table.render())
 
     # Add return type if available
     if processed_func.return_info:
-        content.extend(format_return_type_component(processed_func.return_info))
+        return_table = ReturnTable(processed_func.return_info)
+        content.append(return_table.render())
 
     return "\n".join(content)
 
@@ -140,7 +146,7 @@ def render_class(processed_class: ProcessedClass, doc_path: str) -> str:
 
     # Add heading with embedded ApiType component
     api_type = ApiType(ApiTypeKind.CLASS, doc_path, processed_class.name)
-    content.append(f'## {api_type.render()} {processed_class.name}\n')
+    content.append(f"## {api_type.render()} {processed_class.name}\n")
 
     # Add docstring if available
     if processed_class.docstring:
@@ -152,9 +158,8 @@ def render_class(processed_class: ProcessedClass, doc_path: str) -> str:
         content.append("**Bases:** ")
         base_links = []
         for base_type in processed_class.bases:
-            # Convert the TypeInfo to JSON for TypeLink
-            base_type_json = json.dumps(base_type.to_dict(), cls=EnumEncoder)
-            base_links.append(f"<TypeLink type={{{base_type_json}}} />")
+            type_link = TypeLink(base_type)
+            base_links.append(type_link.render())
         content.append(", ".join(base_links) + "\n")
 
     # Collect all attributes for the attributes table
@@ -165,7 +170,8 @@ def render_class(processed_class: ProcessedClass, doc_path: str) -> str:
 
     # Document attributes using AttributesTable component if there are any
     if attributes:
-        content.extend(format_attributes_table(attributes))
+        attrs_table = AttributesTable(attributes)
+        content.append(attrs_table.render())
 
     # Render other members in order (except attributes which are in the table)
     for member in processed_class.members:
@@ -191,11 +197,11 @@ def render_attribute(processed_attr: ProcessedAttribute, doc_path: str) -> str:
 
     # Add heading with embedded ApiType component
     api_type = ApiType(ApiTypeKind.ATTRIBUTE, doc_path, processed_attr.name)
-    content.append(f'## {api_type.render()} {processed_attr.name}\n')
+    content.append(f"## {api_type.render()} {processed_attr.name}\n")
 
     # Add type information
-    type_str = json.dumps(processed_attr.type_info.to_dict(), cls=EnumEncoder)
-    content.append(f"**Type:** <TypeLink type={{{type_str}}} />\n")
+    type_link = TypeLink(processed_attr.type_info)
+    content.append(f"**Type:** {type_link.render()}\n")
 
     # Add description if available
     if processed_attr.description:
@@ -220,7 +226,7 @@ def render_alias(processed_alias: ProcessedAlias, doc_path: str) -> str:
 
     # Add heading with embedded ApiType component
     api_type = ApiType(ApiTypeKind.ALIAS, doc_path, processed_alias.name)
-    content.append(f'## {api_type.render()} {processed_alias.name}\n')
+    content.append(f"## {api_type.render()} {processed_alias.name}\n")
     # Add docstring if available
     if processed_alias.docstring:
         content.append(processed_alias.docstring.strip())
@@ -228,121 +234,16 @@ def render_alias(processed_alias: ProcessedAlias, doc_path: str) -> str:
 
     # Add parameters table if available
     if processed_alias.parameters:
-        content.extend(format_parameters_table(processed_alias.parameters))
+        params_table = ParametersTable(processed_alias.parameters)
+        content.append(params_table.render())
 
     # Add return type if available
     if processed_alias.return_info:
-        content.extend(format_return_type_component(processed_alias.return_info))
+        return_table = ReturnTable(processed_alias.return_info)
+        content.append(return_table.render())
 
     # Add what this is an alias to, if target path is available
     if processed_alias.target_path:
         content.append(f"\n**Alias to:** `{processed_alias.target_path}`")
 
     return "\n".join(content)
-
-
-def format_return_type_component(return_info) -> list[str]:
-    """Format a ReturnTable component from return type information.
-
-    Args:
-        return_info: The return type information
-
-    Returns:
-        List of strings representing the ReturnTable component
-
-    """
-    component_lines = []
-
-    type_info = return_info.type_info
-    description = return_info.description
-    name = getattr(return_info, "name", None)
-
-    # Create a return type dictionary with the full type_info object
-    return_dict: dict[str, object] = {
-        "type_info": type_info.to_dict(),
-    }
-
-    if description:
-        return_dict["description"] = description
-
-    if name:
-        return_dict["name"] = name
-
-    # Convert to JSON format with proper indentation
-    return_json = json.dumps(return_dict, indent=2, cls=EnumEncoder)
-
-    # Format the component with proper line breaks and proper JSX syntax
-    component_lines.append("<ReturnTable")
-    component_lines.append(f"  returnType={{{return_json}}}")
-    component_lines.append("/>\n")
-
-    return component_lines
-
-
-def format_parameters_table(params: list[ParameterInfo]) -> list[str]:
-    """Format a ParametersTable component from parameter information.
-
-    Args:
-        params: List of parameter information objects
-
-    Returns:
-        List of strings representing the ParametersTable component
-
-    """
-    component_lines = []
-
-    # Convert parameters to dictionaries inline
-    param_dicts = []
-    for param in params:
-        param_dict: dict[str, object] = {"name": param.name}
-        if param.type_info:
-            param_dict["type_info"] = param.type_info.to_dict()
-        if param.default:
-            param_dict["default"] = param.default
-        if param.description:
-            param_dict["description"] = param.description
-        param_dicts.append(param_dict)
-
-    # Convert to JSON format with proper indentation
-    params_json = json.dumps(param_dicts, indent=2, cls=EnumEncoder)
-
-    # Format the component with proper line breaks and proper JSX syntax
-    component_lines.append("<ParametersTable")
-    component_lines.append(f"  parameters={{{params_json}}}")
-    component_lines.append("/>\n")
-
-    return component_lines
-
-
-def format_attributes_table(attrs: list[ProcessedAttribute]) -> list[str]:
-    """Format an AttributesTable component from attribute information.
-
-    Args:
-        attrs: List of ProcessedAttribute objects
-
-    Returns:
-        List of strings representing the AttributesTable component
-
-    """
-    component_lines = []
-
-    # Convert attributes to dictionaries inline
-    attr_dicts = []
-    for attr in attrs:
-        attr_dict: dict[str, object] = {
-            "name": attr.name,
-            "type_info": attr.type_info.to_dict(),  # Using the full type_info object
-        }
-        if attr.description:
-            attr_dict["description"] = attr.description
-        attr_dicts.append(attr_dict)
-
-    # Convert to JSON format with proper indentation
-    attrs_json = json.dumps(attr_dicts, indent=2, cls=EnumEncoder)
-
-    # Format the component with proper line breaks and proper JSX syntax
-    component_lines.append("<AttributesTable")
-    component_lines.append(f"  attributes={{{attrs_json}}}")
-    component_lines.append("/>\n")
-
-    return component_lines
