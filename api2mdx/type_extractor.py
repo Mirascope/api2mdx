@@ -21,7 +21,7 @@ from griffe import (
 
 from .api_discovery import ApiDocumentation
 from .parser import parse_type_string
-from .type_model import ParameterInfo, ReturnInfo, SimpleType, TypeInfo
+from .type_model import GenericType, ParameterInfo, ReturnInfo, SimpleType, TypeInfo
 
 # Configure logging
 logging.basicConfig(
@@ -49,6 +49,29 @@ def resolve_symbol_url(symbol_name: str, api_docs: ApiDocumentation) -> str | No
         return f"{api_docs.api_root}/{api_object.canonical_docs_path}#{api_object.canonical_slug}"
     
     return None
+
+
+def _resolve_url_for_type_info(type_info: TypeInfo, api_docs: ApiDocumentation) -> None:
+    """Recursively resolve URLs for a TypeInfo object and all its nested types.
+    
+    This modifies the TypeInfo objects in-place by setting their url field.
+    
+    Args:
+        type_info: The TypeInfo object to resolve URLs for
+        api_docs: The ApiDocumentation registry containing symbol mappings
+    """
+    if isinstance(type_info, SimpleType):
+        if type_info.doc_identifier:
+            type_info.url = resolve_symbol_url(type_info.doc_identifier, api_docs)
+    elif isinstance(type_info, GenericType):
+        # Resolve URL for the base type
+        if type_info.base_type.doc_identifier:
+            type_info.base_type.url = resolve_symbol_url(type_info.base_type.doc_identifier, api_docs)
+        
+        # Recursively resolve URLs for all parameters
+        for param in type_info.parameters:
+            _resolve_url_for_type_info(param, api_docs)
+        
 
 
 def find_docstring_section(
@@ -79,7 +102,7 @@ def find_docstring_section(
     return None
 
 
-def extract_function_parameters(obj: Function) -> list[ParameterInfo]:
+def extract_function_parameters(obj: Function, api_docs: ApiDocumentation) -> list[ParameterInfo]:
     """Extract parameter information directly from a Function object's parameters.
 
     Args:
@@ -105,6 +128,8 @@ def extract_function_parameters(obj: Function) -> list[ParameterInfo]:
         if hasattr(param, "annotation") and param.annotation:
             type_str = str(param.annotation)
             type_info = parse_type_string(type_str)
+            # Resolve URL for the type
+            _resolve_url_for_type_info(type_info, api_docs)
         else:
             type_info = SimpleType(type_str="Any")
 
@@ -128,7 +153,7 @@ def extract_function_parameters(obj: Function) -> list[ParameterInfo]:
     return params
 
 
-def extract_parameters_from_docstring(obj: Object | Alias) -> list[ParameterInfo]:
+def extract_parameters_from_docstring(obj: Object | Alias, api_docs: ApiDocumentation) -> list[ParameterInfo]:
     """Extract parameter information from a Griffe object's docstring.
 
     Args:
@@ -161,6 +186,8 @@ def extract_parameters_from_docstring(obj: Object | Alias) -> list[ParameterInfo
         if hasattr(param_item, "annotation") and param_item.annotation:
             type_str = str(param_item.annotation)
             type_info = parse_type_string(type_str)
+            # Resolve URL for the type
+            _resolve_url_for_type_info(type_info, api_docs)
         else:
             type_info = SimpleType(type_str="Any")
 
@@ -189,7 +216,7 @@ def extract_parameters_from_docstring(obj: Object | Alias) -> list[ParameterInfo
     return params
 
 
-def extract_return_info_from_docstring(obj: Object | Alias) -> ReturnInfo | None:
+def extract_return_info_from_docstring(obj: Object | Alias, api_docs: ApiDocumentation) -> ReturnInfo | None:
     """Extract return type information from a Griffe object's docstring.
 
     Args:
@@ -205,10 +232,10 @@ def extract_return_info_from_docstring(obj: Object | Alias) -> ReturnInfo | None
     if not returns_section:
         return None
 
-    return process_returns_section(returns_section)
+    return process_returns_section(returns_section, api_docs)
 
 
-def process_returns_section(section: DocstringSectionReturns) -> ReturnInfo | None:
+def process_returns_section(section: DocstringSectionReturns, api_docs: ApiDocumentation) -> ReturnInfo | None:
     """Process a returns section to extract type information.
 
     Args:
@@ -262,12 +289,15 @@ def process_returns_section(section: DocstringSectionReturns) -> ReturnInfo | No
 
     # Parse the type string
     type_info = parse_type_string(type_str)
+    
+    # Resolve URL for the type
+    _resolve_url_for_type_info(type_info, api_docs)
 
     # Create and return the return info
     return ReturnInfo(type_info=type_info, description=description)
 
 
-def extract_function_return_info(obj: Function) -> ReturnInfo | None:
+def extract_function_return_info(obj: Function, api_docs: ApiDocumentation) -> ReturnInfo | None:
     """Extract return type information directly from a Function object.
 
     Args:
@@ -282,6 +312,9 @@ def extract_function_return_info(obj: Function) -> ReturnInfo | None:
         # Extract return type
         type_str = str(obj.returns)
         type_info = parse_type_string(type_str)
+        
+        # Resolve URL for the type
+        _resolve_url_for_type_info(type_info, api_docs)
 
         # Create and return ReturnInfo (no description available from direct extraction)
         return ReturnInfo(type_info=type_info, description=None)
@@ -289,7 +322,7 @@ def extract_function_return_info(obj: Function) -> ReturnInfo | None:
     return None
 
 
-def extract_alias_return_info(obj: Alias) -> ReturnInfo | None:
+def extract_alias_return_info(obj: Alias, api_docs: ApiDocumentation) -> ReturnInfo | None:
     """Extract return type information from an Alias object.
 
     Args:
@@ -309,6 +342,9 @@ def extract_alias_return_info(obj: Alias) -> ReturnInfo | None:
             # Get type from target's annotation
             type_str = str(annotation)
             type_info = parse_type_string(type_str)
+            
+            # Resolve URL for the type
+            _resolve_url_for_type_info(type_info, api_docs)
 
             # Create and return ReturnInfo
             return ReturnInfo(type_info=type_info, description=None)
@@ -353,6 +389,7 @@ def extract_attribute_type_info(attr: Attribute) -> TypeInfo:
 
 def extract_type_info(
     obj: Object | Alias,
+    api_docs: ApiDocumentation,
 ) -> tuple[list[ParameterInfo], ReturnInfo | None]:
     """Extract both parameter and return type information from a Griffe object.
 
@@ -364,12 +401,12 @@ def extract_type_info(
 
     """
     # Extract parameters, preferring direct function parameters if available
-    docstring_params = extract_parameters_from_docstring(obj)
+    docstring_params = extract_parameters_from_docstring(obj, api_docs)
     parameters = docstring_params
 
     # If the object is a Function, try to get parameters directly
     if isinstance(obj, Function):
-        function_params = extract_function_parameters(obj)
+        function_params = extract_function_parameters(obj, api_docs)
 
         # Use direct function parameters if available
         if function_params:
@@ -388,18 +425,18 @@ def extract_type_info(
             parameters = function_params
 
     # Extract return info, preferring direct return info if available
-    return_info = extract_return_info_from_docstring(obj)
+    return_info = extract_return_info_from_docstring(obj, api_docs)
 
     # If return info not found in docstring, try from object directly
     if not return_info:
         if isinstance(obj, Function):
             # Try to get return info from Function
-            function_return = extract_function_return_info(obj)
+            function_return = extract_function_return_info(obj, api_docs)
             if function_return:
                 return_info = function_return
         elif isinstance(obj, Alias):
             # Try to get return info from Alias
-            alias_return = extract_alias_return_info(obj)
+            alias_return = extract_alias_return_info(obj, api_docs)
             if alias_return:
                 return_info = alias_return
 

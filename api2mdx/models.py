@@ -23,6 +23,11 @@ from api2mdx.parser import parse_type_string
 from api2mdx.type_extractor import extract_attribute_type_info, extract_type_info
 from api2mdx.type_model import ParameterInfo, ReturnInfo, SimpleType, TypeInfo
 
+# Forward declaration for type hints
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from api2mdx.api_discovery import ApiDocumentation
+
 # Configure logging
 logging.basicConfig(
     level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
@@ -183,7 +188,7 @@ ProcessedObject = (
 )
 
 
-def process_function(func_obj: Function) -> ProcessedFunction:
+def process_function(func_obj: Function, api_docs: "ApiDocumentation") -> ProcessedFunction:
     """Process a Function object into a ProcessedFunction model.
 
     Args:
@@ -204,7 +209,7 @@ def process_function(func_obj: Function) -> ProcessedFunction:
     docstring = extract_clean_docstring(func_obj)
 
     # Extract parameters and return type
-    params, return_info = extract_type_info(func_obj)
+    params, return_info = extract_type_info(func_obj, api_docs)
 
     # Create and return the processed function
     return ProcessedFunction(
@@ -216,7 +221,7 @@ def process_function(func_obj: Function) -> ProcessedFunction:
     )
 
 
-def process_class(class_obj: Class) -> ProcessedClass:
+def process_class(class_obj: Class, api_docs: "ApiDocumentation") -> ProcessedClass:
     """Process a Class object into a ProcessedClass model.
 
     Args:
@@ -243,6 +248,9 @@ def process_class(class_obj: Class) -> ProcessedClass:
             base_str = str(base)
             try:
                 base_type_info = parse_type_string(base_str)
+                # Resolve URL for the base type
+                from api2mdx.type_extractor import _resolve_url_for_type_info
+                _resolve_url_for_type_info(base_type_info, api_docs)
                 bases.append(base_type_info)
             except Exception as e:
                 logger.warning(
@@ -259,7 +267,7 @@ def process_class(class_obj: Class) -> ProcessedClass:
             if member_name.startswith("_"):
                 continue
 
-            processed_obj = process_object(member)
+            processed_obj = process_object(member, api_docs)
             if isinstance(processed_obj, ProcessedAlias):
                 continue  # Don't document aliases on classes
             if processed_obj is not None:
@@ -275,14 +283,14 @@ def process_class(class_obj: Class) -> ProcessedClass:
     )
 
 
-def process_attribute(obj: Attribute) -> ProcessedAttribute:
+def process_attribute(obj: Attribute, api_docs: "ApiDocumentation") -> ProcessedAttribute:
     name = getattr(obj, "name", "")
     type_info = extract_attribute_type_info(obj)
     descr = extract_clean_docstring(obj)
     return ProcessedAttribute(name=name, type_info=type_info, description=descr)
 
 
-def process_object(obj: Object | Alias) -> ProcessedObject | None:
+def process_object(obj: Object | Alias, api_docs: "ApiDocumentation") -> ProcessedObject | None:
     """Process a Griffe object into the appropriate processed model.
 
     Args:
@@ -294,24 +302,24 @@ def process_object(obj: Object | Alias) -> ProcessedObject | None:
 
     """
     if isinstance(obj, Class):
-        return process_class(obj)
+        return process_class(obj, api_docs)
     elif isinstance(obj, Function):
-        return process_function(obj)
+        return process_function(obj, api_docs)
     elif isinstance(obj, Attribute):
-        return process_attribute(obj)
+        return process_attribute(obj, api_docs)
     elif isinstance(obj, Alias):
         try:
-            return process_alias(obj)
+            return process_alias(obj, api_docs)
         except AliasResolutionError as e:
             logger.warning(e)
             return None
     elif isinstance(obj, Module):
-        return process_module(obj)
+        return process_module(obj, api_docs)
     else:
         raise ValueError("Unexpected object", obj)
 
 
-def process_module(module_obj: Module) -> ProcessedModule:
+def process_module(module_obj: Module, api_docs: "ApiDocumentation") -> ProcessedModule:
     """Process a Module object into a ProcessedModule model.
 
     Args:
@@ -352,7 +360,7 @@ def process_module(module_obj: Module) -> ProcessedModule:
             for member_name in module_all:
                 if member_name in module_obj.members:
                     member = module_obj.members[member_name]
-                    processed_obj = process_object(member)
+                    processed_obj = process_object(member, api_docs)
                     if processed_obj is not None:
                         processed_members.append(processed_obj)
                 else:
@@ -366,7 +374,7 @@ def process_module(module_obj: Module) -> ProcessedModule:
                 if member_name.startswith("_"):
                     continue
 
-                processed_obj = process_object(member)
+                processed_obj = process_object(member, api_docs)
                 if isinstance(processed_obj, ProcessedAlias):
                     continue
                 if processed_obj is not None:
@@ -381,7 +389,7 @@ def process_module(module_obj: Module) -> ProcessedModule:
     )
 
 
-def process_alias(alias_obj: Alias) -> ProcessedAlias:
+def process_alias(alias_obj: Alias, api_docs: "ApiDocumentation") -> ProcessedAlias:
     """Process an Alias object into a ProcessedAlias model.
 
     Args:
@@ -402,7 +410,7 @@ def process_alias(alias_obj: Alias) -> ProcessedAlias:
     docstring = extract_clean_docstring(alias_obj)
 
     # Extract parameters and return type
-    params, return_info = extract_type_info(alias_obj)
+    params, return_info = extract_type_info(alias_obj, api_docs)
 
     # Extract target path
     target_path = ""

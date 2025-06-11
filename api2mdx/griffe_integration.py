@@ -29,6 +29,12 @@ from api2mdx.mdx_renderer import (
     render_object,
 )
 from api2mdx.api_discovery import RawDirective
+
+# Forward declaration for type hints
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from api2mdx.api_discovery import ApiDocumentation
+
 from api2mdx.models import (
     process_object,
 )
@@ -67,7 +73,7 @@ def get_loader(
     return loader
 
 
-def document_object(obj: Object | Alias, doc_path: str) -> str:
+def document_object(obj: Object | Alias, doc_path: str, api_docs: "ApiDocumentation") -> str:
     """Generate documentation for any supported Griffe object type.
 
     Args:
@@ -79,14 +85,14 @@ def document_object(obj: Object | Alias, doc_path: str) -> str:
 
     """
     # Process all objects the same way - modules get their own dedicated pages
-    processed_obj = process_object(obj)
+    processed_obj = process_object(obj, api_docs)
     if processed_obj is None:
         raise ValueError(f"Failed to process object: {obj}")
 
     return render_object(processed_obj, doc_path)
 
 
-def render_directive(directive: RawDirective, module: Module, doc_path: str) -> str:
+def render_directive(directive: RawDirective, module: Module, doc_path: str, api_docs: "ApiDocumentation") -> str:
     """Process an API directive and generate documentation.
 
     Args:
@@ -129,4 +135,4 @@ def render_directive(directive: RawDirective, module: Module, doc_path: str) -> 
                 )
 
     # Use the document_object dispatcher function
-    return document_object(current_obj, doc_path)
+    return document_object(current_obj, doc_path, api_docs)

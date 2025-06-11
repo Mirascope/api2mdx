@@ -247,7 +247,9 @@ class DocumentationGenerator:
                     object_path=directive.api_object.object_path,
                     object_type=directive.api_object.object_type
                 )
-                doc_content = render_directive(raw_directive, self.module, doc_path)
+                if not self.api_documentation:
+                    raise RuntimeError("API documentation must be initialized before processing directives")
+                doc_content = render_directive(raw_directive, self.module, doc_path, self.api_documentation)
                 f.write(doc_content)
                 f.write("\n\n")
 
