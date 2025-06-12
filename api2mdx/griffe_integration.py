@@ -72,7 +72,7 @@ def document_object(
     if processed_obj is None:
         raise ValueError(f"Failed to process object: {obj}")
 
-    return render_object(processed_obj, doc_path)
+    return render_object(processed_obj, doc_path, api_docs)
 
 
 def render_directive(

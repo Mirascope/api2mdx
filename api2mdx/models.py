@@ -28,11 +28,16 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from api2mdx.api_discovery import ApiDocumentation
 
+from api2mdx.api_discovery import ObjectPath
+
+
+
 # Configure logging
 logging.basicConfig(
     level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 )
 logger = logging.getLogger(__name__)
+
 
 
 def extract_clean_docstring(obj: Object | Alias) -> str | None:
@@ -115,8 +120,9 @@ class ProcessedAttribute:
     """Represents a fully processed class attribute ready for rendering."""
 
     name: str
-    type_info: TypeInfo  # Using the TypeInfo from type_model
+    type_info: TypeInfo
     description: str | None
+    object_path: ObjectPath
 
 
 @dataclass
@@ -132,6 +138,7 @@ class ProcessedFunction:
     parameters: list[ParameterInfo]
     return_info: ReturnInfo | None
     module_path: str
+    object_path: ObjectPath
 
 
 @dataclass
@@ -148,6 +155,7 @@ class ProcessedAlias:
     return_info: ReturnInfo | None
     target_path: str
     module_path: str
+    object_path: ObjectPath
 
 
 @dataclass
@@ -163,6 +171,7 @@ class ProcessedClass:
     bases: list[TypeInfo]
     members: list["ProcessedObject"]
     module_path: str
+    object_path: ObjectPath
 
 
 @dataclass
@@ -177,6 +186,7 @@ class ProcessedModule:
     docstring: str | None
     members: list["ProcessedObject"]
     module_path: str
+    object_path: ObjectPath
 
 
 ProcessedObject = (
@@ -218,6 +228,7 @@ def process_function(func_obj: Function, api_docs: "ApiDocumentation") -> Proces
         parameters=params or [],
         return_info=return_info,
         module_path=module_path,
+        object_path=ObjectPath(func_obj.canonical_path),
     )
 
 
@@ -280,6 +291,7 @@ def process_class(class_obj: Class, api_docs: "ApiDocumentation") -> ProcessedCl
         bases=bases,
         members=processed_members,
         module_path=module_path,
+        object_path=ObjectPath(class_obj.canonical_path),
     )
 
 
@@ -287,7 +299,7 @@ def process_attribute(obj: Attribute, api_docs: "ApiDocumentation") -> Processed
     name = getattr(obj, "name", "")
     type_info = extract_attribute_type_info(obj)
     descr = extract_clean_docstring(obj)
-    return ProcessedAttribute(name=name, type_info=type_info, description=descr)
+    return ProcessedAttribute(name=name, type_info=type_info, description=descr, object_path=ObjectPath(obj.canonical_path))
 
 
 def process_object(obj: Object | Alias, api_docs: "ApiDocumentation") -> ProcessedObject | None:
@@ -386,6 +398,7 @@ def process_module(module_obj: Module, api_docs: "ApiDocumentation") -> Processe
         docstring=docstring,
         members=processed_members,
         module_path=module_path,
+        object_path=ObjectPath(module_obj.canonical_path),
     )
 
 
@@ -416,6 +429,7 @@ def process_alias(alias_obj: Alias, api_docs: "ApiDocumentation") -> ProcessedAl
     target_path = ""
     if hasattr(alias_obj, "target") and alias_obj.target:
         target_path = getattr(alias_obj.target, "path", str(alias_obj.target))
+    
     # Create and return the processed alias
     return ProcessedAlias(
         name=name,
@@ -424,4 +438,5 @@ def process_alias(alias_obj: Alias, api_docs: "ApiDocumentation") -> ProcessedAl
         return_info=return_info,
         target_path=target_path,
         module_path=module_path,
+        object_path=ObjectPath(alias_obj.canonical_path),
     )

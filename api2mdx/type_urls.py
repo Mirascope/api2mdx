@@ -69,6 +69,9 @@ BUILTIN_TYPE_URLS: dict[str, str] = {
     "TypeAlias": f"{PYTHON_DOCS_BASE}typing.html#typing.TypeAlias",
     "Unpack": f"{PYTHON_DOCS_BASE}typing.html#typing.Unpack",
     "Enum": f"{PYTHON_DOCS_BASE}enum.html#enum.Enum",
+    "ParamSpec": f"{PYTHON_DOCS_BASE}typing.html#typing.ParamSpec",
+    # Dataclasses module
+    "dataclass": f"{PYTHON_DOCS_BASE}dataclasses.html#dataclasses.dataclass",
     # Collections module
     "deque": f"{PYTHON_DOCS_BASE}collections.html#collections.deque",
     "defaultdict": f"{PYTHON_DOCS_BASE}collections.html#collections.defaultdict",

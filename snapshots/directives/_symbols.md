@@ -98,6 +98,8 @@
 
 <SymbolRef name="OrderedDict" path="https://docs.python.org/3/library/collections.html#collections.OrderedDict.mdx" />
 
+<SymbolRef name="ParamSpec" path="https://docs.python.org/3/library/typing.html#typing.ParamSpec.mdx" />
+
 <SymbolRef name="Path" path="https://docs.python.org/3/library/pathlib.html#pathlib.Path.mdx" />
 
 <SymbolRef name="Protocol" path="https://docs.python.org/3/library/typing.html#typing.Protocol.mdx" />
@@ -171,6 +173,8 @@
 <SymbolRef name="complex" path="https://docs.python.org/3/library/functions.html#complex.mdx" />
 
 <SymbolRef name="content" path="index.mdx" />
+
+<SymbolRef name="dataclass" path="https://docs.python.org/3/library/dataclasses.html#dataclasses.dataclass.mdx" />
 
 <SymbolRef name="date" path="https://docs.python.org/3/library/datetime.html#datetime.date.mdx" />
 

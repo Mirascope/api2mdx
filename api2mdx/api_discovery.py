@@ -414,6 +414,28 @@ class ApiDocumentation:
         """Return number of pages."""
         return len(self.pages)
     
+    def get_slug(self, object_path: ObjectPath) -> Slug:
+        """Get a slug for an object path.
+        
+        If the object path exists in the API registry, return its canonical slug.
+        Otherwise, generate a slug by converting the path (replace dots with hyphens and apply kebab-case).
+        
+        Args:
+            object_path: The object path to get a slug for
+            
+        Returns:
+            A unique slug for the object
+        """
+        # First try to get it from the API registry
+        if object_path in self._api_objects_registry:
+            return self._api_objects_registry[object_path].canonical_slug
+        
+        # Otherwise, generate a slug from the path
+        # Replace dots with hyphens and apply kebab-case conversion
+        path_str = str(object_path).replace(".", "-")
+        kebab_path = self._camel_to_kebab(path_str)
+        return Slug(kebab_path)
+
     def print_unresolved_symbols(self) -> None:
         """Print all symbols that could not be resolved to URLs."""
         if not self._unresolved_symbols:

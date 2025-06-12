@@ -28,12 +28,12 @@ class ApiType:
     """Represents an <ApiType> MDX component."""
 
     type: ApiTypeKind
-    path: str  # Document path
+    slug: str  # Canonical slug
     symbol_name: str  # Name of the symbol
 
     def render(self) -> str:
         """Render the ApiType component as a string."""
-        return f'<ApiType type="{self.type.value}" path="{self.path}" symbolName="{self.symbol_name}" />'
+        return f'<ApiType type="{self.type.value}" slug="{self.slug}" symbolName="{self.symbol_name}" />'
 
 
 @dataclass

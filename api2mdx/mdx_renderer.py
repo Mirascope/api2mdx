@@ -22,38 +22,52 @@ from api2mdx.mdx_components import (
     AttributesTable,
 )
 
+# Forward declaration for type hints
+from typing import TYPE_CHECKING
 
-def render_object(processed_obj: ProcessedObject, doc_path: str) -> str:
+if TYPE_CHECKING:
+    from api2mdx.api_discovery import ApiDocumentation
+
+
+
+
+def render_object(
+    processed_obj: ProcessedObject, doc_path: str, api_docs: "ApiDocumentation"
+) -> str:
     """Render any processed object into MDX documentation.
 
     Args:
         processed_obj: The processed object to render
         doc_path: Path to the document, used for API component links
+        api_docs: The API documentation registry
 
     Returns:
         MDX documentation string
 
     """
     if isinstance(processed_obj, ProcessedModule):
-        return render_module(processed_obj, doc_path)
+        return render_module(processed_obj, doc_path, api_docs)
     elif isinstance(processed_obj, ProcessedClass):
-        return render_class(processed_obj, doc_path)
+        return render_class(processed_obj, doc_path, api_docs)
     elif isinstance(processed_obj, ProcessedFunction):
-        return render_function(processed_obj, doc_path)
+        return render_function(processed_obj, doc_path, api_docs)
     elif isinstance(processed_obj, ProcessedAttribute):
-        return render_attribute(processed_obj, doc_path)
+        return render_attribute(processed_obj, doc_path, api_docs)
     elif isinstance(processed_obj, ProcessedAlias):
-        return render_alias(processed_obj, doc_path)
+        return render_alias(processed_obj, doc_path, api_docs)
     else:
         raise ValueError(f"Unsupported object type: {type(processed_obj)}")
 
 
-def render_module(processed_module: ProcessedModule, doc_path: str) -> str:
+def render_module(
+    processed_module: ProcessedModule, doc_path: str, api_docs: "ApiDocumentation"
+) -> str:
     """Render a processed module into MDX documentation.
 
     Args:
         processed_module: The processed module object to render
         doc_path: Path to the document, used for API component links
+        api_docs: The API documentation registry
 
     Returns:
         MDX documentation string
@@ -69,7 +83,7 @@ def render_module(processed_module: ProcessedModule, doc_path: str) -> str:
             content.append("")
 
         # Add the single member item
-        content.append(render_object(processed_module.members[0], doc_path))
+        content.append(render_object(processed_module.members[0], doc_path, api_docs))
 
         return "\n".join(content)
 
@@ -80,7 +94,8 @@ def render_module(processed_module: ProcessedModule, doc_path: str) -> str:
     module_name = processed_module.module_path.split(".")[-1]
 
     # Add heading with embedded ApiType component
-    api_type = ApiType(ApiTypeKind.MODULE, doc_path, module_name)
+    slug = api_docs.get_slug(processed_module.object_path)
+    api_type = ApiType(ApiTypeKind.MODULE, slug, module_name)
     content.append(f"## {api_type.render()} {module_name}\n")
 
     # Add docstring if available
@@ -88,20 +103,23 @@ def render_module(processed_module: ProcessedModule, doc_path: str) -> str:
         content.append(processed_module.docstring.strip())
         content.append("")
 
-    # Render all members in order
-    for member in processed_module.members:
-        content.append(render_object(member, doc_path))
-        content.append("")
+    # # Render all members in order
+    # for member in processed_module.members:
+    #     content.append(render_object(member, doc_path, api_docs))
+    #     content.append("")
 
     return "\n".join(content)
 
 
-def render_function(processed_func: ProcessedFunction, doc_path: str) -> str:
+def render_function(
+    processed_func: ProcessedFunction, doc_path: str, api_docs: "ApiDocumentation"
+) -> str:
     """Render a processed function into MDX documentation.
 
     Args:
         processed_func: The processed function object to render
         doc_path: Path to the document, used for API component links
+        api_docs: The API documentation registry
 
     Returns:
         MDX documentation string
@@ -110,7 +128,8 @@ def render_function(processed_func: ProcessedFunction, doc_path: str) -> str:
     content: list[str] = []
 
     # Add heading with embedded ApiType component
-    api_type = ApiType(ApiTypeKind.FUNCTION, doc_path, processed_func.name)
+    slug = api_docs.get_slug(processed_func.object_path)
+    api_type = ApiType(ApiTypeKind.FUNCTION, slug, processed_func.name)
     content.append(f"## {api_type.render()} {processed_func.name}\n")
 
     # Add docstring if available
@@ -131,12 +150,15 @@ def render_function(processed_func: ProcessedFunction, doc_path: str) -> str:
     return "\n".join(content)
 
 
-def render_class(processed_class: ProcessedClass, doc_path: str) -> str:
+def render_class(
+    processed_class: ProcessedClass, doc_path: str, api_docs: "ApiDocumentation"
+) -> str:
     """Render a processed class into MDX documentation.
 
     Args:
         processed_class: The processed class object to render
         doc_path: Path to the document, used for API component links
+        api_docs: The API documentation registry
 
     Returns:
         MDX documentation string
@@ -145,7 +167,8 @@ def render_class(processed_class: ProcessedClass, doc_path: str) -> str:
     content: list[str] = []
 
     # Add heading with embedded ApiType component
-    api_type = ApiType(ApiTypeKind.CLASS, doc_path, processed_class.name)
+    slug = api_docs.get_slug(processed_class.object_path)
+    api_type = ApiType(ApiTypeKind.CLASS, slug, processed_class.name)
     content.append(f"## {api_type.render()} {processed_class.name}\n")
 
     # Add docstring if available
@@ -176,18 +199,21 @@ def render_class(processed_class: ProcessedClass, doc_path: str) -> str:
     # Render other members in order (except attributes which are in the table)
     for member in processed_class.members:
         if not isinstance(member, ProcessedAttribute):
-            content.append(render_object(member, doc_path))
+            content.append(render_object(member, doc_path, api_docs))
             content.append("")
 
     return "\n".join(content)
 
 
-def render_attribute(processed_attr: ProcessedAttribute, doc_path: str) -> str:
+def render_attribute(
+    processed_attr: ProcessedAttribute, doc_path: str, api_docs: "ApiDocumentation"
+) -> str:
     """Render a processed attribute into MDX documentation.
 
     Args:
         processed_attr: The processed attribute object to render
         doc_path: Path to the document, used for API component links
+        api_docs: The API documentation registry
 
     Returns:
         MDX documentation string
@@ -196,7 +222,8 @@ def render_attribute(processed_attr: ProcessedAttribute, doc_path: str) -> str:
     content: list[str] = []
 
     # Add heading with embedded ApiType component
-    api_type = ApiType(ApiTypeKind.ATTRIBUTE, doc_path, processed_attr.name)
+    slug = api_docs.get_slug(processed_attr.object_path)
+    api_type = ApiType(ApiTypeKind.ATTRIBUTE, slug, processed_attr.name)
     content.append(f"## {api_type.render()} {processed_attr.name}\n")
 
     # Add type information
@@ -211,12 +238,15 @@ def render_attribute(processed_attr: ProcessedAttribute, doc_path: str) -> str:
     return "\n".join(content)
 
 
-def render_alias(processed_alias: ProcessedAlias, doc_path: str) -> str:
+def render_alias(
+    processed_alias: ProcessedAlias, doc_path: str, api_docs: "ApiDocumentation"
+) -> str:
     """Render a processed alias into MDX documentation.
 
     Args:
         processed_alias: The processed alias object to render
         doc_path: Path to the document, used for API component links
+        api_docs: The API documentation registry
 
     Returns:
         MDX documentation string
@@ -225,7 +255,8 @@ def render_alias(processed_alias: ProcessedAlias, doc_path: str) -> str:
     content: list[str] = []
 
     # Add heading with embedded ApiType component
-    api_type = ApiType(ApiTypeKind.ALIAS, doc_path, processed_alias.name)
+    slug = api_docs.get_slug(processed_alias.object_path)
+    api_type = ApiType(ApiTypeKind.ALIAS, slug, processed_alias.name)
     content.append(f"## {api_type.render()} {processed_alias.name}\n")
     # Add docstring if available
     if processed_alias.docstring:
