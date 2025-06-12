@@ -54,6 +54,8 @@ def resolve_symbol_url(symbol_name: str, api_docs: ApiDocumentation) -> str | No
         # Otherwise, construct relative URL with api_root
         return f"{api_docs.api_root}/{api_object.canonical_docs_path}#{api_object.canonical_slug}"
     
+    # Track unresolved symbols
+    api_docs._unresolved_symbols.add(symbol_name)
     return None
 
 

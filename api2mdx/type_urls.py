@@ -65,6 +65,10 @@ BUILTIN_TYPE_URLS: dict[str, str] = {
     "TypedDict": f"{PYTHON_DOCS_BASE}typing.html#typing.TypedDict",
     "NotRequired": f"{PYTHON_DOCS_BASE}typing.html#typing.NotRequired",
     "Required": f"{PYTHON_DOCS_BASE}typing.html#typing.Required",
+    "Sequence": f"{PYTHON_DOCS_BASE}typing.html#typing.Sequence",
+    "TypeAlias": f"{PYTHON_DOCS_BASE}typing.html#typing.TypeAlias",
+    "Unpack": f"{PYTHON_DOCS_BASE}typing.html#typing.Unpack",
+    "Enum": f"{PYTHON_DOCS_BASE}enum.html#enum.Enum",
     # Collections module
     "deque": f"{PYTHON_DOCS_BASE}collections.html#collections.deque",
     "defaultdict": f"{PYTHON_DOCS_BASE}collections.html#collections.defaultdict",

@@ -106,6 +106,8 @@
 
 <SymbolRef name="ResponseContent" path="responses.mdx" />
 
+<SymbolRef name="Sequence" path="https://docs.python.org/3/library/typing.html#typing.Sequence.mdx" />
+
 <SymbolRef name="Set" path="https://docs.python.org/3/library/typing.html#typing.Set.mdx" />
 
 <SymbolRef name="StopIteration" path="https://docs.python.org/3/library/exceptions.html#StopIteration.mdx" />
@@ -134,11 +136,15 @@
 
 <SymbolRef name="Type" path="https://docs.python.org/3/library/typing.html#typing.Type.mdx" />
 
+<SymbolRef name="TypeAlias" path="https://docs.python.org/3/library/typing.html#typing.TypeAlias.mdx" />
+
 <SymbolRef name="TypeVar" path="https://docs.python.org/3/library/typing.html#typing.TypeVar.mdx" />
 
 <SymbolRef name="TypedDict" path="https://docs.python.org/3/library/typing.html#typing.TypedDict.mdx" />
 
 <SymbolRef name="Union" path="https://docs.python.org/3/library/typing.html#typing.Union.mdx" />
+
+<SymbolRef name="Unpack" path="https://docs.python.org/3/library/typing.html#typing.Unpack.mdx" />
 
 <SymbolRef name="Usage" path="responses.mdx" />
 

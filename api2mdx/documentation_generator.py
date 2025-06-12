@@ -88,6 +88,9 @@ class DocumentationGenerator:
 
         # Generate metadata
         self._generate_meta_file()
+        
+        # Print any unresolved symbols for debugging
+        self.api_documentation.print_unresolved_symbols()
 
     def generate_directive(self, api_directive: DirectivesPage) -> None:
         """Generate documentation for a specific directive.

@@ -193,6 +193,8 @@ class ApiDocumentation:
         self._api_objects_registry = self._build_api_objects_registry()
         self._build_symbol_registry()
         self.pages = self._build_enriched_pages()
+        # Track symbols that we can't find URLs for
+        self._unresolved_symbols: set[str] = set()
 
     def _build_api_objects_registry(self) -> dict[ObjectPath, ApiObject]:
         """Build a registry of all API objects with their canonical properties.
@@ -411,6 +413,17 @@ class ApiDocumentation:
     def __len__(self):
         """Return number of pages."""
         return len(self.pages)
+    
+    def print_unresolved_symbols(self) -> None:
+        """Print all symbols that could not be resolved to URLs."""
+        if not self._unresolved_symbols:
+            print("✅ All symbols resolved successfully!")
+            return
+            
+        print(f"\n⚠️  Found {len(self._unresolved_symbols)} unresolved symbols:")
+        for symbol in sorted(self._unresolved_symbols):
+            print(f"  - {symbol}")
+        print()
 
     @classmethod
     def from_module(cls, module: Module, api_root: str = DEFAULT_API_ROOT) -> "ApiDocumentation":
