@@ -12,7 +12,6 @@ import argparse
 import sys
 from pathlib import Path
 
-from api2mdx.doclinks_postprocessor import process_doc_links
 from api2mdx.documentation_generator import DocumentationGenerator
 
 
@@ -40,10 +39,6 @@ def generate_documentation(
         # Initialize and generate documentation
         generator = DocumentationGenerator(source_path, package, docs_path, output_path)
         generator.generate_all(directive_output_path=directive_output_path)
-
-        # Process documentation links
-        modified_count = process_doc_links(str(output_path))
-        print(f"Processed documentation links, modified {modified_count} files")
 
         print(f"Successfully generated documentation for {package}")
         return True

@@ -46,6 +46,12 @@ def resolve_symbol_url(symbol_name: str, api_docs: ApiDocumentation) -> str | No
     """
     if symbol_name in api_docs._symbol_registry:
         api_object = api_docs._symbol_registry[symbol_name]
+        
+        # If canonical_docs_path is already a full URL (e.g., Python docs), return it as-is
+        if api_object.canonical_docs_path.startswith(('http://', 'https://')):
+            return api_object.canonical_docs_path
+        
+        # Otherwise, construct relative URL with api_root
         return f"{api_docs.api_root}/{api_object.canonical_docs_path}#{api_object.canonical_slug}"
     
     return None
@@ -61,12 +67,12 @@ def _resolve_url_for_type_info(type_info: TypeInfo, api_docs: ApiDocumentation) 
         api_docs: The ApiDocumentation registry containing symbol mappings
     """
     if isinstance(type_info, SimpleType):
-        if type_info.doc_identifier:
-            type_info.url = resolve_symbol_url(type_info.doc_identifier, api_docs)
+        if type_info.symbol_name:
+            type_info.doc_url = resolve_symbol_url(type_info.symbol_name, api_docs)
     elif isinstance(type_info, GenericType):
         # Resolve URL for the base type
-        if type_info.base_type.doc_identifier:
-            type_info.base_type.url = resolve_symbol_url(type_info.base_type.doc_identifier, api_docs)
+        if type_info.base_type.symbol_name:
+            type_info.base_type.doc_url = resolve_symbol_url(type_info.base_type.symbol_name, api_docs)
         
         # Recursively resolve URLs for all parameters
         for param in type_info.parameters:

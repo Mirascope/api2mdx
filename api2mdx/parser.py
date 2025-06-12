@@ -126,7 +126,7 @@ class Parser:
             type_str = " | ".join(t.type_str for t in union_types)
 
             # Create a UnionType (represented as a GenericType with "Union" base type)
-            base_type = SimpleType(type_str="Union", doc_identifier="Union")
+            base_type = SimpleType(type_str="Union", symbol_name="Union")
             return GenericType(
                 type_str=type_str,
                 base_type=base_type,
@@ -166,8 +166,8 @@ class Parser:
                 return self.parse_generic_type(identifier)
 
             # Otherwise, it's a simple type
-            # Use the type name itself as the doc_identifier
-            return SimpleType(type_str=identifier, doc_identifier=identifier)
+            # Use the type name itself as the symbol_name
+            return SimpleType(type_str=identifier, symbol_name=identifier)
 
         raise ParseError(f"Unexpected token: {token.type.name} '{token.value}'")
 
@@ -181,8 +181,8 @@ class Parser:
             A GenericType representing the parsed type
 
         """
-        # Create the base type with documentation identifier
-        base_type = SimpleType(type_str=base_type_str, doc_identifier=base_type_str)
+        # Create the base type with symbol name
+        base_type = SimpleType(type_str=base_type_str, symbol_name=base_type_str)
 
         # Consume the open bracket
         self.expect_token_type(TokenType.OPEN_BRACKET)
@@ -287,7 +287,7 @@ class Parser:
         type_str = f"[{', '.join(element_strs)}]"
 
         # Create and return the tuple type (as a generic with TUPLE kind)
-        base_type = SimpleType(type_str="tuple", doc_identifier="tuple")
+        base_type = SimpleType(type_str="tuple", symbol_name="tuple")
         return GenericType(
             type_str=type_str,
             base_type=base_type,

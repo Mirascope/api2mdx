@@ -78,8 +78,6 @@ BUILTIN_TYPE_URLS: dict[str, str] = {
     "date": f"{PYTHON_DOCS_BASE}datetime.html#datetime.date",
     "time": f"{PYTHON_DOCS_BASE}datetime.html#datetime.time",
     "timedelta": f"{PYTHON_DOCS_BASE}datetime.html#datetime.timedelta",
-    "re.Pattern": f"{PYTHON_DOCS_BASE}re.html#re.Pattern",
-    "re.Match": f"{PYTHON_DOCS_BASE}re.html#re.Match",
 }
 
 

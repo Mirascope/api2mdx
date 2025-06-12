@@ -130,8 +130,7 @@ class DocumentationGenerator:
             # Get docs path for this directive page (without .mdx extension)
             docs_path = api_directive.file_path.replace(".mdx", "")
             directive_content = f"# {api_directive.name}\n\n" + "\n\n".join(
-                directive.render(docs_path)
-                for directive in api_directive.directives
+                directive.render(docs_path) for directive in api_directive.directives
             )
 
             # Write to .md file in directive output directory
@@ -172,7 +171,7 @@ class DocumentationGenerator:
             sys.path.insert(0, str(self.source_path))
 
             # Load the module with basic loader
-            loader = get_loader(self.source_path)
+            loader = get_loader()
 
             # Try to preload common external dependencies to improve alias resolution
             common_dependencies = [
@@ -243,13 +242,18 @@ class DocumentationGenerator:
             for directive in directives_page.directives:
                 # Create a RawDirective from the ApiObject for rendering
                 from api2mdx.api_discovery import RawDirective
+
                 raw_directive = RawDirective(
                     object_path=directive.api_object.object_path,
-                    object_type=directive.api_object.object_type
+                    object_type=directive.api_object.object_type,
                 )
                 if not self.api_documentation:
-                    raise RuntimeError("API documentation must be initialized before processing directives")
-                doc_content = render_directive(raw_directive, self.module, doc_path, self.api_documentation)
+                    raise RuntimeError(
+                        "API documentation must be initialized before processing directives"
+                    )
+                doc_content = render_directive(
+                    raw_directive, self.module, doc_path, self.api_documentation
+                )
                 f.write(doc_content)
                 f.write("\n\n")
 

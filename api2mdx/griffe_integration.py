@@ -24,7 +24,6 @@ from griffe import (
     Parser,
 )
 
-from api2mdx.doclinks import UpdateDocstringsExtension
 from api2mdx.mdx_renderer import (
     render_object,
 )
@@ -32,6 +31,7 @@ from api2mdx.api_discovery import RawDirective
 
 # Forward declaration for type hints
 from typing import TYPE_CHECKING
+
 if TYPE_CHECKING:
     from api2mdx.api_discovery import ApiDocumentation
 
@@ -43,37 +43,20 @@ from api2mdx.models import (
 MODULE_CONTENT_SUBPATH = "docs/mirascope"
 
 
-def get_loader(
-    source_path: Path,
-    content_dir: Path | None = None,
-    content_subpath: str | None = None,
-) -> GriffeLoader:
-    """Create a configured Griffe loader.
-
-    Args:
-        source_path: Path to the source code directory
-        content_dir: Path to the content directory for the doclinks extension
-        content_subpath: Subpath (eg /docs/mirascope) for local link evaluation
-
-    Returns:
-        A configured GriffeLoader instance
-
-    """
+def get_loader() -> GriffeLoader:
+    """Create a configured Griffe loader."""
     # Set up the parser for Google-style docstrings
     parser = Parser("google")
 
     # Create loader with specified docstring parser
     loader = GriffeLoader(docstring_parser=parser)
 
-    # Add the doclinks extension if content_dir is provided
-    if content_dir and content_subpath:
-        extensions = Extensions(UpdateDocstringsExtension(content_dir, content_subpath))
-        loader.extensions = extensions
-
     return loader
 
 
-def document_object(obj: Object | Alias, doc_path: str, api_docs: "ApiDocumentation") -> str:
+def document_object(
+    obj: Object | Alias, doc_path: str, api_docs: "ApiDocumentation"
+) -> str:
     """Generate documentation for any supported Griffe object type.
 
     Args:
@@ -92,7 +75,9 @@ def document_object(obj: Object | Alias, doc_path: str, api_docs: "ApiDocumentat
     return render_object(processed_obj, doc_path)
 
 
-def render_directive(directive: RawDirective, module: Module, doc_path: str, api_docs: "ApiDocumentation") -> str:
+def render_directive(
+    directive: RawDirective, module: Module, doc_path: str, api_docs: "ApiDocumentation"
+) -> str:
     """Process an API directive and generate documentation.
 
     Args:

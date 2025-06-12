@@ -11,6 +11,7 @@ from enum import Enum
 from typing import NewType
 from griffe import Alias, Attribute, Class, Function, Module, Object
 
+from .type_urls import BUILTIN_TYPE_URLS
 
 # Default API documentation root path
 DEFAULT_API_ROOT = "/docs/api"
@@ -197,12 +198,27 @@ class ApiDocumentation:
         """Build a registry of all API objects with their canonical properties.
 
         Uses conflict resolution to ensure unique slugs and first encounter for canonical docs path.
+        Starts by adding builtin Python types, then adds package-specific types.
 
         Returns:
             Dictionary mapping ObjectPath -> ApiObject
         """
         registry: dict[ObjectPath, ApiObject] = {}
         used_slugs: dict[str, ObjectPath] = {}
+
+        # First, add builtin Python types from type_urls.py
+        for type_name, doc_url in BUILTIN_TYPE_URLS.items():
+            # Create ApiObject for builtin type
+            base_slug = self._camel_to_kebab(type_name)
+            api_object = ApiObject(
+                object_path=ObjectPath(type_name),
+                object_type=DirectiveType.ALIAS,  # Treat as external alias
+                canonical_slug=Slug(base_slug),
+                canonical_docs_path=doc_url,  # Use the full external URL as the path
+                symbol_name=type_name
+            )
+            registry[ObjectPath(type_name)] = api_object
+            used_slugs[base_slug] = ObjectPath(type_name)
 
         # Type suffix mappings for disambiguation
         type_suffixes = {
