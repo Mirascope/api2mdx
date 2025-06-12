@@ -58,6 +58,8 @@
 
 <SymbolRef name="Document" path="content.mdx" />
 
+<SymbolRef name="Enum" path="https://docs.python.org/3/library/enum.html#enum.Enum.mdx" />
+
 <SymbolRef name="EnvironmentError" path="https://docs.python.org/3/library/exceptions.html#EnvironmentError.mdx" />
 
 <SymbolRef name="Exception" path="https://docs.python.org/3/library/exceptions.html#Exception.mdx" />

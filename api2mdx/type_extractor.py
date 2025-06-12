@@ -44,6 +44,10 @@ def resolve_symbol_url(symbol_name: str, api_docs: ApiDocumentation) -> str | No
     Returns:
         Canonical URL if symbol is found in registry, None otherwise
     """
+    # Skip ellipsis - it's a literal syntax, not a type to resolve
+    if symbol_name == "...":
+        return None
+        
     if symbol_name in api_docs._symbol_registry:
         api_object = api_docs._symbol_registry[symbol_name]
         
@@ -54,7 +58,7 @@ def resolve_symbol_url(symbol_name: str, api_docs: ApiDocumentation) -> str | No
         # Otherwise, construct relative URL with api_root
         return f"{api_docs.api_root}/{api_object.canonical_docs_path}#{api_object.canonical_slug}"
     
-    # Track unresolved symbols
+    # Track unresolved symbols (but not ellipsis)
     api_docs._unresolved_symbols.add(symbol_name)
     return None
 
